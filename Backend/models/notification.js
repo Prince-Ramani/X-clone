@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
-
 const notificationSchema = new mongoose.Schema({
     to : {
       type : mongoose.Schema.Types.ObjectId,
@@ -9,7 +8,7 @@ const notificationSchema = new mongoose.Schema({
     },
     from : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : "User" ,
+        ref : "User",
         required : true 
       },
       topic :{

@@ -1,7 +1,9 @@
 const Notification = require("../models/notification");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
-const { v2: cloudinary } = require("cloudinary");
+const {cloudinary} = require("../Cloudinary/cloudinary")
+
+const {unlink} = require("fs")
 
 const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -44,10 +46,9 @@ const followPerson = async (req, res) => {
       await User.findByIdAndUpdate(me.id, {
         $push: { following: userToFollow.id },
       });
-      await User.findByIdAndUpdate(userToFollow.id, {
+       await User.findByIdAndUpdate(userToFollow.id, {
         $push: { followers: me.id },
       });
-
       const informing = new Notification({
         to: userToFollow.id,
         from: me.id,
@@ -56,20 +57,20 @@ const followPerson = async (req, res) => {
       });
       await informing.save();
 
-      return res.status(400).json({ message: "followed successfully" });
+      return res.status(200).json({ message: "followed successfully"});
     } else {
       //Unfollow
       await User.findByIdAndUpdate(me.id, {
         $pull: { following: userToFollow.id },
       });
-      await User.findByIdAndUpdate(userToFollow.id, {
+     const updated =  await User.findByIdAndUpdate(userToFollow.id, {
         $pull: { followers: me.id },
       });
       await Notification.findOneAndDelete(
         { to: userToFollow.id },
         { from: me.id }
       );
-      return res.status(400).json({ message: "unfollowed successfully" });
+      return res.status(200).json({ message: "unfollowed successfully" });
     }
   } catch (err) {
     return res.status(500).json({ message: "Internal server error" });
@@ -79,11 +80,12 @@ const followPerson = async (req, res) => {
 const getUserNotifications = async (req, res) => {
   try {
     const myself = await User.findById(req.user);
-    const noti = await Notification.find({ to: myself.id, read: false });
-
-    if (!noti) {
-      return res.status(200).json("You don,t have any new notification");
-    }
+    const noti = await Notification.find({
+      to: myself.id,
+    }).populate({
+      path: "from",
+      select: "-password",
+    });
     await Notification.updateMany(
       { to: myself.id, read: false },
       { read: true }
@@ -96,7 +98,7 @@ const getUserNotifications = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { username, email, newpass, password, bio, links } = req.body;
+    var { username, email, newpass, password, bio, links } = req.body;
     let { profilePic, banner } = req.body;
     var newPassword, newUserName;
     if (!email || !password) {
@@ -107,8 +109,7 @@ const updateProfile = async (req, res) => {
     const valid = validateEmail(email);
     if (!valid) {
       return res.json({
-        error:
-          "Invalid email formate! A email must be in formate of ->xyz@something.com",
+        error: "Invalid email formate!",
       });
     }
     const user = await User.findById(req.user);
@@ -120,6 +121,7 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ error: "Incorrect password" });
     }
     if (username) {
+      username = username.trim();
       const userNameAvailable = await User.find({ username });
       if (userNameAvailable.length === 0) {
         newUserName = username;
@@ -128,16 +130,8 @@ const updateProfile = async (req, res) => {
       }
     }
     if (newpass) {
+      newpass = newpass.trim();
       newPassword = await bcrypt.hash(newpass, 10);
-    }
-    if (profilePic) {
-      if (user.profilePic) {
-        await cloudinary.uploader.destroy(
-          user.profilePic.split("/").pop().split(".")[0]
-        );
-      }
-      const uploadRes = await cloudinary.uploader.upload(profilePic);
-      profilePic = uploadRes.secure_url;
     }
     if (banner && user.banner) {
       await cloudinary.uploader.destroy(
@@ -148,7 +142,6 @@ const updateProfile = async (req, res) => {
     }
     user.username = newUserName || user.username;
     user.email = email;
-    user.password = newPassword || user.password;
     user.profilePic = profilePic || user.profilePic;
     user.banner = banner || user.banner;
     user.bio = bio || user.bio;
@@ -160,9 +153,92 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const findUser = async (req, res) => {
+  try {
+    const findUserName = req.params.name;
+    const data = await User.find({
+      username: { $regex: `^${findUserName}`, $options: "i" }
+    });
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const uploadProfilePic = async(req,res)=>{
+  try{
+  const {user : userID}= req;
+  const user = await User.findById(userID) ;
+      if (user.profilePic!=="defaultXprofile.jpg") {
+        const imgID= user.profilePic.split('/').slice(-1)[0].split('.')[0];
+        const foldername = "X-clone/Profile_pics"
+        const picID = `${foldername}/${imgID}`
+       const result =  await cloudinary.uploader.destroy(picID)
+      }
+      const uploadRes = await cloudinary.uploader.upload(req.file.path,{
+        folder : "X-clone/Profile_pics"
+      });
+      console.log(req.file.path)
+      unlink(req.file.path,(err)=>{
+          if(err){
+            console.log(err)
+          }
+        })
+        const pic = uploadRes.secure_url;
+        await User.findByIdAndUpdate(userID , {profilePic : pic})
+        return res.json({message : "Profile Picture updated successfully!"}).status(200)
+  }catch(err){
+    console.log(err)
+   return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+const updateBannerPic = async(req,res)=>{
+  try{
+  const {user : userID}= req;
+  const user = await User.findById(userID) ;
+      if (user.banner!=="defaultXbanner.jpg") {
+        const imgID= user.banner.split('/').slice(-1)[0].split('.')[0];
+        const foldername = "X-clone/Banners"
+        const picID = `${foldername}/${imgID}`
+       const result =  await cloudinary.uploader.destroy(picID)
+       }
+      const uploadRes = await cloudinary.uploader.upload(req.file.path,{
+        folder : "X-clone/Banners"
+      });
+      unlink(req.file.path,(err)=>{
+          if(err){
+            console.log(err)
+          }
+        })
+        const pic = uploadRes.secure_url;
+        await User.findByIdAndUpdate(userID , {banner : pic})
+        return res.json({message : "Banner updated successfully!"}).status(200)
+  }catch(err){
+    console.log(err)
+   return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+const suggestUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+
+    const suggest = await User.aggregate([{ $match: { _id: { $ne: user._id, $nin: user.following } } }, { $sample: { size: 5 } }]);
+    return res.status(200).json(suggest);
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: "Internal server error!" })
+  }
+}
 module.exports = {
   getProfile,
   followPerson,
   getUserNotifications,
   updateProfile,
+  findUser,
+  suggestUser,
+  uploadProfilePic,
+  updateBannerPic
 };
+

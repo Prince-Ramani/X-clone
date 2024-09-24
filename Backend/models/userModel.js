@@ -32,17 +32,17 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: String,
         required: false,
-        default: ""
+        default: "defaultXprofile.jpg"
     },
     banner: {
         type: String,
         required: false,
-        default: ""
+        default: "defaultXbanner.jpg"
     },
     bio: {
         type: String,
         required: false,
-        default: ""
+        default: "Hello myself ramani prince"
     },
     links: {
         type: String,

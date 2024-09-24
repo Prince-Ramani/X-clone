@@ -12,7 +12,7 @@ const validateEmail = (email) => {
 
 const createAccount = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    var { username, email, password } = req.body;
     const usernameExists = await User.findOne({ username });
     if (!username || !email || !password) {
       return res.status(400).json({ error: "All fields required" });
@@ -26,7 +26,7 @@ const createAccount = async (req, res) => {
     if (!valid) {
       return res.json({
         error:
-          "Invalid email formate! A email must be in formate of ->xyz@something.com",
+          "Invalid email formate!",
       });
     }
 
@@ -72,7 +72,9 @@ const createAccount = async (req, res) => {
 
 const loginAccount = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    var { email, password } = req.body;
+    email.trim();
+    password.trim();
     if (!email || !password) {
       return res.status(400).json({ error: "All fields required" });
     }
@@ -81,7 +83,7 @@ const loginAccount = async (req, res) => {
     if (!validEmail) {
       return res.json({
         error:
-          "Invalid email formate! A email must be in formate of ->xyz@something.com",
+          "Invalid email formate!",
       });
     }
 
@@ -130,6 +132,7 @@ const getMe = async (req, res) => {
       return res.status(400).json({ message: "You are not loggedin" });
     }
     return res.status(200).json({
+      _id : myself._id,
       username: myself.username,
       email: myself.email,
       followers: myself.followers,
