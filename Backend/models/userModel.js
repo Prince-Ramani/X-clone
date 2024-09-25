@@ -42,13 +42,13 @@ const userSchema = new mongoose.Schema({
     bio: {
         type: String,
         required: false,
-        default: "Hello myself ramani prince"
+        default: ""
     },
-    links: {
+    links: [{
         type: String,
         required: false,
         default: ""
-    },
+    }],
 },{
     timestamps :true
 });

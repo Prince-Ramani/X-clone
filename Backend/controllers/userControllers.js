@@ -99,7 +99,6 @@ const getUserNotifications = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     var { username, email, newpass, password, bio, links } = req.body;
-    let { profilePic, banner } = req.body;
     var newPassword, newUserName;
     if (!email || !password) {
       return res
@@ -113,6 +112,7 @@ const updateProfile = async (req, res) => {
       });
     }
     const user = await User.findById(req.user);
+    
     if (user.email !== email) {
       return res.status(400).json({ error: "Invalid email!" });
     }
@@ -133,23 +133,21 @@ const updateProfile = async (req, res) => {
       newpass = newpass.trim();
       newPassword = await bcrypt.hash(newpass, 10);
     }
-    if (banner && user.banner) {
-      await cloudinary.uploader.destroy(
-        user.banner.split("/").pop().split(".")[0]
-      );
-      const uploadRes = await cloudinary.uploader.upload(banner);
-      banner = uploadRes.secure_url;
+    if(links){
+      var newLinks = links.split(",");
+      if(newLinks.length>5)
+        return res.json({error : "Maximum number of links allowed are 5"})
     }
     user.username = newUserName || user.username;
     user.email = email;
-    user.profilePic = profilePic || user.profilePic;
-    user.banner = banner || user.banner;
+    user.password = newPassword || user.password;
     user.bio = bio || user.bio;
-    user.links = bio || user.links;
-    await user.save();
-    return res.status(200).json(user);
+    user.links = newLinks|| user.links;
+    let data = await user.save();
+    return res.status(200).json({message :"Profile updated"});
   } catch (err) {
-    res.status(500).json({ error: "Internal server error!" });
+    console.log(err)
+    return res.status(500).json({ error: "Internal server error!" });
   }
 };
 
@@ -158,7 +156,8 @@ const findUser = async (req, res) => {
     const findUserName = req.params.name;
     const data = await User.find({
       username: { $regex: `^${findUserName}`, $options: "i" }
-    });
+    }).select("-password");
+    
     return res.status(200).json(data);
   } catch (err) {
     console.log(err);
@@ -178,7 +177,6 @@ const uploadProfilePic = async(req,res)=>{
       const uploadRes = await cloudinary.uploader.upload(req.file.path,{
         folder : "X-clone/Profile_pics"
       });
-      console.log(req.file.path)
       unlink(req.file.path,(err)=>{
           if(err){
             console.log(err)

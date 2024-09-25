@@ -102,6 +102,16 @@ function App() {
           }
         ></Route>
         <Route
+          path="/update"
+          element={
+            !data?.error && isLoggedIn ? (
+              <Main name="Update" />
+            ) : (
+              <Navigate to={"/signup"} />
+            )
+          }
+        ></Route>
+        <Route
           path="*"
           element={
             !data?.error && isLoggedIn ? (

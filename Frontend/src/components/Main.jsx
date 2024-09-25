@@ -10,6 +10,7 @@ import ShowProfile from "./profile/ShowProfile";
 import UserProfile from "./profile/UserProfile";
 import NotificationDisplayer from "./list/NotificationDisplayer";
 import ShowComment from "./Comments/ShowComment";
+import UpdateProfile from "./Update Profile/UpdateProfile";
 
 function Main(props) {
   const [currentPage, setCurrentPage] = useState();
@@ -31,6 +32,7 @@ function Main(props) {
       {currentPage === "Searcheduser" ? <UserProfile /> : ""}
       {currentPage === "Search" ? <Search /> : ""}
       {currentPage === "Post" ? <ShowComment /> : ""}
+      {currentPage === "Update" ? <UpdateProfile /> : ""}
       <Suggestion />
     </div>
   );

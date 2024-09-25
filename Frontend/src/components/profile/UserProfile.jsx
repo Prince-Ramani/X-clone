@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
 import { useProfileContext } from "../../context/ProfileContex";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useFetcher, useNavigate } from "react-router-dom";
 import Postdisplayer from "../home/Postdisplayer";
 
 function UserProfile() {
@@ -25,7 +25,7 @@ function UserProfile() {
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
   //getting profile
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
+  const { data: authuser, refetch } = useQuery({ queryKey: ["authUser"] });
   const { data: profile } = useQuery({
     queryKey: ["userProfile", currentProfile, authuser],
     queryFn: async () => {
@@ -38,6 +38,10 @@ function UserProfile() {
       }
     },
     enabled: !!currentProfile,
+  });
+
+  useEffect(() => {
+    refetch();
   });
 
   //settng state
@@ -72,7 +76,6 @@ function UserProfile() {
     refetchOnWindowFocus: false,
     enabled: !!profile,
   });
-  console.log(profile?.banner);
 
   //following logic
   const { mutate: follow } = useMutation({
@@ -153,9 +156,20 @@ function UserProfile() {
               <span className="text-blue-400 font-medium">Bio : </span>
               {profile?.bio}
             </div>
-            <div>
-              <span className="text-blue-400 font-medium">Socials : </span>
-              {profile?.links}
+            <div className="flex flex-col ">
+              <span className="text-blue-400 font-medium ">Socials:</span>
+              {profile?.links.length > 0 &&
+                profile?.links.map((l) => (
+                  <div>
+                    <a
+                      href={l}
+                      className="text-blue-600  hover:text-gray-400"
+                      target="_blank"
+                    >
+                      {l}
+                    </a>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

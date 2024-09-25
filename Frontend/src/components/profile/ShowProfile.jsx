@@ -5,12 +5,14 @@ import { RiImageEditLine } from "react-icons/ri";
 import ProfilepicSkele from "../skeletons/ProfilepicSkele";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ShowProfile() {
   const { data: person } = useQuery({ queryKey: ["authUser"] });
-  const [uploadedProfilePic, setProfilePic] = useState(null);
   const querclient = useQueryClient();
+  const navigate = useNavigate();
+
+  console.log(person);
 
   const {
     data: userPosts,
@@ -114,7 +116,7 @@ function ShowProfile() {
         {isLoading || isPending ? (
           <div className="skeleton h-40 w-full"></div>
         ) : (
-          <div className="h-fit w-fit m-1 rounded-md  hover:border-2  relative group">
+          <div className="h-fit w-full m-1 rounded-md  hover:border-2  relative group">
             <label
               htmlFor="bannerUpload"
               className="hover:cursor-pointer group"
@@ -163,8 +165,13 @@ function ShowProfile() {
             {person.username}
           </div>
           <div className="ml-auto h-fit w-fit">
-            <button className="bg-green-600 p-2 rounded-md hover:border-2 active:bg-blue-500">
-              Update
+            <button
+              className="bg-green-600 p-2 rounded-md hover:border-2 active:bg-blue-500"
+              onClick={() => {
+                navigate("/update");
+              }}
+            >
+              Update Profile
             </button>
           </div>
         </div>
@@ -179,8 +186,21 @@ function ShowProfile() {
               {person.bio}
             </div>
             <div>
-              <span className="text-blue-400 font-medium">Socials : </span>
-              {person.links}
+              <div className="flex flex-col ">
+                <span className="text-blue-400 font-medium ">Socials:</span>
+                {person.links.length > 0 &&
+                  person.links.map((l) => (
+                    <div>
+                      <a
+                        href={l}
+                        className="text-blue-600  hover:text-gray-400"
+                        target="_blank"
+                      >
+                        {l}
+                      </a>
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
         </div>
