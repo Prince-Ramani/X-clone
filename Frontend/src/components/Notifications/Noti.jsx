@@ -17,10 +17,6 @@ function Noti() {
       try {
         const res = await fetch("api/auth/logout", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(),
         });
         const data = await res.json();
         if ("error" in data) toast.error(data.error);
@@ -48,7 +44,7 @@ function Noti() {
   }
 
   return (
-    <div className=" bg-black border-2 border-gray-600 hidden h-screen lg:block p-2 text-white sticky top-0 left  w-2/12 ">
+    <div className=" bg-black border-2 ml-auto border-gray-600 hidden h-screen lg:block p-2 text-white sticky top-0 left  w-2/12 ">
       <div className=" p-2 m-1">
         <FaXTwitter className="h-10 w-10 " />
       </div>

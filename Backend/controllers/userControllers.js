@@ -3,7 +3,8 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const {cloudinary} = require("../Cloudinary/cloudinary")
 
-const {unlink} = require("fs")
+const {unlink} = require("fs");
+const { default: mongoose } = require("mongoose");
 
 const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -229,6 +230,27 @@ const suggestUser = async (req, res) => {
     res.status(500).json({ error: "Internal server error!" })
   }
 }
+
+const getFollowersList = async(req,res)=>{
+  try{
+    const {personID} = req.query;
+    if(!personID ||  !mongoose.Types.ObjectId.isValid(personID)) return  res.status(404).json({error : "No such account exists!"})
+    const user = await User.findById(personID).select("followers").populate({
+      path : "followers",
+      select : "-password"
+    })
+    if(!user){
+      return res.status(404).json({error : "No such account exists!"})
+    }
+    return res.status(200).json(user.followers)
+
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+
 module.exports = {
   getProfile,
   followPerson,
@@ -237,6 +259,7 @@ module.exports = {
   findUser,
   suggestUser,
   uploadProfilePic,
-  updateBannerPic
+  updateBannerPic,
+  getFollowersList
 };
 

@@ -34,7 +34,6 @@ function Addpost() {
       }
       toast.success(`Post created successfully!`);
       navigate("/");
-      await querclient.invalidateQueries({ queryKey: ["myPosts"] });
     },
   });
 

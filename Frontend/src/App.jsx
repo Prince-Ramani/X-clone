@@ -1,11 +1,23 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import Home from "./components/home/Home";
 import Signup from "./components/singup/Signup";
-import Signin from "./components/signin/Signin";
-import Main from "./components/Main";
-
+import Noti from "./components/Notifications/Noti";
+import Suggestions from "./components/Suggestions/Suggestion";
 import Skele from "./components/skeletons/Skele";
-
+import NotificationDisplayer from "./components/list/NotificationDisplayer";
+import Search from "./components/search/Search";
+import UpdateProfile from "./components/Update Profile/UpdateProfile";
+import ShowProfile from "./components/profile/ShowProfile";
+import Addpost from "./components/Addpost/Addpost";
+import UserProfile from "./components/profile/UserProfile";
+import ShowComment from "./components/Comments/ShowComment";
+import Signin from "./components/signin/Signin";
 function App() {
   const { data, isPending, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -16,7 +28,7 @@ function App() {
     },
   });
 
-  var isLoggedIn = data ? true : false;
+  var isLoggedIn = data && !data.error;
 
   if (isLoading || isPending) {
     return (
@@ -27,102 +39,68 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/home"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Home" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/addpost"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Addpost" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Notifications" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/profile"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Profile" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/search"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Search" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/searchuser"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Searcheduser" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/post"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Post" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="/update"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Main name="Update" />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        ></Route>
-        <Route
-          path="*"
-          element={
-            !data?.error && isLoggedIn ? (
-              <Navigate to={"/home"} />
-            ) : (
-              <Navigate to={"/signup"} />
-            )
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <div className="flex border justify-center">
+        {isLoggedIn && <Noti />}
+        <Routes>
+          <Route
+            path="/signup"
+            element={!isLoggedIn ? <Signup /> : <Navigate to="/home" />}
+          />
+          <Route
+            path="/signin"
+            element={!isLoggedIn ? <Signin /> : <Navigate to="/home" />}
+          />
+          <Route
+            path="/home"
+            element={isLoggedIn ? <Home /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/notifications"
+            element={
+              isLoggedIn ? <NotificationDisplayer /> : <Navigate to="/signup" />
+            }
+          />
+          <Route
+            path="/search"
+            element={isLoggedIn ? <Search /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/searchuser"
+            element={isLoggedIn ? <UserProfile /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/profile"
+            element={isLoggedIn ? <ShowProfile /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/update"
+            element={isLoggedIn ? <UpdateProfile /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/addpost"
+            element={isLoggedIn ? <Addpost /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/addpost"
+            element={isLoggedIn ? <Addpost /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/post"
+            element={isLoggedIn ? <ShowComment /> : <Navigate to="/signup" />}
+          />
+
+          <Route
+            path="/*"
+            element={
+              isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/signup" />
+            }
+          />
+        </Routes>
+
+        {isLoggedIn && <Suggestions />}
+      </div>
+    </Router>
   );
 }
 

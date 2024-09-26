@@ -204,9 +204,14 @@ function ShowProfile() {
             </div>
           </div>
         </div>
-        <div className=" m-2">
+        <div className=" m-2 border">
           <div className="flex gap-2 items-center">
-            <div className=" p-1 text-gray-400 ">
+            <div
+              className=" p-1 text-gray-400"
+              onClick={() =>
+                navigate(`/getfollowers/${person.username}/${person._id}`)
+              }
+            >
               <span className=" font-bold mx-2 text-xl ">
                 {person.followers.length}
               </span>

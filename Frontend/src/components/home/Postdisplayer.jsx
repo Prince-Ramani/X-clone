@@ -41,7 +41,6 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
       if ("error" in data) return;
       toast.success(data.message);
       await queryclient.invalidateQueries({ queryKey: ["myPosts"] });
-      await queryclient.invalidateQueries({ queryKey: ["userPosts"] });
     },
   });
 

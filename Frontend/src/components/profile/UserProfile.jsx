@@ -15,17 +15,17 @@ function UserProfile() {
   const navigate = useNavigate();
   const queryclient = useQueryClient();
   const { currentProfile } = useProfileContext();
+  const { data: authuser, refetch } = useQuery({ queryKey: ["authUser"] });
 
   useEffect(() => {
     if (!currentProfile) navigate("/home");
-  }, [currentProfile]);
+  }, [currentProfile, navigate]);
 
   //state
   const [isauthuserFollowing, setAuthUserFollowing] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
   //getting profile
-  const { data: authuser, refetch } = useQuery({ queryKey: ["authUser"] });
   const { data: profile } = useQuery({
     queryKey: ["userProfile", currentProfile, authuser],
     queryFn: async () => {
@@ -40,21 +40,14 @@ function UserProfile() {
     enabled: !!currentProfile,
   });
 
-  useEffect(() => {
-    refetch();
-  });
-
   //settng state
   useEffect(() => {
-    if (
-      profile &&
-      JSON.stringify(authuser?.following) !== JSON.stringify(totalFollowing)
-    ) {
+    if (profile) {
       setAuthUserFollowing([...authuser.following]);
       setTotalFollowing([...profile.following]);
       setTotalFollowers([...profile.followers]);
     }
-  }, [profile, currentProfile, authuser]);
+  }, [profile, authuser]);
 
   //getting post
   const {
@@ -67,13 +60,11 @@ function UserProfile() {
       try {
         const res = await fetch(`/api/post/profile/${profile?._id}`);
         const data = await res.json();
-        console.log(data);
         return data;
       } catch (err) {
         console.log(err);
       }
     },
-    refetchOnWindowFocus: false,
     enabled: !!profile,
   });
 
@@ -97,10 +88,15 @@ function UserProfile() {
       if ("error" in data) {
         return toast.error(data.error);
       }
-      await queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success(data.message);
     },
   });
+
+  const handleFollowClick = (e) => {
+    e.preventDefault();
+    follow();
+  };
 
   return (
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
@@ -131,7 +127,10 @@ function UserProfile() {
           {/* Hello */}
           {!isauthuserFollowing.includes(profile?._id) &&
             profile?._id !== authuser._id && (
-              <div className="ml-auto mx-4  rounded-md" onClick={follow}>
+              <div
+                className="ml-auto mx-4  rounded-md"
+                onClick={handleFollowClick}
+              >
                 <button className="bg-blue-500 hover:bg-blue-300 active:bg-green-500 p-2 rounded-md px-4 select-none ">
                   Follow
                 </button>
@@ -139,8 +138,11 @@ function UserProfile() {
             )}
           {isauthuserFollowing.includes(profile?._id) &&
             profile?._id !== authuser._id && (
-              <div className="ml-auto mx-4  rounded-md" onClick={follow}>
-                <button className="bg-red-500 hover:bg-blue-300 active:bg-green-500 p-2 rounded-md px-4 select-none ">
+              <div
+                className="ml-auto mx-4  rounded-md"
+                onClick={(e) => handleFollowClick(e)}
+              >
+                <button className="bg-red-500 hover:bg-pink-300 active:bg-green-500 p-2 rounded-md px-4 select-none ">
                   Unfollow
                 </button>
               </div>

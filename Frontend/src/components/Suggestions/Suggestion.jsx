@@ -72,7 +72,7 @@ function Suggestion() {
   }, []);
 
   return (
-    <div className=" w-2/12 bg-black border-2 hidden h-screen  lg:block p-2 text-white sticky top-0 lebot-0 select-none">
+    <div className=" w-2/12 bg-black border-2 hidden h-screen mr-auto lg:block p-2 text-white sticky top-0 lebot-0 select-none">
       <div className="border-b p-2 select-none">Suggestions</div>
       {/* {(isLoading || isPending) && <LinesSkele />} */}
       {suggestedUsers?.length <= 0 && (
