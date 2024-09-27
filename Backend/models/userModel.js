@@ -32,12 +32,12 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: String,
         required: false,
-        default: "defaultXprofile.jpg"
+        default: "https://res.cloudinary.com/dwxzguawt/image/upload/v1727403075/defaultXprofile_siuopn.jpg"
     },
     banner: {
         type: String,
         required: false,
-        default: "defaultXbanner.jpg"
+        default: "https://res.cloudinary.com/dwxzguawt/image/upload/v1727093805/X-clone/Banners/hj7immfctj3mjart8hsn.jpg"
     },
     bio: {
         type: String,

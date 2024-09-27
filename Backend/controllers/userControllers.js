@@ -169,7 +169,7 @@ const uploadProfilePic = async(req,res)=>{
   try{
   const {user : userID}= req;
   const user = await User.findById(userID) ;
-      if (user.profilePic!=="defaultXprofile.jpg") {
+      if (user.profilePic!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1727403075/defaultXprofile_siuopn.jpg") {
         const imgID= user.profilePic.split('/').slice(-1)[0].split('.')[0];
         const foldername = "X-clone/Profile_pics"
         const picID = `${foldername}/${imgID}`
@@ -196,7 +196,7 @@ const updateBannerPic = async(req,res)=>{
   try{
   const {user : userID}= req;
   const user = await User.findById(userID) ;
-      if (user.banner!=="defaultXbanner.jpg") {
+      if (user.banner!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1727093805/X-clone/Banners/hj7immfctj3mjart8hsn.jpg") {
         const imgID= user.banner.split('/').slice(-1)[0].split('.')[0];
         const foldername = "X-clone/Banners"
         const picID = `${foldername}/${imgID}`
@@ -250,6 +250,25 @@ const getFollowersList = async(req,res)=>{
   }
 }
 
+const getFOllowingList = async(req,res)=>{
+  try{
+    const {personID} = req.query;
+    if(!personID ||  !mongoose.Types.ObjectId.isValid(personID)) return  res.status(404).json({error : "No such account exists!"})
+    const user = await User.findById(personID).select("following").populate({
+      path : "following",
+      select : "-password"
+    })
+    if(!user){
+      return res.status(404).json({error : "No such account exists!"})
+    }
+    return res.status(200).json(user.following)
+
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
 
 module.exports = {
   getProfile,
@@ -260,6 +279,7 @@ module.exports = {
   suggestUser,
   uploadProfilePic,
   updateBannerPic,
-  getFollowersList
+  getFollowersList,
+  getFOllowingList
 };
 

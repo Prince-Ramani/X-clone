@@ -1,6 +1,6 @@
 const express = require("express");
 const protectRoute = require("../middelwares/protectRoute")
-const { getProfile ,followPerson,getUserNotifications,updateProfile,findUser, suggestUser, uploadProfilePic, updateBannerPic, getFollowersList } = require("../controllers/userControllers")
+const { getProfile ,followPerson,getUserNotifications,updateProfile,findUser, suggestUser, uploadProfilePic, updateBannerPic, getFollowersList, getFOllowingList } = require("../controllers/userControllers")
 const {upload} = require("../Cloudinary/cloudinary")
 const router = express.Router();
 
@@ -13,6 +13,7 @@ router.post("/suggestion",protectRoute,suggestUser)
 router.post("/updatepicture",protectRoute,upload.single('profilePic'),uploadProfilePic)
 router.post("/updatebanner",protectRoute,upload.single('banner'),updateBannerPic)
 router.get("/getfollowers",protectRoute,getFollowersList)
+router.get("/getfollowings",protectRoute,getFOllowingList)
 
 
 module.exports = router;
