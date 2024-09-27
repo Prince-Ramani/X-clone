@@ -33,11 +33,7 @@ function App() {
   var isLoggedIn = data && !data.error;
 
   if (isLoading || isPending) {
-    return (
-      <div className="flex flex-row justify-center  min-w-full p-2">
-        <Skele />
-      </div>
-    );
+    return <div className="skeleton h-screen w-full"></div>;
   }
 
   return (

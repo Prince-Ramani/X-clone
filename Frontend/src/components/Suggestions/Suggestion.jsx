@@ -19,7 +19,11 @@ function Suggestion() {
     }
   }, [authuser, isFollowing]);
 
-  const { data: suggestedUsers, mutate: refetchSuggestions } = useMutation({
+  const {
+    data: suggestedUsers,
+    mutate: refetchSuggestions,
+    isPending,
+  } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch("/user/suggestion", {
@@ -72,9 +76,9 @@ function Suggestion() {
   }, []);
 
   return (
-    <div className=" w-2/12 bg-black border-2 hidden h-screen mr-auto lg:block p-2 text-white sticky top-0 lebot-0 select-none">
+    <div className=" w-2/12 bg-black border  border-white/30 rounded-tr-lg  rounded-br-lg hidden h-screen mr-auto lg:block p-2 text-white sticky top-0 lebot-0 select-none">
       <div className="border-b p-2 select-none">Suggestions</div>
-      {/* {(isLoading || isPending) && <LinesSkele />} */}
+      {isPending && <div className="skeleton h-screen w-full"></div>}
       {suggestedUsers?.length <= 0 && (
         <div className="h-32 flex items-center justify-center p-3 text-blue-500">
           You are following everyone!

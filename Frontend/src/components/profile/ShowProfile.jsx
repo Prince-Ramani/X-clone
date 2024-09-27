@@ -1,18 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Postdisplayer from "../home/Postdisplayer";
-import Skele from "../skeletons/Skele";
+
 import { RiImageEditLine } from "react-icons/ri";
-import ProfilepicSkele from "../skeletons/ProfilepicSkele";
-import { useState } from "react";
+
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Skele from "../skeletons/Skele";
 
 function ShowProfile() {
   const { data: person } = useQuery({ queryKey: ["authUser"] });
   const querclient = useQueryClient();
   const navigate = useNavigate();
-
-  console.log(person);
 
   const {
     data: userPosts,
@@ -34,8 +32,8 @@ function ShowProfile() {
 
   const {
     mutate: uploadPic,
-    isPending: uploading,
-    isLoading: uploader,
+    isPending: pendingPic,
+    isLoading: loadingPic,
   } = useMutation({
     mutationFn: async (formData) => {
       try {
@@ -62,7 +60,11 @@ function ShowProfile() {
     },
   });
 
-  const { mutate: uploadBanner } = useMutation({
+  const {
+    mutate: uploadBanner,
+    isPending: pendingBanner,
+    isLoading: loadingBanner,
+  } = useMutation({
     mutationFn: async (formData) => {
       try {
         const res = await fetch("/user/updatebanner", {
@@ -105,61 +107,68 @@ function ShowProfile() {
     uploadBanner(formData);
   };
 
-  if (uploading || uploader) {
-    return <h1>Uploading</h1>;
-  }
-
   return (
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
       <div className=" rounded-lg  w-full h-40 md:h-fit lg:h-fit my-2">
-        {isLoading || isPending ? (
-          <div className="skeleton h-40 w-full"></div>
-        ) : (
-          <div className="h-fit w-full m-1 rounded-md  hover:border-2  relative group">
-            <label
-              htmlFor="bannerUpload"
-              className="hover:cursor-pointer group"
-            >
-              <RiImageEditLine className="absolute text-center h-full w-full  bg-zinc-700  group-hover:block group-hover:opacity-30 transition-opacity duration-500 opacity-0 rounded-sm" />
-            </label>
-            <input
-              type="file"
-              id="bannerUpload"
-              className="hidden"
-              accept="image/*"
-              name="banner"
-              onChange={(e) => handleBannerUpload(e)}
-            />
-            <a to={person.banner} target="_blank">
-              <img
-                src={person.banner}
-                className="h-full rounded-md w-full md:h-fit select-none object-cover"
-              ></img>
-            </a>
-          </div>
-        )}
+        <div className="h-fit w-full  rounded-md   relative group">
+          {loadingBanner || pendingBanner ? (
+            <div className="skeleton h-40 w-full"></div>
+          ) : (
+            <>
+              <label
+                htmlFor="bannerUpload"
+                className="hover:cursor-pointer group"
+              >
+                <RiImageEditLine className="absolute text-center h-full w-full  bg-zinc-700  group-hover:block group-hover:opacity-30 transition-opacity duration-500 opacity-0 rounded-sm" />
+              </label>
+              <input
+                type="file"
+                id="bannerUpload"
+                className="hidden"
+                accept="image/*"
+                name="banner"
+                onChange={(e) => handleBannerUpload(e)}
+              />
+              <a to={person.banner} target="_blank">
+                <img
+                  src={person.banner}
+                  className="rounded-md w-full md:h-fit select-none object-cover"
+                ></img>
+              </a>
+            </>
+          )}
+        </div>
       </div>
       <div>
         <div className="flex m-1 items-center">
-          <div className="h-fit w-fit m-1 rounded-full border hover:border-2 relative group">
-            <label htmlFor="profilePicUpload" className="hover:cursor-pointer">
-              <RiImageEditLine className="absolute text-center h-full w-full p-3 bg-zinc-700 opacity-0 group-hover:block  group-hover:opacity-30 transition-opacity duration-300 rounded-full" />
-            </label>
-            <input
-              type="file"
-              id="profilePicUpload"
-              className="hidden"
-              accept="image/*"
-              name="profilePic"
-              onChange={(e) => handleProfileUpload(e)}
-            />
-            <a href={person.profilePic} target="_blank">
-              <img
-                src={person.profilePic}
-                className="h-20 w-20 rounded-full select-none object-cover "
-              ></img>
-            </a>
+          <div className="h-fit w-fit m-1 rounded-full  relative group">
+            {pendingPic || loadingPic ? (
+              <div className="skeleton h-20 w-20 rounded-full"></div>
+            ) : (
+              <>
+                <label
+                  htmlFor="profilePicUpload"
+                  className="hover:cursor-pointer"
+                >
+                  <RiImageEditLine className="absolute text-center h-full w-full p-3 bg-zinc-700 opacity-0 group-hover:block  group-hover:opacity-30 transition-opacity duration-300 rounded-full" />
+                </label>
+                <input
+                  type="file"
+                  id="profilePicUpload"
+                  className="hidden"
+                  accept="image/*"
+                  name="profilePic"
+                  onChange={(e) => handleProfileUpload(e)}
+                />
+                <a href={person.profilePic} target="_blank">
+                  <img
+                    src={person.profilePic}
+                    className="h-20 w-20 rounded-full select-none object-cover "
+                  ></img>
+                </a>
+              </>
+            )}
           </div>
           <div className="mx-2 font-semibold  tracking-wider select-none lg:text-xl ">
             {person.username}
@@ -204,7 +213,7 @@ function ShowProfile() {
             </div>
           </div>
         </div>
-        <div className=" m-2 border">
+        <div className=" m-2">
           <div className="flex gap-2 items-center">
             <div
               className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
@@ -231,7 +240,6 @@ function ShowProfile() {
           </div>
         </div>
       </div>
-
       {(isLoading || isPending) && <Skele />}
       {userPosts?.length > 0 &&
         userPosts.map((post) => (

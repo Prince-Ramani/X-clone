@@ -6,7 +6,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";
 import toast from "react-hot-toast";
-import Skele from "../skeletons/Skele";
 
 function Noti() {
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ function Noti() {
   }
 
   return (
-    <div className=" bg-black border-2 ml-auto border-gray-600 hidden h-screen lg:block p-2 text-white sticky top-0 left  w-2/12 ">
+    <div className=" bg-black border border-white/30 rounded-tl-lg rounded-bl-lg ml-auto border-gray-600 hidden h-screen lg:block p-2 text-white sticky top-0 left  w-2/12 ">
       <div className=" p-2 m-1">
         <FaXTwitter className="h-10 w-10 " />
       </div>

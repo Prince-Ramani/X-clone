@@ -62,7 +62,7 @@ function NotificationDisplayer() {
       <div className="border-b m-3 p-1">
         <h1 className="text-xl select-none">Notifications</h1>
       </div>
-      {(isLoading || isPending) && <LinesSkele />}
+      {(isPending || isLoading) && <LinesSkele />}
       {notifications?.length > 0 &&
         notifications?.map((noti) => (
           <Display

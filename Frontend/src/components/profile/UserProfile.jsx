@@ -26,7 +26,11 @@ function UserProfile() {
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
   //getting profile
-  const { data: profile } = useQuery({
+  const {
+    data: profile,
+    isLoading: gettingPro,
+    isPendingingProf: gettingProf,
+  } = useQuery({
     queryKey: ["userProfile", currentProfile, authuser],
     queryFn: async () => {
       try {
@@ -105,29 +109,34 @@ function UserProfile() {
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
       <div className=" rounded-lg  w-full h-40 md:h-fit lg:h-fit my-2">
-        {/* {isPending ||
-            (isLoading && <div className="skeleton h-40 w-full"></div>)} */}
-        <a href={profile?.banner} target="_blank">
-          <img
-            src={profile?.banner}
-            className="h-full rounded-md w-full md:h-fit select-none"
-          ></img>
-        </a>
+        {gettingPro || gettingProf ? (
+          <div className="skeleton h-40 w-full"></div>
+        ) : (
+          <a href={profile?.banner} target="_blank">
+            <img
+              src={profile?.banner}
+              className="h-full rounded-md w-full md:h-fit select-none"
+            ></img>
+          </a>
+        )}
       </div>
       <div>
         <div className="flex m-1 items-center">
-          <div className="h-fit w-fit m-1 rounded-full border ">
-            <a href={profile?.profilePic} target="_blank">
-              <img
-                src={profile?.profilePic}
-                className="h-20 w-20 rounded-full select-none object-cover"
-              ></img>
-            </a>
+          <div className="h-fit w-fit m-1 rounded-full  ">
+            {gettingPro || gettingProf ? (
+              <div className="skeleton h-20 w-20 rounded-full"></div>
+            ) : (
+              <a href={profile?.profilePic} target="_blank">
+                <img
+                  src={profile?.profilePic}
+                  className="h-20 w-20 rounded-full select-none object-cover border"
+                ></img>
+              </a>
+            )}
           </div>
           <div className="mx-2 font-semibold tracking-wider select-none lg:text-xl ">
             {profile?.username}
           </div>
-          {/* Hello */}
           {!isauthuserFollowing.includes(profile?._id) &&
             profile?._id !== authuser._id && (
               <div
@@ -181,7 +190,7 @@ function UserProfile() {
         <div className=" m-2">
           <div className="flex gap-2 items-center">
             <div
-              className=" p-1 text-gray-400 border cursor-pointer hover:text-blue-700 "
+              className=" p-1 text-gray-400  cursor-pointer hover:text-blue-700 "
               onClick={() =>
                 navigate(`/followers/${profile.username}/${profile._id}`)
               }

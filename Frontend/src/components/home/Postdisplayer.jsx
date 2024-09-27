@@ -21,7 +21,11 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
   if (uploadedBy._id == userID) {
     isCreatedByUser = true;
   }
-  const { mutate: deletePost, data } = useMutation({
+  const {
+    mutate: deletePost,
+    data,
+    isPending,
+  } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch(`/api/post/deletepost/${post._id}`, {
@@ -89,6 +93,20 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
     navigate(`/searchuser`);
   };
 
+  if (isPending) {
+    return (
+      <div className=" bg-black text-white flex flex-col gap-4  h-fit  w-full p-2 ">
+        <div className="flex items-center gap-4">
+          <div className="skeleton h-16 w-16 shrink-0 rounded-full"></div>
+          <div className="flex flex-col gap-4">
+            <div className="skeleton h-4 w-20"></div>
+            <div className="skeleton h-4 w-28"></div>
+          </div>
+        </div>
+        <div className="skeleton h-32 w-full"></div>
+      </div>
+    );
+  }
   return (
     <>
       <div className=" h-fit w-full p-2 flex flex-col border-b ">

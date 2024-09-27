@@ -38,7 +38,11 @@ function Addpost() {
   });
 
   if (isPending || isLoading) {
-    return <Skele />;
+    return (
+      <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12  p-2">
+        <Skele />
+      </div>
+    );
   }
 
   async function handleAddPost(e) {
@@ -55,7 +59,7 @@ function Addpost() {
   }
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12  p-2">
       <div className="border-b-2 border-blue-500 m-2 p-2 select-none ">
         Addpost
       </div>

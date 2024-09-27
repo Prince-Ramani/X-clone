@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { RiImageEditLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../ani/Spinner";
 
 function UpdateProfile() {
   const querclient = useQueryClient();
@@ -21,7 +22,7 @@ function UpdateProfile() {
   const {
     mutate: update,
     isPending,
-    data,
+    isLoading,
   } = useMutation({
     mutationFn: async () => {
       try {
@@ -69,7 +70,11 @@ function UpdateProfile() {
 
   //banner upload
 
-  const { mutate: uploadBanner } = useMutation({
+  const {
+    mutate: uploadBanner,
+    isLoading: loadingBanner,
+    isPending: pendingBanner,
+  } = useMutation({
     mutationFn: async (formData) => {
       try {
         const res = await fetch("/user/updatebanner", {
@@ -107,8 +112,8 @@ function UpdateProfile() {
 
   const {
     mutate: uploadPic,
-    isPending: uploading,
-    isLoading: uploader,
+    isPending: pendingPic,
+    isLoading: loadingPic,
   } = useMutation({
     mutationFn: async (formData) => {
       try {
@@ -143,47 +148,80 @@ function UpdateProfile() {
     formData.append("profilePic", file);
     uploadPic(formData);
   };
+
+  if (isPending || isLoading) {
+    return (
+      <div
+        className={`w-screen bg-black text-white h-full min-h-screen md:w-5/12 border flex justify-center items-center  p-2 flex-col `}
+      >
+        <div className="p-2">Updating profile...</div>
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div
+      className={`w-screen bg-black text-white h-full min-h-screen md:w-5/12  p-2 ${
+        isPending || isLoading
+          ? "pointer-events-none opacity-50 select-none"
+          : ""
+      } `}
+    >
       <div className="border-b m-2  p-2">Update Profile</div>
       <div className="  px-3 ">
         <div className="  flex flex-col w-full  items-center justify-end ">
-          <div className="rounded-md hover:border-2 w-full h-full  border relative group">
-            <label
-              htmlFor="bannerUpload"
-              className="hover:cursor-pointer group"
-            >
-              <RiImageEditLine className="absolute text-center  h-full w-full z-10  bg-zinc-700  group-hover:block group-hover:opacity-30 transition-opacity duration-500 opacity-0 rounded-sm" />
-            </label>
-            <input
-              type="file"
-              id="bannerUpload"
-              className="hidden"
-              accept="image/*"
-              name="banner"
-              onChange={(e) => handleBannerUpload(e)}
-            />
-            <img
-              src={authuser.banner}
-              className="select-none  w-full  h-fit opacity-90 -z-10 rounded-lg"
-            ></img>
+          <div className="rounded-md  w-full h-full  relative group">
+            {loadingBanner || pendingBanner ? (
+              <div className="skeleton h-60 w-full hover:cursor-wait"></div>
+            ) : (
+              <>
+                <label
+                  htmlFor="bannerUpload"
+                  className="hover:cursor-pointer group"
+                >
+                  <RiImageEditLine className="absolute text-center  h-full w-full z-10  bg-zinc-700  group-hover:block group-hover:opacity-30 transition-opacity duration-500 opacity-0 rounded-sm" />
+                </label>
+                <input
+                  type="file"
+                  id="bannerUpload"
+                  className="hidden"
+                  accept="image/*"
+                  name="banner"
+                  onChange={(e) => handleBannerUpload(e)}
+                />
+                <img
+                  src={authuser.banner}
+                  className="select-none  w-full  h-fit opacity-90 -z-10 rounded-lg"
+                ></img>
+              </>
+            )}
           </div>
           <div className=" relative z-50 h-fit w-fit   rounded-full bottom-14 group">
-            <label htmlFor="profilePicUpload" className="hover:cursor-pointer">
-              <RiImageEditLine className="absolute text-center h-full w-full p-3 z-30 bg-zinc-700 opacity-0 group-hover:block  group-hover:opacity-30 transition-opacity duration-300 rounded-full" />
-            </label>
-            <input
-              type="file"
-              id="profilePicUpload"
-              className="hidden"
-              accept="image/*"
-              name="profilePic"
-              onChange={(e) => handleProfileUpload(e)}
-            />
-            <img
-              src={authuser.profilePic}
-              className=" w-32 h-32  rounded-full select-none object-cover  z-10 "
-            ></img>
+            {loadingPic || pendingPic ? (
+              <div className="skeleton h-32 w-32 cursor-wait rounded-full"></div>
+            ) : (
+              <>
+                <label
+                  htmlFor="profilePicUpload"
+                  className="hover:cursor-pointer"
+                >
+                  <RiImageEditLine className="absolute text-center h-full w-full p-3 z-30 bg-zinc-700 opacity-0 group-hover:block  group-hover:opacity-30 transition-opacity duration-300 rounded-full" />
+                </label>
+                <input
+                  type="file"
+                  id="profilePicUpload"
+                  className="hidden"
+                  accept="image/*"
+                  name="profilePic"
+                  onChange={(e) => handleProfileUpload(e)}
+                />
+                <img
+                  src={authuser.profilePic}
+                  className=" w-32 h-32  rounded-full select-none object-cover  z-10 "
+                ></img>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -265,7 +303,7 @@ function UpdateProfile() {
             className="bg-green-500 p-2 rounded-md w-3/6 h-14 hover:border-2 active:bg-blue-500 hover:bg-yellow-300"
             onClick={(e) => handleSubmit(e)}
           >
-            Update
+            {isLoading || isPending ? "Updating..." : "Update"}
           </button>
         </div>
       </div>

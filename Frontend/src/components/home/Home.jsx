@@ -63,7 +63,7 @@ function Home() {
   }, [isActive, setActive]);
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen border md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen bg-black text-white h-full min-h-screen  md:w-5/12  p-2">
       <div className="w-full h-10 flex justify-around items-center">
         <button
           className={`w-5/12 p-1 border-b-2 select-none  ${
@@ -82,7 +82,7 @@ function Home() {
           Following
         </button>
       </div>
-      {isLoading ? (
+      {isLoading || isPending ? (
         <Skele />
       ) : Array.isArray(posts) && posts.length > 0 ? (
         posts.map((post) => (
@@ -95,9 +95,9 @@ function Home() {
           />
         ))
       ) : (
-        <div className="flex flex-col justify-center items-center border h-screen">
-          <FaSadTear className="h-3/6 w-7/12  opacity-20 " />
-          <div className="text-xl tracking-wider opacity-50">
+        <div className="flex flex-col justify-center items-center h-screen w-full pb-20">
+          <FaSadTear className="h-2/6 w-7/12  opacity-20 " />
+          <div className="text-xl tracking-wider opacity-50 p-2">
             No posts available!
           </div>
         </div>
