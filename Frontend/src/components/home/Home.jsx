@@ -4,9 +4,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
 import { FaSadTear } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
+import { IoMdNotifications } from "react-icons/io";
+import { IoIosSearch } from "react-icons/io";
+import { IoAddSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const querclient = useQueryClient();
+  const navigate = useNavigate();
   const { data: authuser } = useQuery({ queryKey: ["authUser"] });
   const [currentlyFollowing, setFollowing] = useState([...authuser.following]);
 
@@ -63,7 +69,7 @@ function Home() {
   }, [isActive, setActive]);
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen  md:w-5/12  p-2">
+    <div className="w-screen  bg-black text-white flex flex-col  h-full min-h-screen  md:w-5/12  p-2">
       <div className="w-full h-10 flex justify-around items-center">
         <button
           className={`w-5/12 p-1 border-b-2 select-none  ${

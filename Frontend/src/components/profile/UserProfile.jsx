@@ -8,13 +8,14 @@ import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
 import { useProfileContext } from "../../context/ProfileContex";
 import { useEffect, useState } from "react";
-import { Link, useFetcher, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Postdisplayer from "../home/Postdisplayer";
 
 function UserProfile() {
   const navigate = useNavigate();
   const queryclient = useQueryClient();
   const { currentProfile } = useProfileContext();
+
   const { data: authuser, refetch } = useQuery({ queryKey: ["authUser"] });
 
   useEffect(() => {
@@ -34,29 +35,25 @@ function UserProfile() {
     queryKey: ["userProfile", currentProfile, authuser],
     queryFn: async () => {
       try {
-        const res = await fetch(`/user/profile/${currentProfile}`); // authuser key fix
+        const res = await fetch(`/user/profile/${currentProfile}`);
         const data = await res.json();
         return data;
       } catch (error) {
         console.log(error);
       }
     },
-    enabled: !!currentProfile,
+    enabled: !!currentProfile || !!authuser,
   });
 
   //settng state
   useEffect(() => {
-    if (
-      profile &&
-      JSON.stringify(isauthuserFollowing) !== JSON.stringify(authuser.following)
-    ) {
+    if (profile) {
       setAuthUserFollowing([...authuser.following]);
-      setTotalFollowing([...profile.following]);
       setTotalFollowers([...profile.followers]);
+      setTotalFollowing([...profile.following]);
     }
-  }, [profile, authuser]);
+  }, [currentProfile, authuser, profile]);
 
-  //getting post
   const {
     data: userPosts,
     isLoading,
@@ -95,7 +92,7 @@ function UserProfile() {
       if ("error" in data) {
         return toast.error(data.error);
       }
-      queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      await queryclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success(data.message);
     },
   });
@@ -108,7 +105,7 @@ function UserProfile() {
   return (
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
-      <div className=" rounded-lg  w-full h-40 md:h-fit lg:h-fit my-2">
+      <div className=" rounded-lg  w-full  h-fit my-2">
         {gettingPro || gettingProf ? (
           <div className="skeleton h-40 w-full"></div>
         ) : (
@@ -122,14 +119,14 @@ function UserProfile() {
       </div>
       <div>
         <div className="flex m-1 items-center">
-          <div className="h-fit w-fit m-1 rounded-full  ">
+          <div className="h-fit w-fit m-1 rounded-full shrink-0  ">
             {gettingPro || gettingProf ? (
               <div className="skeleton h-20 w-20 rounded-full"></div>
             ) : (
               <a href={profile?.profilePic} target="_blank">
                 <img
                   src={profile?.profilePic}
-                  className="h-20 w-20 rounded-full select-none object-cover border"
+                  className="h-20 w-20 rounded-full select-none  object-cover border"
                 ></img>
               </a>
             )}

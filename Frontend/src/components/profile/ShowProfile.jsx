@@ -110,8 +110,8 @@ function ShowProfile() {
   return (
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
-      <div className=" rounded-lg  w-full h-40 md:h-fit lg:h-fit my-2">
-        <div className="h-fit w-full  rounded-md   relative group">
+      <div className=" rounded-lg  w-full h-fit my-2 ">
+        <div className="h-full w-full rounded-md    relative group">
           {loadingBanner || pendingBanner ? (
             <div className="skeleton h-40 w-full"></div>
           ) : (
@@ -142,7 +142,7 @@ function ShowProfile() {
       </div>
       <div>
         <div className="flex m-1 items-center">
-          <div className="h-fit w-fit m-1 rounded-full  relative group">
+          <div className="h-fit w-fit m-1 rounded-full  relative group border-2  ">
             {pendingPic || loadingPic ? (
               <div className="skeleton h-20 w-20 rounded-full"></div>
             ) : (
@@ -175,7 +175,7 @@ function ShowProfile() {
           </div>
           <div className="ml-auto h-fit w-fit">
             <button
-              className="bg-green-600 p-2 rounded-md hover:border-2 active:bg-blue-500"
+              className="bg-green-600 p-2 rounded-md hover:border-2 active:bg-blue-500 text-xs sm:text-pretty sm:text-base"
               onClick={() => {
                 navigate("/update");
               }}

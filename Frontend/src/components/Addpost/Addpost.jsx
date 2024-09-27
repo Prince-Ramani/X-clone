@@ -119,8 +119,9 @@ function Addpost() {
           <button
             className="border-2 bg-blue-500 p-2 h-12 w-[30%] rounded-md hover:bg-blue-200 active:bg-green-500"
             onClick={(e) => handleAddPost(e)}
+            disabled={isPending || isLoading}
           >
-            Post
+            {isPending || isLoading ? "Posting..." : "Post"}
           </button>
         </div>
       </div>

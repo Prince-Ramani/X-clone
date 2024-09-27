@@ -3,12 +3,17 @@ import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { useProfileContext } from "../../context/ProfileContex";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../ani/Spinner";
 
 function Search() {
   const { setCurrentProfile, currentProfile } = useProfileContext();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const { data: searchResult, mutate } = useMutation({
+  const {
+    data: searchResult,
+    mutate,
+    isPending,
+  } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch(`user/finduser/${search}`, {
@@ -52,9 +57,15 @@ function Search() {
         </button>
       </div>
 
+      {isPending && (
+        <div className=" flex justify-center items-center ">
+          <Spinner />
+        </div>
+      )}
+
       {searchResult?.map((item) => {
         return (
-          <div key={item._id}>
+          <div key={item._id} className="cursor-pointer">
             <div
               className="border-b  p-2 px-3 flex items-center active:bg-gray-500 hover:bg-gray-300"
               onClick={() => handleClick(item._id)}

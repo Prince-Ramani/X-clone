@@ -20,6 +20,7 @@ import GetFollowers from "./components/FollowersFollowings/GetFollowers";
 import GetFollowing from "./components/FollowersFollowings/GetFollowing";
 import ShowComment from "./components/Comments/ShowComment";
 import Signin from "./components/signin/Signin";
+import Nav from "./layout/Nav";
 function App() {
   const { data, isPending, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -109,6 +110,7 @@ function App() {
 
         {isLoggedIn && <Suggestions />}
       </div>
+      <Nav />
     </Router>
   );
 }

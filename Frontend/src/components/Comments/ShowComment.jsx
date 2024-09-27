@@ -31,7 +31,11 @@ function ShowComment() {
   post?.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   //comment
-  const { mutate } = useMutation({
+  const {
+    mutate,
+    isPending: pendingCommnent,
+    isLoading: loadingComment,
+  } = useMutation({
     mutationFn: async (text) => {
       try {
         const res = await fetch(`/api/post/comment/${postID}`, {
@@ -106,8 +110,9 @@ function ShowComment() {
             <button
               className="bg-blue-500 rounded-md p-2 w-1/5 active:bg-green-500 hover:bg-blue-200"
               onClick={postComment}
+              disabled={isPending || isLoading}
             >
-              Post
+              {isPending || isLoading ? "Posting..." : "Post"}
             </button>
           </div>
         </div>
