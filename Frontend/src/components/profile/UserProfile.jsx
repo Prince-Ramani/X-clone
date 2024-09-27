@@ -30,7 +30,7 @@ function UserProfile() {
     queryKey: ["userProfile", currentProfile, authuser],
     queryFn: async () => {
       try {
-        const res = await fetch(`/user/profile/${currentProfile}`);
+        const res = await fetch(`/user/profile/${currentProfile}`); // authuser key fix
         const data = await res.json();
         return data;
       } catch (error) {
@@ -42,7 +42,10 @@ function UserProfile() {
 
   //settng state
   useEffect(() => {
-    if (profile) {
+    if (
+      profile &&
+      JSON.stringify(isauthuserFollowing) !== JSON.stringify(authuser.following)
+    ) {
       setAuthUserFollowing([...authuser.following]);
       setTotalFollowing([...profile.following]);
       setTotalFollowers([...profile.followers]);
@@ -177,13 +180,23 @@ function UserProfile() {
         </div>
         <div className=" m-2">
           <div className="flex gap-2 items-center">
-            <div className=" p-1 text-gray-400 ">
+            <div
+              className=" p-1 text-gray-400 border cursor-pointer hover:text-blue-700 "
+              onClick={() =>
+                navigate(`/followers/${profile.username}/${profile._id}`)
+              }
+            >
               <span className=" font-bold mx-2 text-xl ">
                 {totalFollowers?.length}
               </span>
               Followers
             </div>
-            <div className=" p-1 text-gray-400">
+            <div
+              className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
+              onClick={() =>
+                navigate(`/followings/${profile.username}/${profile._id}`)
+              }
+            >
               <span className=" font-bold mx-2 text-xl">
                 {totalFollowing?.length}
               </span>

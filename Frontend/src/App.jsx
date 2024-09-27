@@ -16,6 +16,8 @@ import UpdateProfile from "./components/Update Profile/UpdateProfile";
 import ShowProfile from "./components/profile/ShowProfile";
 import Addpost from "./components/Addpost/Addpost";
 import UserProfile from "./components/profile/UserProfile";
+import GetFollowers from "./components/FollowersFollowings/GetFollowers";
+import GetFollowing from "./components/FollowersFollowings/GetFollowing";
 import ShowComment from "./components/Comments/ShowComment";
 import Signin from "./components/signin/Signin";
 function App() {
@@ -89,7 +91,18 @@ function App() {
             path="/post"
             element={isLoggedIn ? <ShowComment /> : <Navigate to="/signup" />}
           />
-
+          <Route
+            path="/getfollowers/:username/personID"
+            element={isLoggedIn ? <ShowComment /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/followers/:username/:personID"
+            element={isLoggedIn ? <GetFollowers /> : <Navigate to="/signup" />}
+          />
+          <Route
+            path="/followings/:username/:personID"
+            element={isLoggedIn ? <GetFollowing /> : <Navigate to="/signup" />}
+          />
           <Route
             path="/*"
             element={

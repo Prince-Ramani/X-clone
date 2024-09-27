@@ -207,9 +207,9 @@ function ShowProfile() {
         <div className=" m-2 border">
           <div className="flex gap-2 items-center">
             <div
-              className=" p-1 text-gray-400"
+              className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
               onClick={() =>
-                navigate(`/getfollowers/${person.username}/${person._id}`)
+                navigate(`/followers/${person.username}/${person._id}`)
               }
             >
               <span className=" font-bold mx-2 text-xl ">
@@ -217,7 +217,12 @@ function ShowProfile() {
               </span>
               Followers
             </div>
-            <div className=" p-1 text-gray-400">
+            <div
+              className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
+              onClick={() =>
+                navigate(`/followings/${person.username}/${person._id}`)
+              }
+            >
               <span className=" font-bold mx-2 text-xl">
                 {person.following.length}
               </span>

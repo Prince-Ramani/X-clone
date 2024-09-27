@@ -15,7 +15,7 @@ function Noti() {
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch("api/auth/logout", {
+        const res = await fetch("/api/auth/logout", {
           method: "POST",
         });
         const data = await res.json();
