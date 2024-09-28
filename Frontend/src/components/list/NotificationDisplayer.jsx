@@ -58,7 +58,7 @@ function NotificationDisplayer() {
   });
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen pt-12 lg:p-2 bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-3 p-1">
         <h1 className="text-xl select-none">Notifications</h1>
       </div>
@@ -72,7 +72,9 @@ function NotificationDisplayer() {
             followPerson={followPerson}
           />
         ))}
-      {notifications?.length <= 0 && <h1>You dont have any notifications</h1>}
+      {notifications?.length <= 0 && (
+        <h1 className="pl-2">You dont have any notifications</h1>
+      )}
     </div>
   );
 }

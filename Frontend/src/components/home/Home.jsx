@@ -9,6 +9,7 @@ import { IoMdNotifications } from "react-icons/io";
 import { IoIosSearch } from "react-icons/io";
 import { IoAddSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import Nav from "../../layout/Nav";
 
 function Home() {
   const querclient = useQueryClient();
@@ -69,7 +70,7 @@ function Home() {
   }, [isActive, setActive]);
 
   return (
-    <div className="w-screen  bg-black text-white flex flex-col  h-full min-h-screen  md:w-5/12  p-2">
+    <div className="w-screen  bg-black h-full mb-80   text-white flex flex-col min-h-screen  md:w-5/12   p-2 pt-12 lg:pt-2 ">
       <div className="w-full h-10 flex justify-around items-center">
         <button
           className={`w-5/12 p-1 border-b-2 select-none  ${

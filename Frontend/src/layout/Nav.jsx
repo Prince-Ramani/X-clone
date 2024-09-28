@@ -20,8 +20,8 @@ function Nav() {
     setCurrent(val);
   };
   return (
-    <div className="lg:hidden border fixed bottom-0 m-2 w-screen left-0 right-0   md:mx-auto   z-20 md:w-5/12 bg-slate-700 rounded-lg h-12">
-      <div className="border flex justify-center items-center gap-5 h-full rounded-lg">
+    <div className="block lg:hidden border-t  border-blue-400 border-2   fixed   w-screen left-0 right-0 md:mx-auto z-20 md:w-5/12 bg-gray-900  h-12">
+      <div className=" flex justify-center items-center gap-5 h-full  rounded-tl-lg rounded-tr-lg  ">
         <div className=" px-3   rounded-md ">
           <FaHome
             className={`h-7 w-7 hover:text-blue-500 border-blue-400 active:text-green-500 ${

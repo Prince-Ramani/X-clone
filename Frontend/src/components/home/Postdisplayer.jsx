@@ -109,7 +109,7 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
   }
   return (
     <>
-      <div className=" h-fit w-full p-2 flex flex-col border-b ">
+      <div className=" h-fit w-full p-2 flex flex-col border-b">
         <div className="flex flex-row ">
           <div className="max-w-fit max-h-fit shirnk-0">
             <img

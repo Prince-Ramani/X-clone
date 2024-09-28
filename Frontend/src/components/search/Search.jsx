@@ -44,7 +44,7 @@ function Search() {
   }
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen bg-black text-white pt-12 h-full min-h-screen md:w-5/12 lg:p-0 p-2">
       <div className="m-5 p-2 flex items-center bg-gray-600 rounded-lg border">
         <IoIosSearch className="text-3xl" />
         <input

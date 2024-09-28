@@ -39,7 +39,7 @@ function App() {
 
   return (
     <Router>
-      <div className="flex border justify-center">
+      <div className="flex  justify-center  ">
         {isLoggedIn && <Noti />}
         <Routes>
           <Route
@@ -107,10 +107,9 @@ function App() {
             }
           />
         </Routes>
-
         {isLoggedIn && <Suggestions />}
+        {isLoggedIn && <Nav />}
       </div>
-      <Nav />
     </Router>
   );
 }

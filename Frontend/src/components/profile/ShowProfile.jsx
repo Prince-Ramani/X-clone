@@ -108,7 +108,7 @@ function ShowProfile() {
   };
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen bg-black pt-12 lg:p-2 text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
       <div className=" rounded-lg  w-full h-fit my-2 ">
         <div className="h-full w-full rounded-md    relative group">
