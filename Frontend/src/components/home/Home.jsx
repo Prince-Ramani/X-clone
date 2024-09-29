@@ -15,7 +15,6 @@ function Home() {
   const [totalPosts, setTotalPosts] = useState([]);
   const [isActive, setActive] = useState("getallpost");
   const [isChanged, setChanged] = useState(0);
-  let temp = 0;
 
   function debounce(func, delay) {
     let timeoutId;
@@ -60,7 +59,7 @@ function Home() {
     },
   });
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["PostsKey"],
     queryFn: async () => {
       try {
@@ -70,6 +69,7 @@ function Home() {
         const data = await res.json();
         if (data.length < 10) setHasMore(false);
         setCurrentOffset((prev) => prev + 10);
+
         return data;
       } catch (err) {
         console.log(err);
@@ -105,7 +105,7 @@ function Home() {
   }, [hasMore]);
 
   return (
-    <div className="w-screen  bg-black  overflow-y-scroll  text-white flex flex-col  md:w-5/12   p-2 pt-12 lg:pt-2 ">
+    <div className="w-screen  bg-black border   overflow-y-scroll pb-10  text-white flex flex-col  md:w-5/12   p-2 pt-12 lg:pt-2 ">
       <div className="w-full h-10 flex justify-around items-center">
         <button
           className={`w-5/12 p-1 border-b-2 select-none  ${
@@ -137,19 +137,26 @@ function Home() {
           />
         ))
       )}
-      {totalPosts.length === 0 ||
-        (!hasMore && (
-          <div className="flex flex-col justify-center items-center h-screen w-full pb-20">
-            <FaSadTear className="h-2/6 w-7/12  opacity-20 " />
-            <div className="text-xl tracking-wider opacity-50 p-2">
-              No More posts available!
-            </div>
-          </div>
-        ))}
-      {isLoading && (
-        <div className=" p-4">
+
+      {(isLoading || isFetching) && (
+        <div className="flex justify-center items-center p-4 ">
           <Spinner />
         </div>
+      )}
+
+      {totalPosts.length === 0 && (
+        <div className="flex flex-col justify-center items-center h-screen w-full pb-20">
+          <FaSadTear className="h-2/6 w-7/12  opacity-20 " />
+          <div className="text-xl tracking-wider opacity-50 p-2">
+            You have seen every single Post!
+          </div>
+        </div>
+      )}
+
+      {!hasMore && (
+        <h1 className="w-full text-center p-2 text-green-500 ">
+          You have seen every single post!
+        </h1>
       )}
     </div>
   );

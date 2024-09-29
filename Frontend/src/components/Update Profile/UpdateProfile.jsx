@@ -34,7 +34,6 @@ function UpdateProfile() {
           body: JSON.stringify(updateInfo),
         });
         const data = await res.json();
-        console.log(data);
         if ("error" in data) toast.error(data.error);
         return data;
       } catch (err) {
@@ -82,7 +81,6 @@ function UpdateProfile() {
           body: formData,
         });
         const data = await res.json();
-        console.log(data);
         if ("error" in data) {
           return toast.error("Make sure internet is ON!");
         }
@@ -122,7 +120,6 @@ function UpdateProfile() {
           body: formData,
         });
         const data = await res.json();
-        console.log(data);
         if ("error" in data) {
           return toast.error("Make sure internet is ON!");
         }

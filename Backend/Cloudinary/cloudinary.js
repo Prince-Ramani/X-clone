@@ -9,9 +9,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
-console.log(process.env.CLOUDINARY_NAME)
-
   
 
   const storage = multer.diskStorage({

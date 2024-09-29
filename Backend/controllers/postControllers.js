@@ -193,8 +193,10 @@ const deletePost = async (req, res) => {
 
 const getProfilePost = async(req,res) =>{
   try {
+    const limit = parseInt(req.query.limit)||10;
+    const offset = parseInt(req.query.offset);
     const personID = req.params.personID
-    const posts = await Post.find({uploadedBy : personID}).sort({ createdAt: -1 }).populate({
+    const posts = await Post.find({uploadedBy : personID}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
       path : "uploadedBy",
       select : "-password"
     });

@@ -1,5 +1,3 @@
-const {v2:cloudinary} = require("cloudinary")
-const multer = require("multer")
 const path = require("path")
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const express = require("express");

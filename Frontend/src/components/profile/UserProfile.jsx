@@ -10,6 +10,7 @@ import { useProfileContext } from "../../context/ProfileContex";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Postdisplayer from "../home/Postdisplayer";
+import Spinner from "../../ani/Spinner";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -22,10 +23,23 @@ function UserProfile() {
     if (!currentProfile) navigate("/home");
   }, [currentProfile, navigate]);
 
+  function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
   //state
   const [isauthuserFollowing, setAuthUserFollowing] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
+  const [userOffSet, setUserOffset] = useState(0);
+  const [totalUserPosts, setTotalUserPosts] = useState([]);
+  const [morePost, setMorePost] = useState(true);
   //getting profile
   const {
     data: profile,
@@ -54,16 +68,24 @@ function UserProfile() {
     }
   }, [currentProfile, authuser, profile]);
 
+  //posts
+
   const {
     data: userPosts,
     isLoading,
     isPending,
+    refetch: FetchPosts,
+    isFetching,
   } = useQuery({
     queryKey: ["userPosts"],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/post/profile/${profile?._id}`);
+        const res = await fetch(
+          `/api/post/profile/${profile?._id}?limit=10&offset=${userOffSet}`
+        );
         const data = await res.json();
+        if (data.length < 10) setMorePost(false);
+        setUserOffset((prev) => prev + data.length);
         return data;
       } catch (err) {
         console.log(err);
@@ -71,6 +93,27 @@ function UserProfile() {
     },
     enabled: !!profile,
   });
+
+  useEffect(() => {
+    if (userPosts) setTotalUserPosts((prev) => [...prev, ...userPosts]);
+  }, [userPosts]);
+
+  const handleScroll = debounce(() => {
+    if (
+      window.innerHeight + window.scrollY + 1 >=
+        document.documentElement.scrollHeight &&
+      morePost
+    ) {
+      FetchPosts();
+    }
+  }, 200);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [morePost]);
 
   //following logic
   const { mutate: follow } = useMutation({
@@ -103,7 +146,7 @@ function UserProfile() {
   };
 
   return (
-    <div className="w-screen pt-12 lg:p-2 bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen pt-12 lg:p-2 bg-black  text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-1 font-medium ">Profile</div>
       <div className=" rounded-lg  w-full  h-fit my-2">
         {gettingPro || gettingProf ? (
@@ -212,10 +255,19 @@ function UserProfile() {
         </div>
       </div>
       {(isLoading || isPending) && <Skele />}
-      {userPosts?.length > 0 &&
-        userPosts?.map((post) => (
-          <Postdisplayer key={post._id} post={post} userID={authuser._id} />
+      {totalUserPosts?.length > 0 &&
+        totalUserPosts?.map((post, index) => (
+          <Postdisplayer
+            key={`${post._id}-${userOffSet}-${index}`}
+            post={post}
+            userID={authuser._id}
+          />
         ))}
+      {isFetching && (
+        <div className="flex justify-center items-center ">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 }
