@@ -73,11 +73,12 @@ const commentOnPost = async (req, res) => {
 
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find({uploadedBy : {$ne : req.user}}).sort({ createdAt: -1 }).populate({
+    const offset = parseInt(req.query.offset);
+    const limit = parseInt(req.query.limit) || 5
+    const posts = await Post.find({uploadedBy : {$ne : req.user}}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
       path: "uploadedBy",
       select: "-password",
     });
-    if (!posts) return res.status(200).json([]);
     return res.status(200).json(posts);
   } catch (err) {
     return res.status(500).json({ error: "Internal servere error" });
@@ -89,11 +90,13 @@ const postOfFollowing = async (req, res) => {
     const userID = req.user;
     const user = await User.findById(userID);
     const following = user.following;
+    const limit = parseInt(req.query.limit) ||10;
+    const offset = parseInt(req.query.offset);
     if (following.length <= 0) {
       return res.status(200).json([]);
     }
     const posts = await Post.find({ uploadedBy: { $in: following } })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }).skip(offset).limit(limit)
       .populate({
         path: "uploadedBy",
         select: "-password",
