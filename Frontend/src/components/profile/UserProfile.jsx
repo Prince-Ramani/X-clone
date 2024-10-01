@@ -45,12 +45,15 @@ function UserProfile() {
     data: profile,
     isLoading: gettingPro,
     isPendingingProf: gettingProf,
+    refetch: refetchProf,
   } = useQuery({
-    queryKey: ["userProfile", currentProfile, authuser],
+    queryKey: ["userProfile", currentProfile],
     queryFn: async () => {
       try {
         const res = await fetch(`/user/profile/${currentProfile}`);
         const data = await res.json();
+        console.log(data.followers.length);
+        console.log(data.following.length);
         return data;
       } catch (error) {
         console.log(error);
@@ -65,6 +68,7 @@ function UserProfile() {
       setAuthUserFollowing([...authuser.following]);
       setTotalFollowers([...profile.followers]);
       setTotalFollowing([...profile.following]);
+      refetchProf();
     }
   }, [currentProfile, authuser, profile]);
 
@@ -116,7 +120,11 @@ function UserProfile() {
   }, [morePost]);
 
   //following logic
-  const { mutate: follow } = useMutation({
+  const {
+    mutate: follow,
+    isLoading: loadingFollow,
+    isPending: pendingFollow,
+  } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch(`/user/follow/${profile._id}`, {
@@ -183,8 +191,11 @@ function UserProfile() {
                 className="ml-auto mx-4  rounded-md"
                 onClick={handleFollowClick}
               >
-                <button className="bg-blue-500 hover:bg-blue-300 active:bg-green-500 p-2 rounded-md px-4 select-none ">
-                  Follow
+                <button
+                  className="bg-blue-500 hover:bg-blue-300 active:bg-green-500 p-2 rounded-md px-4 select-none "
+                  disabled={loadingFollow || pendingFollow}
+                >
+                  {loadingFollow || pendingFollow ? "Following..." : "Follow"}
                 </button>
               </div>
             )}
@@ -194,8 +205,13 @@ function UserProfile() {
                 className="ml-auto mx-4  rounded-md"
                 onClick={(e) => handleFollowClick(e)}
               >
-                <button className="bg-red-500 hover:bg-pink-300 active:bg-green-500 p-2 rounded-md px-4 select-none ">
-                  Unfollow
+                <button
+                  className="bg-red-500 hover:bg-pink-300 active:bg-green-500 p-2 rounded-md px-4 select-none"
+                  disabled={loadingFollow || pendingFollow}
+                >
+                  {loadingFollow || pendingFollow
+                    ? "Unfollowing..."
+                    : "Unfollow"}
                 </button>
               </div>
             )}

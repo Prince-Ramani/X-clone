@@ -43,7 +43,7 @@ function Noti() {
   }
 
   return (
-    <div className=" bg-black border border-white/30 rounded-tl-lg rounded-bl-lg ml-auto border-gray-600 hidden h-screen lg:block p-2 text-white sticky top-0 left  w-2/12 ">
+    <div className=" bg-black border  border-white/30   rounded-tl-lg  rounded-bl-lg ml-auto border-gray-600 hidden h-screen lg:block  p-2 text-white sticky top-0 left  w-2/12 ">
       <div className=" p-2 m-1">
         <FaXTwitter className="h-10 w-10 " />
       </div>
@@ -111,7 +111,7 @@ function Noti() {
         </div>
       </div>
 
-      <div className=" h-fit min-w-full max-w-full mt-44 p-2 flex border-2 rounded-md justify-around   ">
+      <div className=" h-fit min-w-full max-w-full p-2 flex border-2 rounded-md justify-around mt-auto  ">
         <div className="h-fit w-fit shrink-0">
           <img
             src={authuser.profilePic}

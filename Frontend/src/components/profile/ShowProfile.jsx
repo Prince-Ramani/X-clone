@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Postdisplayer from "../home/Postdisplayer";
+import { IoIosLogOut } from "react-icons/io";
 
 import { RiImageEditLine } from "react-icons/ri";
 
@@ -30,6 +31,34 @@ function ShowProfile() {
     refetchOnWindowFocus: false,
   });
 
+  //logout
+
+  const { mutate: logoutUser, isLoading: loggingOut } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch("/api/auth/logout", {
+          method: "POST",
+        });
+        const data = await res.json();
+        if ("error" in data) toast.error(data.error);
+        return data;
+      } catch (err) {
+        toast.error("Logout failed!");
+        console.log(err);
+      }
+    },
+    onSuccess: () => {
+      querclient.invalidateQueries({ queryKey: ["authUser"] });
+      toast.success("Logout successfull!");
+    },
+  });
+
+  const handleLogout = () => {
+    if (!loggingOut) {
+      logoutUser();
+    }
+  };
+
   const {
     mutate: uploadPic,
     isPending: pendingPic,
@@ -42,7 +71,6 @@ function ShowProfile() {
           body: formData,
         });
         const data = await res.json();
-        console.log(data);
         if ("error" in data) {
           return toast.error("Make sure internet is ON!");
         }
@@ -72,7 +100,6 @@ function ShowProfile() {
           body: formData,
         });
         const data = await res.json();
-        console.log(data);
         if ("error" in data) {
           return toast.error("Make sure internet is ON!");
         }
@@ -109,7 +136,15 @@ function ShowProfile() {
 
   return (
     <div className="w-screen bg-black pt-12 lg:p-2 text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
-      <div className="border-b m-2 p-1 font-medium ">Profile</div>
+      <div className="border-b m-2 p-1 font-medium flex justify-between ">
+        Profile
+        <div>
+          <IoIosLogOut
+            className="h-7 w-7 active:text-red-500 hover:text-gray-500"
+            onClick={handleLogout}
+          />
+        </div>
+      </div>
       <div className=" rounded-lg  w-full h-fit my-2 ">
         <div className="h-full w-full rounded-md    relative group">
           {loadingBanner || pendingBanner ? (

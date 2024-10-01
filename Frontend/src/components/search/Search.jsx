@@ -52,9 +52,6 @@ function Search() {
           value={search}
           onChange={(e) => findfast(e)}
         />
-        <button className="mx-2 bg-blue-500 p-2 rounded-lg active:bg-green-500 hover:bg-blue-200">
-          Search
-        </button>
       </div>
 
       {isPending && (
@@ -83,6 +80,11 @@ function Search() {
           </div>
         );
       })}
+      {searchResult?.length === 0 && (
+        <p className="text-center text-lg p-2 tracking-wide">
+          No such person exists!
+        </p>
+      )}
     </div>
   );
 }
