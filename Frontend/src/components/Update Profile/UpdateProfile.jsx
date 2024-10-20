@@ -10,13 +10,45 @@ function UpdateProfile() {
   const navigate = useNavigate();
   const { data: authuser } = useQuery({ queryKey: ["authUser"] });
   const [isUsernameAvailable, setUsernameAvailable] = useState();
+  const [newUsername, setNewUsername] = useState();
+
   const [updateInfo, setUpdateInfo] = useState({
+    username: "",
     email: "",
     password: "",
     newpass: "",
     bio: "",
     links: "",
   });
+
+  //username
+
+  const { mutate: checkUsername } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/user/usernameavailable/${newUsername}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        if (data.length > 0) {
+          setUsernameAvailable(false);
+        } else {
+          setUsernameAvailable(true);
+        }
+        return data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  });
+
+  const handleUsernameChange = (e) => {
+    e.preventDefault();
+    if (e.target.value) checkUsername();
+  };
 
   //update
   const {
@@ -63,6 +95,9 @@ function UpdateProfile() {
     }
     if (updateInfo.newpass && updateInfo.newpass.length < 6) {
       return toast.error("New password must contain more than 6 characters!");
+    }
+    if (newUsername && newUsername !== authuser.username) {
+      setUpdateInfo({ ...updateInfo, username: newUsername });
     }
     update();
   };
@@ -228,9 +263,25 @@ function UpdateProfile() {
           type="text"
           className="m-2 borde-2 p-2 placeholder-black placeholder-opacity-50 w-4/5 sm:w-3/5  md:w-4/5 bg-blue-500 text-white rounded-md focus:outline-none focus:border"
           required
+          onChange={(e) => {
+            if (!e.target.value) setNewUsername(" ");
+            else setNewUsername(e.target.value);
+            handleUsernameChange(e);
+          }}
           placeholder="Username"
+          value={newUsername || authuser.username}
           id="username"
         />
+        {newUsername && newUsername !== authuser.username && (
+          <p
+            className={`text-xs lg:text-base ${
+              isUsernameAvailable ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            This username is{" "}
+            {isUsernameAvailable ? "availble" : "Not available"}!
+          </p>
+        )}
         <label htmlFor="email">
           Email<span className="text-red-500 font-semibold">*</span>
         </label>

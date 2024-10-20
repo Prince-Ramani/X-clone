@@ -34,12 +34,14 @@ function UserProfile() {
   }
 
   //state
+
   const [isauthuserFollowing, setAuthUserFollowing] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
   const [userOffSet, setUserOffset] = useState(0);
   const [totalUserPosts, setTotalUserPosts] = useState([]);
   const [morePost, setMorePost] = useState(true);
+  var isFollowReq = false;
   //getting profile
   const {
     data: profile,
@@ -52,8 +54,6 @@ function UserProfile() {
       try {
         const res = await fetch(`/user/profile/${currentProfile}`);
         const data = await res.json();
-        console.log(data.followers.length);
-        console.log(data.following.length);
         return data;
       } catch (error) {
         console.log(error);
@@ -85,7 +85,7 @@ function UserProfile() {
     queryFn: async () => {
       try {
         const res = await fetch(
-          `/api/post/profile/${profile?._id}?limit=10&offset=${userOffSet}`
+          `/api/post/profile/${currentProfile}?limit=10&offset=${userOffSet}`
         );
         const data = await res.json();
         if (data.length < 10) setMorePost(false);
@@ -95,12 +95,18 @@ function UserProfile() {
         console.log(err);
       }
     },
-    enabled: !!profile,
+    enabled: !!profile || !!currentProfile || !!authuser,
   });
 
   useEffect(() => {
-    if (userPosts) setTotalUserPosts((prev) => [...prev, ...userPosts]);
+    if (profile) setTotalUserPosts((prev) => [...prev, ...userPosts]);
   }, [userPosts]);
+
+  useEffect(() => {
+    setTotalUserPosts([]);
+    setUserOffset(0);
+    FetchPosts();
+  }, [currentProfile]);
 
   const handleScroll = debounce(() => {
     if (
@@ -127,6 +133,7 @@ function UserProfile() {
   } = useMutation({
     mutationFn: async () => {
       try {
+        isFollowReq = true;
         const res = await fetch(`/user/follow/${profile._id}`, {
           method: "POST",
           headers: {
@@ -144,6 +151,7 @@ function UserProfile() {
         return toast.error(data.error);
       }
       await queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      isFollowReq = false;
       toast.success(data.message);
     },
   });

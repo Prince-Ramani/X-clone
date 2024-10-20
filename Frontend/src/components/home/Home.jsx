@@ -100,7 +100,7 @@ function Home() {
   }, [isChanged]);
 
   useEffect(() => {
-    if (data) {
+    if (data && data.length > 0 && hasMore) {
       setCurrentOffset((prev) => prev + data.length);
       setTotalPosts((prev) => [...prev, ...data]);
     }
@@ -146,7 +146,7 @@ function Home() {
       )}
 
       {(isLoading || isFetching) && (
-        <div className="flex justify-center items-center p-4 ">
+        <div className="flex justify-center items-center p-4 transition-opacity  ">
           <Spinner />
         </div>
       )}
@@ -160,8 +160,8 @@ function Home() {
         </div>
       )}
 
-      {!hasMore && (
-        <h1 className="w-full text-center p-2 text-green-500 ">
+      {!hasMore && totalPosts?.length > 0 && (
+        <h1 className="w-full text-center p-4 text-green-500 ">
           You have seen every single post!
         </h1>
       )}

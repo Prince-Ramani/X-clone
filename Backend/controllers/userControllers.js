@@ -121,7 +121,7 @@ const updateProfile = async (req, res) => {
     if (!match) {
       return res.status(404).json({ error: "Incorrect password" });
     }
-    if (username) {
+    if (username && username!== "") {
       username = username.trim();
       const userNameAvailable = await User.find({ username });
       if (userNameAvailable.length === 0) {
@@ -269,6 +269,18 @@ const getFOllowingList = async(req,res)=>{
   }
 }
 
+const userNameAvailable = async(req,res)=>{
+  try {
+    const userName = req.params.username;
+    const data = await User.findOne({username : userName})
+    if(data)return res.json([data]).status(200);
+ return  res.json([]).status(200);
+  } catch (err) {
+    console.log(err)
+    return req.status(500).json({error : "Internal server error"})
+  }
+}
+
 
 module.exports = {
   getProfile,
@@ -280,6 +292,7 @@ module.exports = {
   uploadProfilePic,
   updateBannerPic,
   getFollowersList,
-  getFOllowingList
+  getFOllowingList,
+  userNameAvailable
 };
 
