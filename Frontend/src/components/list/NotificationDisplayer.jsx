@@ -6,8 +6,8 @@ import LinesSkele from "../skeletons/LinesSekele";
 import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function NotificationDisplayer() {
-  const { authUser } = useAuthUserContext();
-  const [isFollowing, setFollowing] = useState([...authUser.following]);
+  const { authUser, setAuthUser } = useAuthUserContext();
+
   const {
     data: notifications,
     isPending,
@@ -49,10 +49,16 @@ function NotificationDisplayer() {
         return;
       }
       if (data.message === "unfollowed successfully") {
-        setFollowing((prev) => prev.filter((per) => per != personID));
+        await setAuthUser({
+          ...authUser,
+          following: authUser.following.filter((val) => val !== personID),
+        });
       }
       if (data.message === "followed successfully") {
-        setFollowing((prev) => [...prev, personID]);
+        await setAuthUser({
+          ...authUser,
+          following: [...authUser.following, personID],
+        });
       }
       toast.success(data.message);
     },
@@ -69,12 +75,12 @@ function NotificationDisplayer() {
           <Display
             key={noti._id}
             noti={noti}
-            following={isFollowing.includes(noti.from._id)}
+            following={authUser.following.includes(noti.from._id)}
             followPerson={followPerson}
           />
         ))}
       {notifications?.length <= 0 && (
-        <h1 className="pl-2">You dont have any notifications</h1>
+        <h1 className="pl-2">You dont have any new notifications</h1>
       )}
     </div>
   );

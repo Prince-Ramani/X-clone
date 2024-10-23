@@ -15,13 +15,16 @@ import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function UserProfile() {
   const navigate = useNavigate();
-  const queryclient = useQueryClient();
+
   const { currentProfile } = useProfileContext();
 
   const { authUser, setAuthUser } = useAuthUserContext();
 
   useEffect(() => {
     if (!currentProfile) navigate("/home");
+    if (currentProfile == authUser._id) {
+      navigate("/profile");
+    }
   }, [currentProfile, navigate]);
 
   function debounce(func, delay) {

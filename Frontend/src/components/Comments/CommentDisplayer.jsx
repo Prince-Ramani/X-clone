@@ -70,8 +70,8 @@ function CommentDisplayer({ comment, postID, userID, isPostOwner }) {
   });
 
   return (
-    <div className=" m-2 mt-2 p-2 border-b select-none">
-      <div className=" flex items-center p-1">
+    <div className=" m-2 mt-2 p-2 border-b select-none ">
+      <div className=" flex items-center p-1 ">
         <div className="h-fit w-fit rounded-full select-none">
           <img
             src={commenter.profilePic}
