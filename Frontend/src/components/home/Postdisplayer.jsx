@@ -4,8 +4,9 @@ import { FaHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useProfileContext } from "../../context/ProfileContex";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
   //
@@ -16,7 +17,7 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
 
   const navigate = useNavigate();
   const queryclient = useQueryClient();
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { authUser, setAuthUser } = useAuthUserContext();
   var isCreatedByUser;
   if (uploadedBy._id == userID) {
     isCreatedByUser = true;
@@ -118,7 +119,7 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
             />
           </div>
           <div
-            className="  h-fit w-fit m-1 p-2 font-bold : active:text-green-400"
+            className="  h-fit w-fit m-1 p-2 font-bold : active:text-green-400 hover:text-slate-400 cursor-pointer"
             onClick={() => ShowProfile()}
           >
             <p className="select-none">{uploadedBy.username}</p>
@@ -161,7 +162,7 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
             <a href={uploadedPhoto} target="_blank">
               <img
                 src={uploadedPhoto}
-                className="h-full rounded-lg w-full fill select-none object-cover "
+                className="h-full rounded-lg w-full fill select-none object-cover border border-white/20 "
               ></img>
             </a>
           </div>
@@ -169,10 +170,10 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
 
         <div className="w-full h-fit p-2 m-1 flex justify-around">
           <div
-            className={` w-3/12 flex justify-center items-center opacity-80 ${
+            className={` w-3/12 flex justify-center items-center cursor-pointer opacity-80 ${
               isOn &&
               isOn == "comments" &&
-              "bg-blue-700 border-2 opacity-100 rounded-md p-1"
+              "bg-blue-700 border-2 opacity-100  rounded-md p-1"
             } hover:text-blue-500 `}
             onClick={comme}
           >
@@ -180,7 +181,7 @@ function Postdisplayer({ post, isFollowing, followFunc, userID, isOn }) {
             <p className={`text-xs mx-1 select-none `}>{comments.length}</p>
           </div>
           <div
-            className=" w-3/12 flex justify-center items-center opacity-80 "
+            className=" w-3/12 flex justify-center items-center opacity-80  cursor-pointer"
             onClick={likePost}
           >
             <FaHeart

@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom";
 import Skele from "../skeletons/Skele";
 import { CiImageOn } from "react-icons/ci";
 import { CiCircleRemove } from "react-icons/ci";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 function Addpost() {
   const querclient = useQueryClient();
   const fileInputRef = useRef();
   const navigate = useNavigate();
   const [pContent, setpContent] = useState("");
   const [currentFile, setFile] = useState();
-  const { data } = useQuery({ queryKey: ["authUser"] });
+  const { authUser: data } = useAuthUserContext();
   const { mutate, isPending, isLoading } = useMutation({
     mutationFn: async (formData) => {
       try {

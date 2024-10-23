@@ -5,11 +5,12 @@ import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
 import { FaSadTear } from "react-icons/fa";
 import Spinner from "../../ani/Spinner";
+import { useAuthUserContext } from "../../context/AuthUserContext";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const querclient = useQueryClient();
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
-  const [currentlyFollowing, setFollowing] = useState([...authuser.following]);
+  const { authUser, setAuthUser } = useAuthUserContext();
+  const [currentlyFollowing, setFollowing] = useState([...authUser.following]);
   const [currentOffSet, setCurrentOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalPosts, setTotalPosts] = useState([]);
@@ -50,11 +51,18 @@ function Home() {
       }
       if (data.message === "unfollowed successfully") {
         setFollowing((prev) => prev.filter((per) => per != personID));
+        await setAuthUser({
+          ...authUser,
+          following: authUser.following.filter((val) => val !== personID),
+        });
       }
       if (data.message === "followed successfully") {
         setFollowing((prev) => [...prev, personID]);
+        await setAuthUser({
+          ...authUser,
+          following: [...authUser.following, personID],
+        });
       }
-      await querclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success(data.message);
     },
   });
@@ -75,7 +83,7 @@ function Home() {
       }
     },
     refetchOnWindowFocus: false,
-    enabled: hasMore && !!authuser,
+    enabled: hasMore && !!authUser,
   });
 
   const handleScroll = debounce(() => {
@@ -123,7 +131,7 @@ function Home() {
           For you
         </button>
         <button
-          className={` w-5/12 p-1 border-b-2 select-none ${
+          className={` w-5/12 p-1 border-b-2 select-none transition-opacity duration-700po ${
             isActive == "followingposts" ? "border-blue-500" : "border-none"
           }`}
           onClick={() => setActive(`followingposts`)}
@@ -140,7 +148,7 @@ function Home() {
             post={post}
             isFollowing={currentlyFollowing.includes(post.uploadedBy._id)}
             followFunc={follow}
-            userID={authuser._id}
+            userID={authUser._id}
           />
         ))
       )}

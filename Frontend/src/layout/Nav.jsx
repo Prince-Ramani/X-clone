@@ -4,10 +4,11 @@ import { FaHome } from "react-icons/fa";
 import { IoIosSearch, IoMdNotifications } from "react-icons/io";
 import { IoAddSharp } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthUserContext } from "../context/AuthUserContext";
 
 function Nav() {
   const [current, setCurrent] = useState("/home");
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
+  const { authUser } = useAuthUserContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,7 +60,7 @@ function Nav() {
           onClick={() => handleClick("/profile")}
         >
           <img
-            src={authuser?.profilePic}
+            src={authUser?.profilePic}
             className="h-8 w-8 rounded-full object-cover select-non e hover:cursor-pointer "
           ></img>
         </div>

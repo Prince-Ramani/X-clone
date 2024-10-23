@@ -3,44 +3,14 @@ import { BiBell, BiHome, BiUser } from "react-icons/bi";
 import { IoIosLogOut } from "react-icons/io";
 import { IoAddSharp } from "react-icons/io5";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";
-import toast from "react-hot-toast";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function Noti() {
   const navigate = useNavigate();
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      try {
-        const res = await fetch("/api/auth/logout", {
-          method: "POST",
-        });
-        const data = await res.json();
-        if ("error" in data) toast.error(data.error);
-        return data;
-      } catch (err) {
-        throw Error(err);
-      }
-    },
-    onSuccess: async (data) => {
-      if ("error" in data) {
-        return;
-      }
-      toast.success(`Logout successfull!`);
-      navigate("/signup");
-      await querclient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-  });
-
-  if (isPending) {
-    return <div className="skeleton h-screen w-screen"></div>;
-  }
-
-  async function logoutUser() {
-    mutate();
-  }
+  const { authUser } = useAuthUserContext();
 
   return (
     <div className=" bg-black border  border-white/30   rounded-tl-lg  rounded-bl-lg ml-auto border-gray-600 hidden h-screen lg:block  p-2 text-white sticky top-0 left  w-2/12 ">
@@ -111,23 +81,20 @@ function Noti() {
         </div>
       </div>
 
-      <div className=" h-fit min-w-full max-w-full p-2 flex border-2 rounded-md justify-around mt-auto  ">
+      <div
+        className=" h-fit min-w-full max-w-full p-2 flex border-2 rounded-md justify-around mt-auto hover:bg-slate-900"
+        onClick={() => navigate("/profile")}
+      >
         <div className="h-fit w-fit shrink-0">
           <img
-            src={authuser.profilePic}
+            src={authUser.profilePic}
             className=" rounded-full h-10 w-10 border-2 select-none object-cover"
           />
         </div>
         <div className="h-full  w-[60%]">
           <p className="select-none break-words h-full w-full mx-1">
-            {authuser.username}
+            {authUser.username}
           </p>
-        </div>
-        <div
-          className=" hover:text-gray-600 shrink-0  flex justify-center items-center w-[20%]   h-fit p-2 active:text-white active:bg-green-500"
-          onClick={logoutUser}
-        >
-          <IoIosLogOut className="h-full w-full scale-150" />
         </div>
       </div>
     </div>

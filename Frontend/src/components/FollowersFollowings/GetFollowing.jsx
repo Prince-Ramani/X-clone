@@ -5,18 +5,19 @@ import { useParams } from "react-router-dom";
 import { TbMoodSad } from "react-icons/tb";
 
 import ListFollowersFollowings from "./ListFollowersFollowings";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function GetFollowing() {
   const { personID, username } = useParams();
   if (!personID) return;
   const querclient = useQueryClient();
   const [isFollowing, setFollowing] = useState([]);
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
-  const auth = authuser._id;
+  const { authUser, setAuthUser } = useAuthUserContext();
+  const auth = authUser._id;
 
   useEffect(() => {
-    setFollowing([...authuser.following]);
-  }, [authuser]);
+    setFollowing([...authUser.following]);
+  }, [authUser]);
 
   const { data: followings } = useQuery({
     queryKey: [`following${personID}`],
@@ -52,11 +53,24 @@ function GetFollowing() {
         console.log(err);
       }
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data, person) => {
       if ("error" in data) {
         return;
       }
-      await querclient.invalidateQueries({ queryKey: ["authUser"] });
+      if (data.message === "unfollowed successfully") {
+        setFollowing((prev) => prev.filter((per) => per != person));
+        await setAuthUser({
+          ...authUser,
+          following: authUser.following.filter((val) => val !== person),
+        });
+      }
+      if (data.message === "followed successfully") {
+        setFollowing((prev) => [...prev, person]);
+        await setAuthUser({
+          ...authUser,
+          following: [...authUser.following, person],
+        });
+      }
       toast.success(data.message);
     },
   });

@@ -11,6 +11,7 @@ function UpdateProfile() {
   const { data: authuser } = useQuery({ queryKey: ["authUser"] });
   const [isUsernameAvailable, setUsernameAvailable] = useState();
   const [newUsername, setNewUsername] = useState();
+  const [usernameChange, setUsernameChanged] = useState(false);
 
   const [updateInfo, setUpdateInfo] = useState({
     username: "",
@@ -264,12 +265,16 @@ function UpdateProfile() {
           className="m-2 borde-2 p-2 placeholder-black placeholder-opacity-50 w-4/5 sm:w-3/5  md:w-4/5 bg-blue-500 text-white rounded-md focus:outline-none focus:border"
           required
           onChange={(e) => {
-            if (!e.target.value) setNewUsername(" ");
-            else setNewUsername(e.target.value);
+            setNewUsername(e.target.value);
+            setUsernameChanged(true);
             handleUsernameChange(e);
           }}
           placeholder="Username"
-          value={newUsername || authuser.username}
+          value={
+            usernameChange && newUsername !== authuser.username
+              ? newUsername
+              : authuser.username
+          }
           id="username"
         />
         {newUsername && newUsername !== authuser.username && (

@@ -95,7 +95,7 @@ function CommentDisplayer({ comment, postID, userID, isPostOwner }) {
       <div className=" p-1 m-1 font-light select-none ">{comment.text}</div>
       <div className=" flex justify-center items-center">
         <div
-          className=" w-3/12 flex justify-center items-center opacity-80 py-2 "
+          className=" w-2/12 flex justify-center items-center opacity-80  cursor-pointer py-1"
           onClick={like}
         >
           <FaHeart

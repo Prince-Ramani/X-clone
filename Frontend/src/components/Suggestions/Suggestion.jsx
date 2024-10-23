@@ -1,23 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import SuggestionDisplayer from "./SuggestionDisplayer";
 import toast from "react-hot-toast";
-import LinesSkele from "../skeletons/LinesSekele";
 import { IoIosRefresh } from "react-icons/io";
+import { useAuthUserContext } from "../../context/AuthUserContext";
+import { useProfileContext } from "../../context/ProfileContex";
 
 function Suggestion() {
-  const querclient = useQueryClient();
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
-  const [isFollowing, setFollowing] = useState([]);
-
-  useEffect(() => {
-    if (
-      authuser &&
-      JSON.stringify(isFollowing) !== JSON.stringify(authuser.following)
-    ) {
-      setFollowing([...authuser.following]);
-    }
-  }, [authuser, isFollowing]);
+  const { authUser, setAuthUser } = useAuthUserContext();
+  const queryclient = useQueryClient();
+  const { currentProfile } = useProfileContext();
 
   const {
     data: suggestedUsers,
@@ -60,13 +52,27 @@ function Suggestion() {
       if ("error" in data) {
         return;
       }
+
       if (data.message === "unfollowed successfully") {
-        setFollowing((prev) => prev.filter((per) => per != personID));
+        await setAuthUser({
+          ...authUser,
+          following: authUser.following.filter((val) => val !== personID),
+        });
       }
+
       if (data.message === "followed successfully") {
-        setFollowing((prev) => [...prev, personID]);
+        await setAuthUser({
+          ...authUser,
+          following: [...authUser.following, personID],
+        });
       }
-      await querclient.invalidateQueries({ queryKey: ["authUser"] });
+      //for userProfile
+      if (currentProfile == personID) {
+        console.log(currentProfile, personID);
+        await queryclient.invalidateQueries({
+          queryKey: ["userProfile", currentProfile],
+        });
+      }
       toast.success(data.message);
     },
   });
@@ -88,7 +94,7 @@ function Suggestion() {
         <SuggestionDisplayer
           key={sug._id}
           suggestion={sug}
-          following={isFollowing.includes(sug._id)}
+          following={authUser.following.includes(sug._id)}
           follow={follow}
         />
       ))}

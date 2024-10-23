@@ -7,9 +7,10 @@ import { RiImageEditLine } from "react-icons/ri";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Skele from "../skeletons/Skele";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function ShowProfile() {
-  const { data: person } = useQuery({ queryKey: ["authUser"] });
+  const { authUser, setAuthUser } = useAuthUserContext();
   const querclient = useQueryClient();
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ function ShowProfile() {
     queryKey: ["myPosts"],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/post/profile/${person._id}`);
+        const res = await fetch(`/api/post/profile/${authUser._id}`);
         const data = await res.json();
         return data;
       } catch (err) {
@@ -47,8 +48,8 @@ function ShowProfile() {
         console.log(err);
       }
     },
-    onSuccess: () => {
-      querclient.invalidateQueries({ queryKey: ["authUser"] });
+    onSuccess: async () => {
+      await querclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success("Logout successfull!");
     },
   });
@@ -83,7 +84,7 @@ function ShowProfile() {
       if ("error" in data) {
         return;
       }
-      querclient.invalidateQueries("authUser");
+      await querclient.invalidateQueries("authUser");
       toast.success(`Profile picture updated successfully!`);
     },
   });
@@ -112,7 +113,7 @@ function ShowProfile() {
       if ("error" in data) {
         return;
       }
-      querclient.invalidateQueries("authUser");
+      await querclient.invalidateQueries("authUser");
       toast.success(`banner updated successfully!`);
     },
   });
@@ -165,9 +166,9 @@ function ShowProfile() {
                 name="banner"
                 onChange={(e) => handleBannerUpload(e)}
               />
-              <a to={person.banner} target="_blank">
+              <a to={authUser.banner} target="_blank">
                 <img
-                  src={person.banner}
+                  src={authUser.banner}
                   className="rounded-md w-full md:h-fit select-none object-cover"
                 ></img>
               </a>
@@ -196,9 +197,9 @@ function ShowProfile() {
                   name="profilePic"
                   onChange={(e) => handleProfileUpload(e)}
                 />
-                <a href={person.profilePic} target="_blank">
+                <a href={authUser.profilePic} target="_blank">
                   <img
-                    src={person.profilePic}
+                    src={authUser.profilePic}
                     className="h-20 w-20 rounded-full select-none object-cover "
                   ></img>
                 </a>
@@ -206,7 +207,7 @@ function ShowProfile() {
             )}
           </div>
           <div className="mx-2 font-semibold  tracking-wider select-none lg:text-xl ">
-            {person.username}
+            {authUser.username}
           </div>
           <div className="ml-auto h-fit w-fit">
             <button
@@ -223,17 +224,17 @@ function ShowProfile() {
           <div className="p-2 flex flex-col gap-1">
             <div>
               <span className="text-blue-400 font-medium">Email : </span>
-              {person.email}
+              {authUser.email}
             </div>
             <div>
               <span className="text-blue-400 font-medium">Bio : </span>
-              {person.bio}
+              {authUser.bio}
             </div>
             <div>
               <div className="flex flex-col ">
                 <span className="text-blue-400 font-medium ">Socials:</span>
-                {person.links.length > 0 &&
-                  person.links.map((l) => (
+                {authUser.links.length > 0 &&
+                  authUser.links.map((l) => (
                     <div>
                       <a
                         href={l}
@@ -253,22 +254,22 @@ function ShowProfile() {
             <div
               className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
               onClick={() =>
-                navigate(`/followers/${person.username}/${person._id}`)
+                navigate(`/followers/${authUser.username}/${authUser._id}`)
               }
             >
               <span className=" font-bold mx-2 text-xl ">
-                {person.followers.length}
+                {authUser.followers.length}
               </span>
               Followers
             </div>
             <div
               className=" p-1 text-gray-400 cursor-pointer hover:text-blue-700"
               onClick={() =>
-                navigate(`/followings/${person.username}/${person._id}`)
+                navigate(`/followings/${authUser.username}/${authUser._id}`)
               }
             >
               <span className=" font-bold mx-2 text-xl">
-                {person.following.length}
+                {authUser.following.length}
               </span>
               Following
             </div>
@@ -282,7 +283,7 @@ function ShowProfile() {
             key={post._id}
             post={post}
             isFollowing="false"
-            userID={person._id}
+            userID={authUser._id}
           />
         ))}
     </div>

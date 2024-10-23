@@ -21,12 +21,19 @@ import GetFollowing from "./components/FollowersFollowings/GetFollowing";
 import ShowComment from "./components/Comments/ShowComment";
 import Signin from "./components/signin/Signin";
 import Nav from "./layout/Nav";
+import { useAuthUserContext } from "./context/AuthUserContext";
 function App() {
+  const { authUser, setAuthUser } = useAuthUserContext();
   const { data, isPending, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       const res = await fetch("/api/auth/me");
       const data = await res.json();
+      if ("error" in data) {
+        return data;
+      }
+      await setAuthUser(data);
+
       return data;
     },
   });
@@ -75,10 +82,6 @@ function App() {
           <Route
             path="/update"
             element={isLoggedIn ? <UpdateProfile /> : <Navigate to="/signup" />}
-          />
-          <Route
-            path="/addpost"
-            element={isLoggedIn ? <Addpost /> : <Navigate to="/signup" />}
           />
           <Route
             path="/addpost"

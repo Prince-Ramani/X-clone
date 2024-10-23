@@ -3,10 +3,11 @@ import Display from "./display";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import LinesSkele from "../skeletons/LinesSekele";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function NotificationDisplayer() {
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
-  const [isFollowing, setFollowing] = useState([...authuser.following]);
+  const { authUser } = useAuthUserContext();
+  const [isFollowing, setFollowing] = useState([...authUser.following]);
   const {
     data: notifications,
     isPending,

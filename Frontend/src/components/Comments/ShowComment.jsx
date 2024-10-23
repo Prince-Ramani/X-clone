@@ -6,12 +6,15 @@ import CommentDisplayer from "./CommentDisplayer";
 
 import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function ShowComment() {
-  const queryclient = useQueryClient();
+  const { authUser } = useAuthUserContext();
   const [commentText, setCommentText] = useState("");
   const location = useLocation();
   const { state: postID } = location;
+
+  const queryclient = useQueryClient();
 
   const {
     data: post,
@@ -72,7 +75,6 @@ function ShowComment() {
     mutate(commentText);
   }
 
-  const { data: authuser } = useQuery({ queryKey: ["authUser"] });
   return (
     <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-2">{post?.uploadedBy.username}</div>
@@ -81,12 +83,12 @@ function ShowComment() {
         <div className="px-2 text-xl tracking-wider border-b pb-4 ">
           Comments ({post?.comments.length})
         </div>
-        <div className="border my-2 rounded-md p-2 bg-gray-600 ">
+        <div className="border my-2 rounded-md p-2 bg-sky-900 ">
           <div className="flex">
             <div className="h-fit w-fit rounded-full m-2 border">
               <img
                 className="h-12 w-12 rounded-full object-cover"
-                src={authuser.profilePic}
+                src={authUser.profilePic}
               ></img>
             </div>
             <div className="w-full ml-2 ">
@@ -99,7 +101,7 @@ function ShowComment() {
               />
             </div>
           </div>
-          <div className=" my-2 p-2 flex justify-end border items-center">
+          <div className=" my-2 p-2 flex justify-end  items-center">
             <div
               className={`border w-fit h-7 mx-4 rounded-md px-2  grid place-content-center text-xs ${
                 commentText.length > 500 ? "bg-red-600" : "bg-green-600"
@@ -110,7 +112,9 @@ function ShowComment() {
             <button
               className="bg-blue-500 rounded-md p-2 w-1/5 active:bg-green-500 hover:bg-blue-200"
               onClick={postComment}
-              disabled={isPending || isLoading}
+              disabled={
+                isPending || isLoading || pendingCommnent || loadingComment
+              }
             >
               {isPending || isLoading ? "Posting..." : "Post"}
             </button>
@@ -123,8 +127,8 @@ function ShowComment() {
               key={comment._id}
               comment={comment}
               postID={post._id}
-              userID={authuser._id}
-              isPostOwner={authuser._id == post.uploadedBy._id}
+              userID={authUser._id}
+              isPostOwner={authUser._id == post.uploadedBy._id}
             />
           ))}
       </div>

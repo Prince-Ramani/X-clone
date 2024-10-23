@@ -11,13 +11,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Postdisplayer from "../home/Postdisplayer";
 import Spinner from "../../ani/Spinner";
+import { useAuthUserContext } from "../../context/AuthUserContext";
 
 function UserProfile() {
   const navigate = useNavigate();
   const queryclient = useQueryClient();
   const { currentProfile } = useProfileContext();
 
-  const { data: authuser, refetch } = useQuery({ queryKey: ["authUser"] });
+  const { authUser, setAuthUser } = useAuthUserContext();
 
   useEffect(() => {
     if (!currentProfile) navigate("/home");
@@ -35,42 +36,38 @@ function UserProfile() {
 
   //state
 
-  const [isauthuserFollowing, setAuthUserFollowing] = useState([]);
   const [totalFollowers, setTotalFollowers] = useState([]);
   const [totalFollowing, setTotalFollowing] = useState([]);
   const [userOffSet, setUserOffset] = useState(0);
   const [totalUserPosts, setTotalUserPosts] = useState([]);
   const [morePost, setMorePost] = useState(true);
-  var isFollowReq = false;
+
   //getting profile
   const {
     data: profile,
     isLoading: gettingPro,
     isPendingingProf: gettingProf,
-    refetch: refetchProf,
   } = useQuery({
     queryKey: ["userProfile", currentProfile],
     queryFn: async () => {
       try {
         const res = await fetch(`/user/profile/${currentProfile}`);
         const data = await res.json();
+        if ("error" in data) return data;
         return data;
       } catch (error) {
         console.log(error);
       }
     },
-    enabled: !!currentProfile || !!authuser,
+    enabled: !!currentProfile || !!authUser,
   });
 
-  //settng state
   useEffect(() => {
     if (profile) {
-      setAuthUserFollowing([...authuser.following]);
       setTotalFollowers([...profile.followers]);
       setTotalFollowing([...profile.following]);
-      refetchProf();
     }
-  }, [currentProfile, authuser, profile]);
+  }, [profile]);
 
   //posts
 
@@ -95,7 +92,7 @@ function UserProfile() {
         console.log(err);
       }
     },
-    enabled: !!profile || !!currentProfile || !!authuser,
+    enabled: !!profile || !!currentProfile || !!authUser,
   });
 
   useEffect(() => {
@@ -133,7 +130,6 @@ function UserProfile() {
   } = useMutation({
     mutationFn: async () => {
       try {
-        isFollowReq = true;
         const res = await fetch(`/user/follow/${profile._id}`, {
           method: "POST",
           headers: {
@@ -148,10 +144,24 @@ function UserProfile() {
     },
     onSuccess: async (data) => {
       if ("error" in data) {
-        return toast.error(data.error);
+        return;
       }
-      await queryclient.invalidateQueries({ queryKey: ["authUser"] });
-      isFollowReq = false;
+      if (data.message === "unfollowed successfully") {
+        await setAuthUser({
+          ...authUser,
+          following: authUser.following.filter((val) => val !== profile._id),
+        });
+        setTotalFollowers([
+          totalFollowers.filter((val) => val !== authUser._id),
+        ]);
+      }
+      if (data.message === "followed successfully") {
+        await setAuthUser({
+          ...authUser,
+          following: [...authUser.following, profile._id],
+        });
+        setTotalFollowers([...totalFollowers, authUser._id]);
+      }
       toast.success(data.message);
     },
   });
@@ -193,8 +203,8 @@ function UserProfile() {
           <div className="mx-2 font-semibold tracking-wider select-none lg:text-xl ">
             {profile?.username}
           </div>
-          {!isauthuserFollowing.includes(profile?._id) &&
-            profile?._id !== authuser._id && (
+          {!authUser.following.includes(profile?._id) &&
+            profile?._id !== authUser._id && (
               <div
                 className="ml-auto mx-4  rounded-md"
                 onClick={handleFollowClick}
@@ -207,8 +217,8 @@ function UserProfile() {
                 </button>
               </div>
             )}
-          {isauthuserFollowing.includes(profile?._id) &&
-            profile?._id !== authuser._id && (
+          {authUser.following.includes(profile?._id) &&
+            profile?._id !== authUser._id && (
               <div
                 className="ml-auto mx-4  rounded-md"
                 onClick={(e) => handleFollowClick(e)}
@@ -284,7 +294,7 @@ function UserProfile() {
           <Postdisplayer
             key={`${post._id}-${userOffSet}-${index}`}
             post={post}
-            userID={authuser._id}
+            userID={authUser._id}
           />
         ))}
       {isFetching && (
