@@ -15,13 +15,12 @@ function Nav() {
   useEffect(() => {
     setCurrent(location.pathname);
   }, [location.pathname]);
-
   const handleClick = (val) => {
     navigate(`${val}`);
     setCurrent(val);
   };
   return (
-    <div className="block lg:hidden border-t border-blue-400 border-2 top-0  fixed  w-screen left-0 right-0 md:mx-auto z-20 md:w-5/12 bg-gray-900  h-12">
+    <div className="block lg:hidden border-t border-blue-400 border-2 top-0  fixed  w-screen left-0 right-0 md:mx-auto z-[100] md:w-5/12 bg-gray-900  h-12">
       <div className=" flex justify-center items-center gap-5 h-full  rounded-tl-lg rounded-tr-lg  ">
         <div className=" px-3   rounded-md ">
           <FaHome

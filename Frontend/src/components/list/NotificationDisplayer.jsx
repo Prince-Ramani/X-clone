@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Display from "./display";
-import { useState } from "react";
 import toast from "react-hot-toast";
 import LinesSkele from "../skeletons/LinesSekele";
 import { useAuthUserContext } from "../../context/AuthUserContext";

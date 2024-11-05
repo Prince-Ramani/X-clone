@@ -76,7 +76,7 @@ function ShowComment() {
   }
 
   return (
-    <div className="w-screen bg-black text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
+    <div className="w-screen bg-black pt-10 text-white h-full min-h-screen md:w-5/12 lg:5/12 p-2">
       <div className="border-b m-2 p-2">{post?.uploadedBy.username}</div>
       {post && <Postdisplayer post={post} isOn="comments" />}
       <div className="my-2">

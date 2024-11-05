@@ -22,8 +22,10 @@ import ShowComment from "./components/Comments/ShowComment";
 import Signin from "./components/signin/Signin";
 import Nav from "./layout/Nav";
 import { useAuthUserContext } from "./context/AuthUserContext";
+
 function App() {
   const { authUser, setAuthUser } = useAuthUserContext();
+
   const { data, isPending, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
@@ -33,7 +35,6 @@ function App() {
         return data;
       }
       await setAuthUser(data);
-
       return data;
     },
   });
@@ -46,7 +47,7 @@ function App() {
 
   return (
     <Router>
-      <div className="flex  justify-center  ">
+      <div className="flex  justify-center   ">
         {isLoggedIn && <Noti />}
         <Routes>
           <Route

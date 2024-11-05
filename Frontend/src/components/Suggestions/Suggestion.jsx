@@ -68,7 +68,6 @@ function Suggestion() {
       }
       //for userProfile
       if (currentProfile == personID) {
-        console.log(currentProfile, personID);
         await queryclient.invalidateQueries({
           queryKey: ["userProfile", currentProfile],
         });

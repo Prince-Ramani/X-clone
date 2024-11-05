@@ -1,5 +1,5 @@
 import Postdisplayer from "./Postdisplayer";
-import { isValidElement, useEffect, useState } from "react";
+import { isValidElement, useCallback, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Skele from "../skeletons/Skele";
@@ -17,7 +17,7 @@ function Home() {
   const [isActive, setActive] = useState("getallpost");
   const [isChanged, setChanged] = useState(null);
 
-  function debounce(func, delay) {
+  const debounce = useCallback((func, delay) => {
     let timeoutId;
     return function (...args) {
       if (timeoutId) clearTimeout(timeoutId);
@@ -25,7 +25,7 @@ function Home() {
         func.apply(this, args);
       }, delay);
     };
-  }
+  }, []);
 
   const { mutate: follow } = useMutation({
     mutationFn: async (personID) => {
@@ -86,16 +86,6 @@ function Home() {
     enabled: hasMore && !!authUser,
   });
 
-  const handleScroll = debounce(() => {
-    if (
-      window.innerHeight + window.scrollY + 1 >=
-        document.documentElement.scrollHeight &&
-      hasMore
-    ) {
-      refetch();
-    }
-  }, 200);
-
   useEffect(() => {
     setTotalPosts([]);
     setCurrentOffset(0);
@@ -115,12 +105,24 @@ function Home() {
   }, [data]);
 
   useEffect(() => {
+    const handleScroll = debounce(() => {
+      if (
+        window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight &&
+        hasMore
+      ) {
+        refetch();
+      }
+    }, 200);
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasMore]);
 
+  console.log(totalPosts);
+
   return (
-    <div className="w-screen  bg-black  pb-96 lg:pb-10 text-white flex flex-col md:w-5/12 p-2 pt-12 lg:pt-2 ">
+    <div className="w-screen  bg-black  pb-80 lg:pb-10 text-white flex flex-col md:w-5/12 p-2 pt-12 lg:pt-2 ">
       <div className="w-full h-10 flex justify-around items-center">
         <button
           className={`w-5/12 p-1 border-b-2 select-none  ${
@@ -153,13 +155,13 @@ function Home() {
         ))
       )}
 
-      {(isLoading || isFetching) && (
+      {isFetching && (
         <div className="flex justify-center items-center p-4 transition-opacity  ">
           <Spinner />
         </div>
       )}
 
-      {totalPosts.length === 0 && !isFetching && (
+      {totalPosts.length === 0 && !isFetching && !isLoading && (
         <div className="flex flex-col justify-center items-center h-screen w-full pb-20">
           <FaSadTear className="h-2/6 w-7/12  opacity-20 " />
           <div className="text-xl tracking-wider opacity-50 p-2">
