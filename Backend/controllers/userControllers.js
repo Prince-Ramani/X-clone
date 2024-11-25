@@ -196,7 +196,7 @@ const updateBannerPic = async(req,res)=>{
   try{
   const {user : userID}= req;
   const user = await User.findById(userID) ;
-      if (user.banner!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1727093805/X-clone/Banners/hj7immfctj3mjart8hsn.jpg") {
+      if (user.banner!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1732515390/jeremy-thomas-4dpAqfTbvKA-unsplash_xwdeqn.jpg") {
         const imgID= user.banner.split('/').slice(-1)[0].split('.')[0];
         const foldername = "X-clone/Banners"
         const picID = `${foldername}/${imgID}`

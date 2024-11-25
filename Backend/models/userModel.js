@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
     banner: {
         type: String,
         required: false,
-        default: "https://res.cloudinary.com/dwxzguawt/image/upload/v1727093805/X-clone/Banners/hj7immfctj3mjart8hsn.jpg"
+        default: "https://res.cloudinary.com/dwxzguawt/image/upload/v1732515390/jeremy-thomas-4dpAqfTbvKA-unsplash_xwdeqn.jpg",
     },
     bio: {
         type: String,

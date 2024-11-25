@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { CiLock } from "react-icons/ci";
 import { FaXTwitter } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Signin() {
   const querclient = useQueryClient();
@@ -12,6 +12,7 @@ function Signin() {
     email: "",
     password: "",
   });
+
   const navigate = useNavigate();
   const { mutate, isPending, data } = useMutation({
     mutationFn: async (Info) => {
@@ -44,17 +45,17 @@ function Signin() {
     mutate(userInfo);
   }
   return (
-    <div className="w-screen bg-black h-screen text-white  flex justify-center items-center">
+    <div className="w-full  h-full  text-white  flex justify-center items-center">
       <div className="w-8/12 h-5/6  flex ">
         <div className="hidden lg:w-6/12 lg:h-full lg:flex lg:justify-center lg:items-center  ">
           <FaXTwitter className="h-5/6 w-7/12 " />
         </div>
-        <div className="w-full h-fit lg:w-6/12 flex justify-center items-center flex-col">
+        <div className="w-full h-full lg:w-6/12 flex justify-center items-center flex-col  pb-12 ">
           <FaXTwitter className="h-20 w-32 lg:hidden" />
-          <h1 className="lg:text-5xl md:text-4xl  text-3xl font-bold lg:p-3">
+          <h1 className="md:text-4xl  text-3xl font-bold lg:p-3">
             Welcome back.
           </h1>
-          <div className="w-9/12  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500">
+          <div className="w-full  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500">
             <MdEmail className="relative top-3 ml-1 min-w-5 " />
             <input
               type="email"
@@ -67,7 +68,7 @@ function Signin() {
             />
           </div>
 
-          <div className="w-9/12 flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500  ">
+          <div className="w-full flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500  ">
             <CiLock className="relative top-3 ml-1 min-w-5" />
             <input
               type="password"
@@ -86,7 +87,7 @@ function Signin() {
           )}
 
           <button
-            className={`bg-blue-600 max-w-xl lg:w-9/12 p-3 mt-3 rounded-3xl hover:bg-blue-300 w-9/12 ${
+            className={`bg-blue-600 max-w-xl lg:w-9/12 p-3 mt-3 rounded-3xl hover:bg-blue-300 w-full ${
               isPending ? "bg-gray-500" : "bg-blue-600"
             }`}
             onClick={(e) => {
@@ -98,8 +99,8 @@ function Signin() {
           </button>
           <p className="mt-2 m-2 mb-0">Don't have an account?</p>
           <Link
-            to="/signup"
-            className="max-w-xl lg:w-9/12 w-9/12  mt-3   flex justify-center items-center "
+            to="/sign-up"
+            className="max-w-xl lg:w-9/12   mt-3   flex justify-center items-center w-full"
           >
             <button className="bg-blue-600 h-full w-full rounded-3xl p-3 hover:bg-blue-300">
               Sign up
