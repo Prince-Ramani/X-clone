@@ -1,21 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Lock, Mail, X } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { CiLock } from "react-icons/ci";
-import { FaXTwitter } from "react-icons/fa6";
-import { MdEmail } from "react-icons/md";
+
 import { Link, useNavigate } from "react-router-dom";
+
+interface signinRequirements {
+  email: string;
+  password: string;
+}
 
 function Signin() {
   const querclient = useQueryClient();
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<signinRequirements>({
     email: "",
     password: "",
   });
 
   const navigate = useNavigate();
   const { mutate, isPending, data } = useMutation({
-    mutationFn: async (Info) => {
+    mutationFn: async (Info: signinRequirements) => {
       try {
         const res = await fetch("api/auth/login", {
           method: "POST",
@@ -27,7 +31,7 @@ function Signin() {
         const data = await res.json();
         if ("error" in data) toast.error(data.error);
         return data;
-      } catch (err) {
+      } catch (err: any) {
         throw Error(err);
       }
     },
@@ -36,27 +40,27 @@ function Signin() {
         return;
       }
       await querclient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
+      navigate("/home");
       toast.success(`Welcom back ${data?.username}!`);
     },
   });
-  function handleMutate(e) {
+  function handleMutate(e: React.SyntheticEvent) {
     e.preventDefault();
     mutate(userInfo);
   }
   return (
-    <div className="w-full  h-full  text-white  flex justify-center items-center">
+    <div className="w-full  h-screen text-white  flex justify-center items-center">
       <div className="w-8/12 h-5/6  flex ">
         <div className="hidden lg:w-6/12 lg:h-full lg:flex lg:justify-center lg:items-center  ">
-          <FaXTwitter className="h-5/6 w-7/12 " />
+          <X className="h-5/6 w-7/12 " />
         </div>
         <div className="w-full h-full lg:w-6/12 flex justify-center items-center flex-col  pb-12 ">
-          <FaXTwitter className="h-20 w-32 lg:hidden" />
+          <X className="h-20 w-32 lg:hidden" />
           <h1 className="md:text-4xl  text-3xl font-bold lg:p-3">
             Welcome back.
           </h1>
-          <div className="w-full  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500">
-            <MdEmail className="relative top-3 ml-1 min-w-5 " />
+          <div className="w-full  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-[75%] select-none hover:border-blue-500">
+            <Mail className="relative top-3 ml-2 size-5 " />
             <input
               type="email"
               className="w-full bg-transparent p-2 ml-1 focus:outline-none focus:border-none "
@@ -68,8 +72,8 @@ function Signin() {
             />
           </div>
 
-          <div className="w-full flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl select-none hover:border-blue-500  ">
-            <CiLock className="relative top-3 ml-1 min-w-5" />
+          <div className="w-full flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-[75%] select-none hover:border-blue-500  ">
+            <Lock className="relative top-3 ml-2 size-5" />
             <input
               type="password"
               className="w-full bg-transparent p-2 ml-1 focus:outline-none focus:border-none "

@@ -1,23 +1,26 @@
-import { CiLock } from "react-icons/ci";
-import { FaXTwitter } from "react-icons/fa6";
-import { FaUserAlt } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Lock, Mail, User, X } from "lucide-react";
+
+interface signupRequirements {
+  username: string;
+  email: string;
+  password: string;
+}
 
 function Signup() {
   const navigate = useNavigate();
   const querclient = useQueryClient();
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<signupRequirements>({
     username: "",
     email: "",
     password: "",
   });
 
   const { mutate, isPending, data } = useMutation({
-    mutationFn: async (Info) => {
+    mutationFn: async (Info: signupRequirements) => {
       try {
         const res = await fetch("/api/auth/create", {
           method: "POST",
@@ -40,29 +43,29 @@ function Signup() {
         return;
       }
       await querclient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
+      navigate("/home");
       toast.success(`Welcome to X ${data.username}!`);
     },
   });
 
-  async function handleClick(e) {
+  async function handleClick(e: React.SyntheticEvent) {
     e.preventDefault();
     mutate(userInfo);
   }
 
   return (
     <>
-      <div className="w-full  h-full  text-white  flex justify-center items-center select-none ">
+      <div className="w-full     flex justify-center items-center select-none ">
         <div className="w-8/12 h-5/6  flex ">
           <div className="hidden lg:w-6/12 lg:h-full lg:flex lg:justify-center lg:items-center  ">
-            <FaXTwitter className=" hidden h-5/6 w-7/12 lg:block " />
+            <X className=" hidden h-5/6 w-7/12 lg:block " />
           </div>
           <div className="w-full h-full  lg:w-6/12 flex justify-center items-center flex-col  pb-12">
-            <FaXTwitter className="h-20 w-20  lg:hidden " />
+            <X className="h-20 w-20  lg:hidden " />
             <h1 className="text-5xl font-bold lg:p-3">Join us.</h1>
 
             <div className="w-full flex  border-2 border-white rounded-xl mt-4 max-w-[75%] hover:border-blue-500  ">
-              <FaUserAlt className="relative top-3 ml-1 min-w-5" />
+              <User className="relative top-3 ml-2 size-5" />
               <input
                 type="text"
                 className="lg:w-full bg-transparent p-2 ml-1  focus:outline-none focus:border-none  w-full "
@@ -76,7 +79,7 @@ function Signup() {
             </div>
 
             <div className="w-full  flex  border-2 border-white  rounded-xl mt-4 max-w-[75%] hover:border-blue-500">
-              <MdEmail className="relative top-3 ml-1 min-w-5 " />
+              <Mail className="relative top-3 ml-2 size-5 " />
               <input
                 type="email"
                 className="w-full bg-transparent p-2 ml-1 focus:outline-none focus:border-none  "
@@ -89,19 +92,19 @@ function Signup() {
               />
             </div>
 
-            <div className="w-full flex  border-2 border-white rounded-xl mt-4 max-w-[75%] hover:border-blue-500">
-              <CiLock className="relative top-3 ml-1 min-w-5" />
+            <div className="w-full flex  border-2 border-white  rounded-xl mt-4 max-w-[75%]  hover:border-blue-500  ">
+              <Lock className="relative top-3 ml-2 size-5" />
               <input
                 type="password"
-                className="min-w-full bg-transparent p-2 ml-1  focus:outline-none focus:border-none "
+                className="w-full bg-transparent p-2 ml-1 focus:outline-none focus:border-none "
                 placeholder="Enter password"
                 value={userInfo.password}
                 onChange={(e) =>
                   setUserInfo({ ...userInfo, password: e.target.value })
                 }
-                required
               />
             </div>
+
             <div className="w-full flex  mt-4 max-w-xl hover:border-blue-500">
               {data?.error && (
                 <p className="leading-tight text-sm text-red-500">
