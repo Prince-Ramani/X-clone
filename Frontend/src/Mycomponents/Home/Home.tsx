@@ -6,14 +6,15 @@ import TextareaAutosize from "react-textarea-autosize";
 
 const Home = () => {
   const { authUser } = useAuthUser();
+
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
   const [textareaValue, setTextareaValue] = useState<string>("");
 
   return (
-    <div className="min-h-full w-full  bg-black border border-gray-800 border-b-0 border-t-0  ">
+    <div className="min-h-full w-full   border border-gray-800 border-b-0 border-t-0  ">
       {/* Top */}
 
-      <div className="border-b border-gray-800   flex justify-around items-center bg-black sticky top-0  ">
+      <div className="border-b border-gray-800   flex justify-around items-center  sticky top-0  ">
         <div
           className=" py-4  h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
           onClick={() => setIsActive("For you")}

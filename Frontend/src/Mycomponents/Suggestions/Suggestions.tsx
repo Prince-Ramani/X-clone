@@ -6,7 +6,7 @@ const Suggestions = () => {
   const [searchValue, setSearchValue] = useState("");
 
   return (
-    <div className=" w-[23%]  hidden md:block p-1 ml-5  ">
+    <div className="  w-[23%]  hidden lg:block p-1  ml-5  ">
       <div
         className="flex items-center rounded-full focus-within:border group focus-within:border-blue-600 focus-within:bg-transparent   p-2 py-3 bg-gray-700/50 "
         onFocus={() => setIsSearching(true)}

@@ -55,7 +55,7 @@ function Signup() {
 
   return (
     <>
-      <div className="w-full     flex justify-center items-center select-none ">
+      <div className="w-full h-screen   flex justify-center items-center select-none ">
         <div className="w-8/12 h-5/6  flex ">
           <div className="hidden lg:w-6/12 lg:h-full lg:flex lg:justify-center lg:items-center  ">
             <X className=" hidden h-5/6 w-7/12 lg:block " />

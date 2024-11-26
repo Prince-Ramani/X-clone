@@ -1,4 +1,6 @@
+import { useCreatePostContext } from "@/context/createPostContext";
 import { useAuthUser } from "@/context/userContext";
+
 import {
   BellIcon,
   CircleEllipsis,
@@ -23,6 +25,9 @@ enum CurrentlyOnOptions {
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { setCreateDialog } = useCreatePostContext();
+
   const [currentlyOn, setCurrentlyOn] = useState<CurrentlyOnOptions | null>();
 
   const { authUser } = useAuthUser();
@@ -40,7 +45,7 @@ const Sidebar = () => {
   }, [location]);
 
   return (
-    <div className=" w-1/6 min-h-full  border  bg-black py-2 border-r  border-gray-800/10 hidden md:flex flex-col   ">
+    <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 min-h-full  border    py-2 border-r  border-gray-800/10 hidden md:flex flex-col   ">
       <X className="size-8 ml-3" />
       <div className="flex flex-col py-5 gap-y-1">
         <div
@@ -114,16 +119,19 @@ const Sidebar = () => {
           }}
         >
           <CircleEllipsis className="size-7 ml-2 shrink-0" />
-          <span className="font-medium text-xl rounded-full rounded-r-none select-none   ">
+          <span className="font-medium text-xl rounded-full rounded-r-none select-none  ">
             More
           </span>
         </div>
 
-        <button className="bg-blue-400 rounded-full font-semibold text-lg p-2 py-3 w-5/6 hover:opacity-95 transition-opacity mt-1">
+        <button
+          className="bg-blue-400 rounded-full w-4/5 p-3 mt-1 hover:opacity-90 font-semibold text-lg"
+          onClick={() => setCreateDialog(true)}
+        >
           Post
         </button>
       </div>
-      <div className=" mt-auto flex items-center gap-3 p-2 mx-2 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
+      <div className=" mt-auto flex items-center gap-2 p-2 mx-2 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
         <img
           src={authUser?.profilePic}
           className="bg-white rounded-full h-10 w-10 shrink-0 object-cover"
@@ -134,7 +142,7 @@ const Sidebar = () => {
             {authUser?.username}
           </span>
         </div>
-        <div className=" h-fit w-fit shrink-0 ml-auto mr-1">
+        <div className=" h-fit w-fit shrink-0 ml-auto mr-1  hidden lg:block ">
           <Ellipsis className="size-5 shrink-0" />
         </div>
       </div>
