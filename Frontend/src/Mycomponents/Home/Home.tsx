@@ -6,12 +6,14 @@ import TextareaAutosize from "react-textarea-autosize";
 import ForYou from "./ForYou";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import Following from "./Following";
+import CustomTooltip from "@/customComponents/ToolTip";
 
 const Home = () => {
   const { authUser } = useAuthUser();
 
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
-  const [textareaValue, setTextareaValue] = useState<string | null>(null);
+  const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
 
   const { mutate: createPost, isPending } = useMutation({
@@ -58,9 +60,9 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-full w-full cursor-pointer   border border-gray-800 border-b-0 border-t-0  ">
+    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0   ">
       {/* Top */}
-      <div className="border-b border-gray-800   flex justify-around items-center  sticky top-0  ">
+      <div className="border-b border-gray-800   flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0  ">
         <div
           className=" py-4  h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
           onClick={() => setIsActive("For you")}
@@ -113,21 +115,30 @@ const Home = () => {
                 onChange={handleFileChange}
               />
             </div>
+
             <div className="flex gap-1 p-2 items-center h-full ">
-              <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer ">
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <ImageIcon className="size-5 text-blue-400" />
-                </label>
-              </span>
-              <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
-                <VideoIcon className="size-5 text-blue-400" />
-              </span>
-              <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
-                <ArrowUpDown className="size-5 text-blue-400" />
-              </span>
-              <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
-                <Smile className="size-5 text-blue-400" />
-              </span>
+              <CustomTooltip title="Media">
+                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer ">
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <ImageIcon className="size-5 text-blue-400" />
+                  </label>
+                </span>
+              </CustomTooltip>
+              <CustomTooltip title="Video">
+                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                  <VideoIcon className="size-5 text-blue-400" />
+                </span>
+              </CustomTooltip>
+              <CustomTooltip title="Poll">
+                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                  <ArrowUpDown className="size-5 text-blue-400" />
+                </span>
+              </CustomTooltip>
+              <CustomTooltip title="Emoji">
+                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                  <Smile className="size-5 text-blue-400" />
+                </span>
+              </CustomTooltip>
 
               {textareaValue ? (
                 <div
@@ -167,7 +178,11 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {isActive === "For you" ? <ForYou /> : ""}
+      {isActive === "For you" ? (
+        <ForYou authUserId={authUser?._id} />
+      ) : (
+        <Following authUserId={authUser?._id} />
+      )}
     </div>
   );
 };

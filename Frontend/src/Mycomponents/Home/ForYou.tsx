@@ -26,7 +26,7 @@ export interface UploadedByType {
   _id: string;
 }
 
-const ForYou = () => {
+const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
   const { data: posts } = useQuery({
     queryKey: ["ForYouPosts"],
     queryFn: async () => {
@@ -40,7 +40,7 @@ const ForYou = () => {
   return (
     <div>
       {posts?.map((post: PostType) => (
-        <PostDisplayer key={post._id} post={post} />
+        <PostDisplayer key={post._id} post={post} authUserId={authUserId} />
       ))}
     </div>
   );
