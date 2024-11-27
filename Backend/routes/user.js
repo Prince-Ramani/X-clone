@@ -4,7 +4,7 @@ const { getProfile ,followPerson,getUserNotifications,updateProfile,findUser, su
 const {upload} = require("../Cloudinary/cloudinary")
 const router = express.Router();
 
-router.get("/profile/:id",protectRoute,getProfile);
+router.get("/profile/:username",protectRoute,getProfile);
 router.post("/follow/:id",protectRoute,followPerson);
 router.get("/getnoti",protectRoute,getUserNotifications);
 router.post("/updateprofile",protectRoute,updateProfile);

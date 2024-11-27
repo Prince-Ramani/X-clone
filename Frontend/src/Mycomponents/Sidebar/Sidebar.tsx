@@ -45,7 +45,7 @@ const Sidebar = () => {
   }, [location]);
 
   return (
-    <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen  border sticky top-0    py-2 border-r  border-gray-800/10 hidden md:flex flex-col   ">
+    <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen   sticky top-0    py-2    hidden md:flex flex-col   ">
       <X className="size-8 ml-3" />
       <div className="flex flex-col py-5 gap-y-1">
         <div

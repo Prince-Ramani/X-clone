@@ -12,6 +12,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { useAuthUser } from "./context/userContext";
+import Profile from "./Mycomponents/Profile/Profile";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -43,8 +44,12 @@ function App() {
           path="/sign-up"
           element={!isLoggedIn ? <Signup /> : <Navigate to="/home" />}
         />
-        <Route path="/home" element={<Layout />}>
+        <Route path="/" element={<Layout />}>
           <Route index element={isLoggedIn ? <Home /> : null} />
+          <Route
+            path="profile/:username"
+            element={isLoggedIn ? <Profile /> : <Signup />}
+          />
         </Route>
       </Routes>
     </Router>

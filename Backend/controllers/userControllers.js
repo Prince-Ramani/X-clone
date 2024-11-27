@@ -13,8 +13,8 @@ const validateEmail = (email) => {
 
 const getProfile = async (req, res) => {
   try {
-    const { id: profileID } = req.params;
-    const profile = await User.findById(profileID).select("-password");
+    const { username: UserName } = req.params;
+    const profile = await User.findOne( { username : UserName}).select("-password");
     if (!profile) {
       return res
         .status(404)
@@ -23,7 +23,7 @@ const getProfile = async (req, res) => {
     return res.status(200).json(profile);
   } catch (err) {
     return res.status(500).json({ error: "Internal server error" });
-  }
+  } 
 };
 
 const followPerson = async (req, res) => {

@@ -40,7 +40,7 @@ function Signin() {
         return;
       }
       await querclient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/home");
+      navigate("/");
       toast.success(`Welcom back ${data?.username}!`);
     },
   });
