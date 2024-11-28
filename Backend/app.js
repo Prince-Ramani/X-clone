@@ -15,9 +15,9 @@ const postRoute = require("./routes/post.js");
 
 
 const corsOptions = {
-  origin : "*",
-  methods : ["GET","POST","PATCH","DELETE","PUT","OPTIONS"],
-  allowedHeaders : ["Content-Type"]
+  origin: "*",
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
 }
 
 const app = express();
@@ -26,15 +26,16 @@ const port = process.env.PORT || 8000;
 app.use(cors(corsOptions))
 app.use(cookieParser());
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-app.use(express.json({limit : '10mb'}));
+app.use(express.json({ limit: '10mb' }));
 
 app.use("/api/auth", auth);
-app.use("/api", userFile);
+app.use("/api/", userFile);
 app.use("/api/post", postRoute);
 
-app.options("*",cors())
+app.options("*", cors())
 
 app.get("*", (req, res) => {
+  console.log(req.url)
   res.status(400).json({ error: "Page doesn't exists" });
 });
 

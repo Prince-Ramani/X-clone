@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import CustomTooltip from "@/customComponents/ToolTip";
+import { useNavigate } from "react-router-dom";
 
 const PostDisplayer = ({
   post,
@@ -17,12 +18,13 @@ const PostDisplayer = ({
   const { comments, createdAt, likes, uploadedBy, uploadedPhoto, postContent } =
     post;
 
+  const navigate = useNavigate();
+
   const [totalLikes, setTotalLikes] = useState(likes);
   const [hasUserLiked, setHasUserLiked] = useState<boolean>(
     likes.includes(authUserId)
   );
 
-  console.log(post);
   //likePost
 
   const { mutate } = useMutation({
@@ -38,7 +40,7 @@ const PostDisplayer = ({
     onSuccess: (data) => {
       if ("error" in data) return;
 
-      if (data.message === "Post liked successfully!") {
+      if (data.message === "Post liked successfully!" && !hasUserLiked) {
         setHasUserLiked(true);
         setTotalLikes((prev) => [...prev, authUserId]);
       } else {
@@ -56,16 +58,22 @@ const PostDisplayer = ({
   };
 
   return (
-    <div className="border-b border-gray-600/60  w-full  p-2 pr-5 flex">
+    <div className="border-b border-gray-600/60  w-full  p-2 pb-1 pr-5 flex ">
       <img
         src={uploadedBy.profilePic}
         className="size-10   rounded-full object-cover border "
         loading="lazy"
+        onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
       />
 
       <div className=" w-full h-fit ml-2 flex-flex-col ">
         <div className="flex gap-2 items-center ">
-          <span className="font-bold">{uploadedBy.username}</span>
+          <span
+            className="font-bold hover:underline decoration-white decoration-1"
+            onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
+          >
+            {uploadedBy.username}
+          </span>
           <div className="flex items-center   text-gray-400/90">
             <span className="text-sm">@{uploadedBy.username}</span>
             <span>
@@ -93,14 +101,14 @@ const PostDisplayer = ({
           ""
         )}
 
-        <div className=" p-1 mt-1 flex items-center justify-between gap-4 text-gray-500/90">
+        <div className=" p-1 mt-1 flex items-center justify-between gap-4  text-gray-500/90">
           <CustomTooltip title="Reply">
             <span className="flex gap-1 items-end text-sm hover:text-blue-500 ">
               <MessageCircle className="size-6 p-1  rounded-full  hover:bg-blue-400/20" />
               {comments.length || 0}
             </span>
           </CustomTooltip>
-          <CustomTooltip title="Like">
+          <CustomTooltip title={hasUserLiked ? "Unlike" : "Like"}>
             <span
               className="flex gap-2 items-end text-sm hover:text-pink-600 group "
               onClick={() => mutate()}
@@ -114,7 +122,7 @@ const PostDisplayer = ({
             </span>
           </CustomTooltip>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             <CustomTooltip title="Save">
               <span className="flex gap-2 items-end text-sm group">
                 <Bookmark className="size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white" />

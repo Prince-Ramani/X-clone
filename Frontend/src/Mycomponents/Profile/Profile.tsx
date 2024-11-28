@@ -1,8 +1,7 @@
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { PostType } from "../Home/ForYou";
-
 import {
   ArrowLeft,
   LucideCalendarRange,
@@ -14,23 +13,24 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import PostDisplayer from "../Home/PostDisplayer";
 import { useAuthUser } from "@/context/userContext";
+import { useRef, useState } from "react";
 
 const Profile = () => {
   const { username: personUsername } = useParams();
   const navigate = useNavigate();
   const { authUser } = useAuthUser();
+  const userId = authUser?._id;
+  if (!userId) return;
 
   const { data: profile } = useQuery({
     queryKey: [personUsername, "Profile"],
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
-      console.log(data);
       return data;
     },
+    refetchOnWindowFocus: false,
   });
-
-  console.log("Hello");
 
   const { data: posts } = useQuery({
     queryKey: [personUsername, "Posts"],
@@ -38,10 +38,46 @@ const Profile = () => {
       const res = await fetch(`/api/post/profile/${profile?._id}`);
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      console.log(data);
       return data;
     },
     enabled: !!profile,
+    refetchOnWindowFocus: false,
+  });
+
+  const isFollowingRef = useRef<boolean | undefined>(
+    authUser?.following.includes(profile?._id)
+  );
+  const [profileFollowers, setProfileFollowers] = useState<string[]>(
+    profile?.followers || []
+  );
+
+  const { mutate: follow, isPending: pendingFollow } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/follow/${profile._id}`, {
+        method: "POST",
+      });
+      const data = await res.json();
+
+      if ("error" in data) toast.error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      if ("error" in data) return;
+      if (
+        data.message === "unfollowed successfully" &&
+        isFollowingRef.current
+      ) {
+        isFollowingRef.current = false;
+        setProfileFollowers((prev) => prev?.filter((p) => p !== authUser?._id));
+      } else if (
+        data.message === "followed successfully" &&
+        !isFollowingRef.current
+      ) {
+        isFollowingRef.current = true;
+        setProfileFollowers((prev) => [...prev, userId]);
+      }
+      toast.success(data.message);
+    },
   });
 
   return (
@@ -75,30 +111,36 @@ const Profile = () => {
           className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "
         />
       </div>
-      <div className=" relative bottom-20  sm:bottom-24 md:bottom-32 flex items-center justify-end gap-3 md:gap-4 px-4  ">
+      <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
         <CustomTooltip title="More">
           <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center">
             <MoreHorizontal className="size-5" />
           </button>
         </CustomTooltip>
         <CustomTooltip title="Search">
-          <button className="size-8 border border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">
+          <button className="size-8 border  border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">
             <Search className="size-4 m-1 " />
           </button>
         </CustomTooltip>
         <button
-          className={`font-bold bg-white text-black p-2 px-3 rounded-full`}
+          className={`font-bold ${
+            isFollowingRef.current === true
+              ? "bg-transparent border text-white w-24 text-sm"
+              : "bg-white"
+          } text-black w-20 h-8    rounded-full`}
+          disabled={pendingFollow}
+          onClick={() => follow()}
         >
-          Follow
+          {isFollowingRef.current ? "Following" : "Follow"}
         </button>
       </div>
 
-      <div className="p-2 px-5 relative bottom-20 md:bottom-24">
+      <div className="p-2 px-5 relative bottom-20 md:bottom-20 ">
         <div className="font-bold text-xl "> {profile?.username}</div>
         <div className="text-gray-400/80">@{profile?.username}</div>
       </div>
 
-      <div className="  relative bottom-16 md:bottom-20 px-2 md:px-4 flex flex-col gap-2">
+      <div className="  relative bottom-16 md:bottom-20  px-2 md:px-4 flex flex-col gap-2">
         web dev for rest of us
         <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
           <MapPin className="size-4" />
@@ -112,13 +154,13 @@ const Profile = () => {
             <span className="text-gray-400/70">Following</span>
           </div>
           <div className="flex gap-1">
-            <span className="font-bold">{profile?.followers.length}</span>
+            <span className="font-bold">{profileFollowers?.length}</span>
             <span className="text-gray-400/70">Followers</span>
           </div>
         </div>
       </div>
 
-      <div className="font-semibold tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
+      <div className="font-semibold relative bottom-12  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
         <div className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ">
           <div className="p-1 pt-2">Posts</div>
           <div className="border-2 border-blue-400 w-16 rounded-full" />
@@ -133,7 +175,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="min-h-screen">
+      <div className="min-h-screen relative bottom-10">
         {posts?.map((post: PostType) => (
           <PostDisplayer
             post={post}
