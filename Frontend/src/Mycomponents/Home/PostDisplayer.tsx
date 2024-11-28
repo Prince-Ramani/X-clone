@@ -22,6 +22,7 @@ const PostDisplayer = ({
     likes.includes(authUserId)
   );
 
+  console.log(post);
   //likePost
 
   const { mutate } = useMutation({
@@ -39,10 +40,10 @@ const PostDisplayer = ({
 
       if (data.message === "Post liked successfully!") {
         setHasUserLiked(true);
-        setTotalLikes([...totalLikes, authUserId]);
+        setTotalLikes((prev) => [...prev, authUserId]);
       } else {
         setHasUserLiked(false);
-        setTotalLikes(totalLikes.filter((p) => p !== authUserId));
+        setTotalLikes((prev) => prev.filter((p) => p !== authUserId));
       }
       toast.success(data.message);
     },
