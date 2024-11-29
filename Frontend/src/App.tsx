@@ -15,6 +15,7 @@ import { useAuthUser } from "./context/userContext";
 import Profile from "./Mycomponents/Profile/Profile";
 import FollowersList from "./Mycomponents/FollowersList/FollowersList";
 import FollowingList from "./Mycomponents/FollowersList/FollowingList";
+import ShowPost from "./Mycomponents/ShowPost/Post";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -60,6 +61,10 @@ function App() {
           <Route
             path="profile/:username/following"
             element={isLoggedIn ? <FollowingList /> : <Signup />}
+          />
+          <Route
+            path="profile/:username/post/:postId"
+            element={isLoggedIn ? <ShowPost /> : <Signup />}
           />
         </Route>
       </Routes>

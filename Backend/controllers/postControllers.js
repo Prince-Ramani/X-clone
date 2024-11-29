@@ -218,7 +218,7 @@ const getPost= async (req, res) => {
       select : "-password"
     }).sort()
     if (!posts) return res.status(200).json([]);
-    return res.status(200).json(posts);
+    return res.status(200).json(...posts);
   } catch (err) {
     console.log(err)
     return res.status(500).json({ error: "Internal servere error" });

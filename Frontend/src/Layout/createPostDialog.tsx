@@ -20,6 +20,7 @@ const CreatePostDialog = () => {
 
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   //post
@@ -68,7 +69,15 @@ const CreatePostDialog = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileExists = e.target.files?.[0];
-    if (fileExists) setFile(fileExists);
+    if (fileExists) {
+      setFile(fileExists);
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(fileExists);
+    }
   };
   return (
     <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialog}>
@@ -143,12 +152,19 @@ const CreatePostDialog = () => {
                   {isPending ? "Posting..." : "Post"}
                 </button>
               </div>
-              {file ? (
+              {imagePreview ? (
                 <div className="text-xs ml-5  w-fit p-2 flex gap-3 items-center ">
-                  {file?.name}
+                  <img
+                    src={imagePreview}
+                    alt="Selected preview"
+                    className=" size-24 object-cover rounded-md"
+                  />
                   <X
                     className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70"
-                    onClick={() => setFile(null)}
+                    onClick={() => {
+                      setFile(null);
+                      setImagePreview(null);
+                    }}
                   />
                 </div>
               ) : (

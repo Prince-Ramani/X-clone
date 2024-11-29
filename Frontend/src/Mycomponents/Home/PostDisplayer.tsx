@@ -25,8 +25,6 @@ const PostDisplayer = ({
     likes.includes(authUserId)
   );
 
-  //likePost
-
   const { mutate } = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/post/likepost/${post._id}`, {
@@ -57,8 +55,16 @@ const PostDisplayer = ({
     }
   };
 
+  const handlPostClick = (e: any) => {
+    if (e.target.tagName !== "DIV") return;
+    navigate(`/profile/${uploadedBy.username}/post/${post._id}`);
+  };
+
   return (
-    <div className="border-b border-gray-600/60  w-full  p-2 pb-1 pr-5 flex ">
+    <div
+      className="border-b border-gray-600/60  w-full  p-2 pb-1 pr-5 flex "
+      onClick={(e: any) => handlPostClick(e)}
+    >
       <img
         src={uploadedBy.profilePic}
         className="size-10   rounded-full object-cover border "

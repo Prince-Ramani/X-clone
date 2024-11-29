@@ -15,6 +15,7 @@ const Home = () => {
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { mutate: createPost, isPending } = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -56,36 +57,59 @@ const Home = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileExists = e.target.files?.[0];
-    if (fileExists) setFile(fileExists);
+    if (fileExists) {
+      setFile(fileExists);
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+
+      reader.readAsDataURL(fileExists);
+    }
   };
 
   return (
     <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0   ">
       {/* Top */}
-      <div className="border-b border-gray-800   flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0  ">
+      <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0  ">
         <div
-          className=" py-4  h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
+          className="h-full w-1/2 text-center hover:bg-gray-700/30   "
           onClick={() => setIsActive("For you")}
         >
-          <span
-            className={`  h-full py-3  rounded-sm font-semibold tracking-tight ${
-              isActive === "For you" ? "border-b-4 border-blue-500" : null
-            }`}
-          >
-            For you
-          </span>
+          <div className="h-full flex flex-col justify-center items-center pt-3">
+            <span
+              className={`  h-full   rounded-sm font-semibold tracking-tight text-sm ${
+                isActive === "For you" ? "" : "font-medium text-gray-400/60"
+              }`}
+            >
+              For you
+            </span>
+            <div
+              className={`border-2  border-blue-400 rounded-full w-12 ${
+                isActive === "For you" ? "block" : "hidden"
+              }`}
+            />
+          </div>
         </div>
         <div
-          className=" py-4  h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
+          className="   h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
           onClick={() => setIsActive("Following")}
         >
-          <span
-            className={`  h-full py-3   rounded-sm font-semibold tracking-tight ${
-              isActive === "Following" ? "border-b-4 border-blue-500" : null
-            }`}
-          >
-            Following
-          </span>
+          <div className=" h-full flex flex-col justify-center items-center pt-[12px] ">
+            <span
+              className={`  h-full   rounded-sm font-semibold tracking-tight text-sm ${
+                isActive === "Following" ? "" : "font-medium text-gray-400/60"
+              }`}
+            >
+              Following
+            </span>
+            <div
+              className={`border-2  border-blue-400 rounded-full w-16 ${
+                isActive === "Following" ? "block" : "hidden"
+              }`}
+            />
+          </div>
         </div>
       </div>
       {/* Posts */}
@@ -118,9 +142,9 @@ const Home = () => {
 
             <div className="flex gap-1 p-2 items-center h-full ">
               <CustomTooltip title="Media">
-                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer ">
+                <span className="rounded-full  hover:bg-gray-800/70 cursor-pointer ">
                   <label htmlFor="file-upload" className="cursor-pointer">
-                    <ImageIcon className="size-5 text-blue-400" />
+                    <ImageIcon className="size-5 text-blue-400 m-2" />
                   </label>
                 </span>
               </CustomTooltip>
@@ -164,12 +188,19 @@ const Home = () => {
                 {isPending ? "Posting..." : "Post"}
               </button>
             </div>
-            {file ? (
+            {imagePreview ? (
               <div className="text-xs  w-fit p-2 pt-0 flex gap-3 items-center ">
-                {file?.name}
+                <img
+                  src={imagePreview}
+                  alt="Selected preview"
+                  className="w-24 h-24 object-cover rounded-md"
+                />
                 <X
                   className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70"
-                  onClick={() => setFile(null)}
+                  onClick={() => {
+                    setFile(null);
+                    setImagePreview(null);
+                  }}
                 />
               </div>
             ) : (
