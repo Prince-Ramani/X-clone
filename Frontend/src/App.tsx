@@ -13,6 +13,8 @@ import {
 } from "react-router-dom";
 import { useAuthUser } from "./context/userContext";
 import Profile from "./Mycomponents/Profile/Profile";
+import FollowersList from "./Mycomponents/FollowersList/FollowersList";
+import FollowingList from "./Mycomponents/FollowersList/FollowingList";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -29,6 +31,7 @@ function App() {
 
       return data;
     },
+    refetchOnMount: true,
   });
 
   const isLoggedIn = data && !data.error;
@@ -49,6 +52,14 @@ function App() {
           <Route
             path="profile/:username"
             element={isLoggedIn ? <Profile /> : <Signup />}
+          />
+          <Route
+            path="profile/:username/followers"
+            element={isLoggedIn ? <FollowersList /> : <Signup />}
+          />
+          <Route
+            path="profile/:username/following"
+            element={isLoggedIn ? <FollowingList /> : <Signup />}
           />
         </Route>
       </Routes>

@@ -250,6 +250,49 @@ const getFollowersList = async(req,res)=>{
   }
 }
 
+const getFollowersListByUsername = async(req,res)=>{
+  try{
+    const {username} = req.query;
+   
+    const user = await User.findOne({username}).select("followers").populate({
+      path : "followers",
+      select : "-password"
+    })
+    if(!user){
+      return res.status(404).json({error : "No such account exists!"})
+    }
+
+    return res.status(200).json(user.followers)
+
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+const getFollowingListByUsername = async(req,res)=>{
+  try{
+    const {username} = req.query;
+   
+    const user = await User.findOne({username}).select("following").populate({
+      path : "following",
+      select : "-password"
+    })
+    if(!user){
+      return res.status(404).json({error : "No such account exists!"})
+    }
+
+
+    return res.status(200).json(user.following)
+
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+
+
 const getFOllowingList = async(req,res)=>{
   try{
     const {personID} = req.query;
@@ -277,8 +320,41 @@ const userNameAvailable = async(req,res)=>{
  return  res.json([]).status(200);
   } catch (err) {
     console.log(err)
-    return req.status(500).json({error : "Internal server error"})
+    return res.status(500).json({error : "Internal server error"})
   }
+}
+
+const getFollowersNumber = async( req,res)=>{
+  try {
+
+    const {username} = req.query
+
+    const user = await User.findOne({username}).select("followers")
+
+    return res.json([...user.followers]).status(200);
+
+  } catch (error) {
+    console.log(err)
+    return res.status(500).json({error : "Internal server error"})
+  }
+
+}
+
+const userExists = async(req,res)=>{
+  try{
+  const {username} = req.params
+
+  const user = await User.findOne({username}).select("username")
+
+  if(!user) return res.status(404).json({error : "No such user exists!"})
+    
+
+    return res.json({username : user.username}).status(200);
+
+}catch(err){
+  console.log(err)
+  return res.status(500).json({error : "Internal server error"})
+}
 }
 
 
@@ -293,6 +369,10 @@ module.exports = {
   updateBannerPic,
   getFollowersList,
   getFOllowingList,
-  userNameAvailable
+  userNameAvailable,
+  getFollowersNumber,
+  getFollowersListByUsername,
+  userExists,
+  getFollowingListByUsername
 };
 

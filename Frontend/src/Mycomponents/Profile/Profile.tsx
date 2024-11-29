@@ -1,5 +1,5 @@
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { PostType } from "../Home/ForYou";
 import {
@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import PostDisplayer from "../Home/PostDisplayer";
 import { useAuthUser } from "@/context/userContext";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 const Profile = () => {
   const { username: personUsername } = useParams();
@@ -22,11 +22,15 @@ const Profile = () => {
   const userId = authUser?._id;
   if (!userId) return;
 
+  const [isFollowing, setIsFollowing] = useState(false);
+  const queryClient = useQueryClient();
+
   const { data: profile } = useQuery({
     queryKey: [personUsername, "Profile"],
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
+
       return data;
     },
     refetchOnWindowFocus: false,
@@ -38,18 +42,27 @@ const Profile = () => {
       const res = await fetch(`/api/post/profile/${profile?._id}`);
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
+
       return data;
     },
     enabled: !!profile,
     refetchOnWindowFocus: false,
   });
 
-  const isFollowingRef = useRef<boolean | undefined>(
-    authUser?.following.includes(profile?._id)
-  );
-  const [profileFollowers, setProfileFollowers] = useState<string[]>(
-    profile?.followers || []
-  );
+  const { data: followers } = useQuery({
+    queryKey: [personUsername, "followers"],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/getfollowersnumbers?username=${personUsername}`
+      );
+      const data = await res.json();
+      if ("error" in data) toast.error(data.error);
+      setIsFollowing(data.includes(userId));
+      return data;
+    },
+
+    refetchOnWindowFocus: false,
+  });
 
   const { mutate: follow, isPending: pendingFollow } = useMutation({
     mutationFn: async () => {
@@ -63,26 +76,18 @@ const Profile = () => {
     },
     onSuccess: (data) => {
       if ("error" in data) return;
-      if (
-        data.message === "unfollowed successfully" &&
-        isFollowingRef.current
-      ) {
-        isFollowingRef.current = false;
-        setProfileFollowers((prev) => prev?.filter((p) => p !== authUser?._id));
-      } else if (
-        data.message === "followed successfully" &&
-        !isFollowingRef.current
-      ) {
-        isFollowingRef.current = true;
-        setProfileFollowers((prev) => [...prev, userId]);
-      }
+
+      queryClient.invalidateQueries({
+        queryKey: [personUsername, "followers"],
+      });
+
       toast.success(data.message);
     },
   });
 
   return (
     <div className="border border-gray-800 min-h-full  cursor-pointer">
-      <div className="  p-1 px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-8 z-50 ">
+      <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-50 ">
         <CustomTooltip title="Back">
           <div
             className="h-fit w-fit p-2 hover:bg-gray-500/20 rounded-full"
@@ -91,7 +96,7 @@ const Profile = () => {
             <ArrowLeft className="size-5 " />
           </div>
         </CustomTooltip>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col ">
           <span className="font-bold text-lg tracking-wider">
             {profile?.username}
           </span>
@@ -101,7 +106,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="h-40  md:h-52 w-full  ">
+      <div className="h-40  md:h-44 w-full   ">
         <img src={profile?.banner} className="h-full w-full" />
       </div>
 
@@ -123,15 +128,20 @@ const Profile = () => {
           </button>
         </CustomTooltip>
         <button
-          className={`font-bold ${
-            isFollowingRef.current === true
-              ? "bg-transparent border text-white w-24 text-sm"
-              : "bg-white"
+          className={`font-bold relative flex justify-center items-center group  ${
+            isFollowing
+              ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-900/50 hover:text-red-700 hover:border-red-800"
+              : "bg-white text-black"
           } text-black w-20 h-8    rounded-full`}
           disabled={pendingFollow}
           onClick={() => follow()}
         >
-          {isFollowingRef.current ? "Following" : "Follow"}
+          <span className={`absolute opacity-100 group-hover:opacity-0 `}>
+            {isFollowing ? "Following" : "Follow"}
+          </span>
+          <span className={`absolute opacity-0  group-hover:opacity-100 `}>
+            {isFollowing ? "Unfollow" : "Follow"}
+          </span>
         </button>
       </div>
 
@@ -149,12 +159,18 @@ const Profile = () => {
           {profile ? format(profile?.createdAt, "MMMM yyyy") : ""}
         </div>
         <div className=" px-1 mt-2 flex  gap-4 text-sm ">
-          <div className="flex gap-1">
+          <div
+            className="flex gap-1 hover:border-b"
+            onClick={() => navigate(`/profile/${personUsername}/following`)}
+          >
             <span className="font-bold">{profile?.following.length}</span>
             <span className="text-gray-400/70">Following</span>
           </div>
-          <div className="flex gap-1">
-            <span className="font-bold">{profileFollowers?.length}</span>
+          <div
+            className="flex gap-1 hover:border-b"
+            onClick={() => navigate(`/profile/${personUsername}/followers`)}
+          >
+            <span className="font-bold">{followers?.length}</span>
             <span className="text-gray-400/70">Followers</span>
           </div>
         </div>

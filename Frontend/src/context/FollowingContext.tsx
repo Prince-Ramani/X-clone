@@ -1,7 +1,7 @@
 import { createContext, SetStateAction, useContext, useState } from "react";
 
 interface FollowingContextTypes {
-  authUserFollowing: string[];
+  authUserFollowing: string[] | [];
   setAuthUserFollowing: React.Dispatch<SetStateAction<string[]>>;
 }
 
@@ -27,7 +27,7 @@ const FollowingContextProvider = ({
 export const useAuthUserFollowingContext = () => {
   const context = useContext(FollowingContext);
   if (!context) throw new Error();
-  return useContext(FollowingContext);
+  return context;
 };
 
 export default FollowingContextProvider;
