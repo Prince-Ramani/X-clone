@@ -78,8 +78,15 @@ const getPosts = async (req, res) => {
     const posts = await Post.find({uploadedBy : {$ne : req.user}}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
       path: "uploadedBy",
       select: "-password",
-    });
-    return res.status(200).json(posts);
+    }).lean()
+
+   const postss =  posts.map(post => ({...post , comments : post.comments.length}));
+  
+
+    
+
+
+    return res.status(200).json(postss);
   } catch (err) {
     return res.status(500).json({ error: "Internal servere error" });
   }
@@ -100,11 +107,14 @@ const postOfFollowing = async (req, res) => {
       .populate({
         path: "uploadedBy",
         select: "-password",
-      });
+      }).lean();
     if (!posts) {
       return res.status(200).json([]);
     }
-    return res.status(200).json(posts);
+
+    const postss =  posts.map(post => ({...post , comments : post.comments.length}));
+
+    return res.status(200).json(postss);
   } catch (err) {
     return res.status(500).json({ error: "Internal servere error" });
   }
@@ -196,13 +206,20 @@ const getProfilePost = async(req,res) =>{
     const limit = parseInt(req.query.limit)||10;
     const offset = parseInt(req.query.offset);
     const personID = req.params.personID
-    const posts = await Post.find({uploadedBy : personID}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
+    const postss = await Post.find({uploadedBy : personID}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
       path : "uploadedBy",
       select : "-password"
-    });
-    if (!posts) return res.status(200).json([]);
+    }).lean();
+
+
+
+    if (!postss) return res.status(200).json([]);
+
+    const posts =  postss.map(post => ({...post , comments : post.comments.length}));
+  
     return res.status(200).json(posts);
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ error: "Internal servere error" });
   }
 }

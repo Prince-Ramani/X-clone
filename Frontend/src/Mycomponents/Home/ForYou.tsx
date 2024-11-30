@@ -5,7 +5,7 @@ export interface PostType {
   _id: string;
   postContent: string;
   uploadedPhoto: string;
-  comments: any[];
+  comments: any[] | number;
   likes: any[];
   uploadedBy: UploadedByType;
   createdAt: string;
@@ -32,6 +32,7 @@ const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
     queryFn: async () => {
       const res = await fetch("/api/post/getallpost?limit=10&offset=0");
       const data = await res.json();
+
       return data;
     },
     refetchOnWindowFocus: false,

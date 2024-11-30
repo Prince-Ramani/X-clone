@@ -9,6 +9,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  envDir: "../",
   server: {
     proxy: {
       "/api": {

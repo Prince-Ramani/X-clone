@@ -1,6 +1,6 @@
 import { useAuthUser } from "@/context/userContext";
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import CommentDisplayer from "./CommentDisplayer";
 import {
@@ -22,7 +22,8 @@ const ShowPost = () => {
   const { username, postId } = useParams();
   const { authUser } = useAuthUser();
   const navigate = useNavigate();
-  const [textareaValue, setTextareaValue] = useState<string | null>(null);
+  const [textareaValue, setTextareaValue] = useState("");
+  const querClient = useQueryClient();
 
   const { data: userExists } = useQuery({
     queryKey: [username, "sync"],
@@ -41,14 +42,44 @@ const ShowPost = () => {
     queryFn: async () => {
       const res = await fetch(`/api/post/getpost/${postId}`);
       const data = await res.json();
-      console.log(data);
+
       if ("error" in data) toast.error("Invalid post id!");
       return data;
     },
     enabled: !!userExists && !!username && !!postId,
   });
 
-  const { mutate: postComment } = useMutation({
+  const [totalLikes, setTotalLikes] = useState(post?.likes ?? []);
+  const [hasUserLiked, setHasUserLiked] = useState<boolean>(
+    (post?.likes ?? []).includes(authUser?._id)
+  );
+
+  const { mutate: likePost } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/post/likepost/${post._id}`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if ("error" in data) toast.error(data.error);
+
+      return data;
+    },
+    onSuccess: (data) => {
+      if ("error" in data) return;
+
+      if (data.message === "Post liked successfully!" && !hasUserLiked) {
+        setHasUserLiked(true);
+        setTotalLikes((prev: any) => [...prev, authUser?._id]);
+      } else {
+        setHasUserLiked(false);
+        setTotalLikes((prev: any) =>
+          prev.filter((p: any) => p !== authUser?._id)
+        );
+      }
+      toast.success(data.message);
+    },
+  });
+  const { mutate: postComment, isPending } = useMutation({
     mutationFn: async (text: string) => {
       const res = await fetch(`/api/post/comment/${post?._id}`, {
         method: "POST",
@@ -58,19 +89,20 @@ const ShowPost = () => {
         body: JSON.stringify({ text }),
       });
       const data = await res.json();
-      console.log(data);
+
       if ("error" in data) toast.error(data.error);
       return data;
     },
     onSuccess: (data) => {
       if (data.error) return;
+      querClient.invalidateQueries({ queryKey: [postId, username] });
       toast.success("Replied sucessfully!");
     },
   });
 
   const handleComment = () => {
     if (textareaValue) {
-      if (textareaValue.length >= 280)
+      if (textareaValue?.length >= 280)
         return toast.error("reply length must be less than 280 characters!");
 
       postComment(textareaValue);
@@ -128,7 +160,7 @@ const ShowPost = () => {
           ""
         )}
 
-        <div className="flex text-sm p-3 leading-tight tracking-tighter">
+        <div className="flex text-sm py-2 leading-tight tracking-tighter text-gray-400/80">
           <span>
             {post?.createdAt ? format(post?.createdAt, "h:mm a") : "hello"}
           </span>
@@ -150,14 +182,17 @@ const ShowPost = () => {
             </span>
           </div>
           <CustomTooltip title={1 ? "Unlike" : "Like"}>
-            <span className="flex gap-1 items-center text-sm hover:text-pink-600 group ">
+            <span
+              className="flex gap-1 items-center text-sm hover:text-pink-600 group "
+              onClick={() => likePost()}
+            >
               <Heart
                 className={`size-7 p-1  rounded-full   group-hover:bg-pink-600/20  ${
-                  1 ? "fill-pink-600 text-transparent" : ""
+                  hasUserLiked ? "fill-pink-600 text-transparent" : ""
                 }`}
               />
               <span className="text-gray-400/80 ">
-                {post?.likes.length || 0}
+                {totalLikes?.length || 0}
               </span>
             </span>
           </CustomTooltip>
@@ -174,7 +209,18 @@ const ShowPost = () => {
           </div>
 
           <CustomTooltip title="Copy url">
-            <div className="flex gap-2 items-end text-sm group h-fit w-fit p-1 hover:bg-blue-400/20  active:bg-green-500 rounded-full">
+            <div
+              className="flex gap-2 items-end text-sm group h-fit w-fit p-1 hover:bg-blue-400/20  active:bg-green-500 rounded-full"
+              onClick={() =>
+                navigator.clipboard
+                  .writeText(
+                    `${import.meta.env.VITE_BASE_URL}/profile/${
+                      post.uploadedBy.username
+                    }/post/${post?._id}`
+                  )
+                  .then(() => toast.success("URL copied!"))
+              }
+            >
               <Share className="size-5  group group-active:text-white" />
             </div>
           </CustomTooltip>
@@ -205,7 +251,7 @@ const ShowPost = () => {
                 {textareaValue ? (
                   <div
                     className={` lg:size-7 size-5 md:size-6  text-xs flex justify-center items-center  bg-green-600 rounded-full ${
-                      textareaValue && textareaValue.length >= 280
+                      textareaValue && textareaValue?.length >= 280
                         ? "bg-red-600"
                         : "bg-green-600"
                     }`}
@@ -215,8 +261,14 @@ const ShowPost = () => {
                 ) : (
                   ""
                 )}
-                <div className="bg-blue-400 rounded-full p-2  w-20 text-center ml-auto active:bg-green-500">
-                  <button onClick={handleComment}>Reply</button>
+                <div
+                  className={`bg-blue-400 rounded-full p-2  w-20 text-center ml-auto active:bg-green-500 focus:outline-none ${
+                    isPending ? "opacity-75" : ""
+                  } `}
+                >
+                  <button onClick={handleComment} disabled={isPending}>
+                    Reply
+                  </button>
                 </div>
               </div>
             </div>
@@ -226,7 +278,12 @@ const ShowPost = () => {
 
       <div>
         {post?.comments.map((comment: CommentType) => (
-          <CommentDisplayer comment={comment} />
+          <CommentDisplayer
+            comment={comment}
+            authUserId={authUser?._id}
+            postId={post._id}
+            key={comment._id}
+          />
         ))}
       </div>
     </div>
