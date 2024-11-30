@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import PostDisplayer from "../Home/PostDisplayer";
 import { useAuthUser } from "@/context/userContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Profile = () => {
   const { username: personUsername } = useParams();
@@ -21,6 +21,10 @@ const Profile = () => {
   const { authUser } = useAuthUser();
   const userId = authUser?._id;
   if (!userId) return;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const [isFollowing, setIsFollowing] = useState(false);
   const queryClient = useQueryClient();
@@ -87,7 +91,7 @@ const Profile = () => {
   });
 
   return (
-    <div className="border border-gray-800 min-h-full  cursor-pointer">
+    <div className="border border-b-0 border-gray-800 min-h-full  cursor-pointer">
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-50 ">
         <CustomTooltip title="Back">
           <div
@@ -108,14 +112,18 @@ const Profile = () => {
       </div>
 
       <div className="h-40  md:h-44 w-full   ">
-        <img src={profile?.banner} className="h-full w-full" />
+        <a href={profile?.banner} target="_blank">
+          <img src={profile?.banner} className="h-full w-full" />
+        </a>
       </div>
 
       <div className="relative   p-1 md:p-2 bg-black h-fit w-fit rounded-full bottom-10 left-3 sm:bottom-14 sm:left-4  md:bottom-16 md:left-5">
-        <img
-          src={profile?.profilePic}
-          className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "
-        />
+        <a href={profile?.profilePic} target="_blank">
+          <img
+            src={profile?.profilePic}
+            className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "
+          />
+        </a>
       </div>
       <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
         <CustomTooltip title="More">

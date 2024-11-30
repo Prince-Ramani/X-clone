@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 
 import UserContextProvider from "./context/userContext";
 import CreatePostContextProvider from "./context/createPostContext";
+import ReplyDialogContextProvider from "./context/ReplyPostContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,9 +26,11 @@ if (rootElement) {
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
-          <CreatePostContextProvider>
-            <App />
-          </CreatePostContextProvider>
+          <ReplyDialogContextProvider>
+            <CreatePostContextProvider>
+              <App />
+            </CreatePostContextProvider>
+          </ReplyDialogContextProvider>
         </UserContextProvider>
       </QueryClientProvider>
     </>

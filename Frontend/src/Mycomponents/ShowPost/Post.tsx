@@ -43,16 +43,17 @@ const ShowPost = () => {
       const res = await fetch(`/api/post/getpost/${postId}`);
       const data = await res.json();
 
+      setTotalLikes(data.likes);
+      setHasUserLiked(data.likes.includes(authUser?._id));
+
       if ("error" in data) toast.error("Invalid post id!");
       return data;
     },
     enabled: !!userExists && !!username && !!postId,
   });
 
-  const [totalLikes, setTotalLikes] = useState(post?.likes ?? []);
-  const [hasUserLiked, setHasUserLiked] = useState<boolean>(
-    (post?.likes ?? []).includes(authUser?._id)
-  );
+  const [totalLikes, setTotalLikes] = useState<string[]>();
+  const [hasUserLiked, setHasUserLiked] = useState<boolean>();
 
   const { mutate: likePost } = useMutation({
     mutationFn: async () => {

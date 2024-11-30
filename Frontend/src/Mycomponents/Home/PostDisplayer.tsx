@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import CustomTooltip from "@/customComponents/ToolTip";
 import { useNavigate } from "react-router-dom";
 import { FormateDate } from "@/lib/Date";
+import { useReplyDialogContext } from "@/context/ReplyPostContext";
 
 const PostDisplayer = memo(
   ({
@@ -23,6 +24,8 @@ const PostDisplayer = memo(
       uploadedPhoto,
       postContent,
     } = post;
+
+    const { setIsReplyDialog, setPostContent } = useReplyDialogContext();
 
     const navigate = useNavigate();
     const [totalLikes, setTotalLikes] = useState(likes);
@@ -108,7 +111,13 @@ const PostDisplayer = memo(
 
           <div className=" p-1 mt-1 flex items-center justify-between gap-4  text-gray-500/90">
             <CustomTooltip title="Reply">
-              <span className="flex gap-1 items-end text-sm hover:text-blue-500 ">
+              <span
+                className="flex gap-1 items-end text-sm hover:text-blue-500 "
+                onClick={() => {
+                  setIsReplyDialog(true);
+                  setPostContent(post);
+                }}
+              >
                 <MessageCircle className="size-6 p-1  rounded-full  hover:bg-blue-400/20" />
                 {comments || 0}
               </span>

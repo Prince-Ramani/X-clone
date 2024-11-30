@@ -11,6 +11,7 @@ import CustomTooltip from "@/customComponents/ToolTip";
 
 const Home = () => {
   const { authUser } = useAuthUser();
+  console.log("Ui");
 
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
   const [textareaValue, setTextareaValue] = useState<string | null>("");
@@ -69,7 +70,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0   ">
+    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0    ">
       {/* Top */}
       <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0  ">
         <div
