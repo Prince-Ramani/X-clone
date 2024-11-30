@@ -14,17 +14,26 @@ import { useNavigate, useParams } from "react-router-dom";
 import PostDisplayer from "../Home/PostDisplayer";
 import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
+import Media from "./Media";
+import LikedPosts from "./LikedPosts";
 
 const Profile = () => {
-  const { username: personUsername } = useParams();
   const navigate = useNavigate();
+
+  const [currentPath, setCurrentPath] = useState<string | null | undefined>(
+    null
+  );
+
+  useEffect(() => {
+    const currentPath = window.location.pathname.split("/")[3]?.toLowerCase();
+    setCurrentPath(currentPath || null);
+  }, [navigate]);
+
+  const { username: personUsername } = useParams();
+
   const { authUser } = useAuthUser();
   const userId = authUser?._id;
   if (!userId) return;
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const [isFollowing, setIsFollowing] = useState(false);
   const queryClient = useQueryClient();
@@ -34,9 +43,9 @@ const Profile = () => {
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
-
       return data;
     },
+    enabled: !!personUsername,
     refetchOnWindowFocus: false,
   });
 
@@ -46,11 +55,11 @@ const Profile = () => {
       const res = await fetch(`/api/post/profile/${profile?._id}`);
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      console.log(data);
 
       return data;
     },
-    enabled: !!profile,
+    enabled:
+      !!profile && currentPath !== "likedposts" && currentPath !== "media",
     refetchOnWindowFocus: false,
   });
 
@@ -139,7 +148,7 @@ const Profile = () => {
         <button
           className={`font-bold relative flex justify-center items-center group  ${
             isFollowing
-              ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-900/50 hover:text-red-700 hover:border-red-800"
+              ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
               : "bg-white text-black"
           } text-black w-20 h-8    rounded-full`}
           disabled={pendingFollow}
@@ -186,29 +195,73 @@ const Profile = () => {
       </div>
 
       <div className="font-semibold relative bottom-12  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
-        <div className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ">
+        <div
+          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 text-white`}
+          onClick={() => navigate(`/profile/${personUsername}`)}
+        >
           <div className="p-1 pt-2">Posts</div>
-          <div className="border-2 border-blue-400 w-16 rounded-full" />
+          <div
+            className={`border-2 border-blue-400 w-16 rounded-full ${
+              !currentPath ? "block" : "hidden"
+            }`}
+          />
         </div>
-        <div className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 ">
-          <div className="p-1 pt-2">Replies</div>
-          <div className="border-2 border-blue-400 w-16 rounded-full" />
+        <div
+          className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 "
+          onClick={() => navigate(`/profile/${personUsername}/likedposts`)}
+        >
+          <div className="p-1 pt-2">Liked posts</div>
+          <div
+            className={`border-2 border-blue-400 w-20 rounded-full ${
+              currentPath === "likedposts" ? "block" : "hidden"
+            }`}
+          />
         </div>
-        <div className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 ">
+        <div
+          className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 "
+          onClick={() => navigate(`/profile/${personUsername}/media`)}
+        >
           <div className="p-1 pt-2"> Media</div>
-          <div className="border-2 border-blue-400 w-16 rounded-full" />
+          <div
+            className={`border-2 border-blue-400 w-16 rounded-full ${
+              currentPath === "media" ? "block" : "hidden"
+            }`}
+          />
         </div>
       </div>
 
-      <div className="min-h-screen relative bottom-10">
-        {posts?.map((post: PostType) => (
-          <PostDisplayer
-            post={post}
-            authUserId={authUser?._id}
-            key={post._id}
-          />
-        ))}
-      </div>
+      {currentPath === "likedposts" && profile ? (
+        <LikedPosts
+          isAuthenticated={!!profile._id}
+          authUserId={authUser._id}
+          profileId={profile._id}
+        />
+      ) : (
+        ""
+      )}
+      {currentPath === "media" && profile ? (
+        <Media
+          isAuthenticated={!!profile._id}
+          authUserId={authUser._id}
+          profileId={profile._id}
+        />
+      ) : (
+        ""
+      )}
+
+      {!currentPath && profile ? (
+        <div className="min-h-fit relative bottom-10">
+          {posts?.map((post: PostType) => (
+            <PostDisplayer
+              post={post}
+              authUserId={authUser?._id}
+              key={post?._id}
+            />
+          ))}
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

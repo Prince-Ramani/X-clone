@@ -165,12 +165,19 @@ const getLikedPosts = async (req, res) => {
     if (!person) {
       return res.status(404).json({ error: "Invalid user" });
     }
-    const posts = await Post.find({ likes: { $in: person._id } }).populate({
-      path: "likes",
-      select: "-password",
-    });
+    const postss = await Post.find({likes : {$in : req.params.personid}}).populate({
+      path : "uploadedBy",
+      select : (" username email _id profilePic createdAt ")
+    }).lean()
+
+    if (!postss) return res.status(200).json([]);
+    const posts =  postss.map(post => ({...post , comments : post.comments.length}));
+  
+    
+    
     return res.status(200).json(posts);
   } catch (err) {
+    console.log(err)
     return res.status(404).json({ error: "Invalid user!" });
   }
 };

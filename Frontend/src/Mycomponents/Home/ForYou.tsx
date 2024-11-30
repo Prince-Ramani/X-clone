@@ -30,7 +30,7 @@ const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
   const { data: posts } = useQuery({
     queryKey: ["ForYouPosts"],
     queryFn: async () => {
-      const res = await fetch("/api/post/getallpost?limit=10&offset=0");
+      const res = await fetch("/api/post/getallpost?limit=30&offset=0");
       const data = await res.json();
 
       return data;

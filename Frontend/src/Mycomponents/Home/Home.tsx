@@ -11,7 +11,6 @@ import CustomTooltip from "@/customComponents/ToolTip";
 
 const Home = () => {
   const { authUser } = useAuthUser();
-  console.log("Ui");
 
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
   const [textareaValue, setTextareaValue] = useState<string | null>("");

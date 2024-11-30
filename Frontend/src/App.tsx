@@ -51,7 +51,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={isLoggedIn ? <Home /> : null} />
           <Route
-            path="profile/:username"
+            path="profile/:username/*"
             element={isLoggedIn ? <Profile /> : <Signup />}
           />
           <Route

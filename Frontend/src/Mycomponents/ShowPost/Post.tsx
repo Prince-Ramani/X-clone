@@ -97,6 +97,7 @@ const ShowPost = () => {
     onSuccess: (data) => {
       if (data.error) return;
       querClient.invalidateQueries({ queryKey: [postId, username] });
+      setTextareaValue("");
       toast.success("Replied sucessfully!");
     },
   });

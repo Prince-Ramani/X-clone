@@ -5,6 +5,7 @@ const {cloudinary} = require("../Cloudinary/cloudinary")
 
 const {unlink} = require("fs");
 const { default: mongoose } = require("mongoose");
+const Post = require("../models/postmodel");
 
 const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -357,6 +358,31 @@ const userExists = async(req,res)=>{
 }
 }
 
+const getMediaOfUser = async(req,res)=>{
+  try{
+
+    const limit = parseInt(req.query.limit)||10;
+    const offset = parseInt(req.query.offset);
+    const personID = req.params.personID
+    const postss = await Post.find({$and : [{uploadedPhoto : {$ne : null} },{uploadedBy : personID}]}).sort({ createdAt: -1 }).skip(offset).limit(limit).populate({
+      path : "uploadedBy",
+      select : "-password"
+    }).lean();
+
+
+
+    if (!postss) return res.status(200).json([]);
+
+    const posts =  postss.map(post => ({...post , comments : post.comments.length}));
+  
+    return res.status(200).json(posts);
+
+  }catch(err){
+    console.log(err)
+    return res.json({error : "Internal server error!"}).status(500)
+  }
+}
+
 
 module.exports = {
   getProfile,
@@ -373,6 +399,7 @@ module.exports = {
   getFollowersNumber,
   getFollowersListByUsername,
   userExists,
-  getFollowingListByUsername
+  getFollowingListByUsername,
+  getMediaOfUser
 };
 
