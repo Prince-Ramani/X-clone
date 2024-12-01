@@ -37,7 +37,7 @@ const NotificationDisplayer = ({
     },
   });
 
-  const { data: followers } = useQuery({
+  const {} = useQuery({
     queryKey: [notification.from.username, "followers"],
     queryFn: async () => {
       const res = await fetch(
@@ -54,8 +54,8 @@ const NotificationDisplayer = ({
   });
 
   const handleClick = (e: any) => {
-    if (e.target.tagName === "Div")
-      navigate(`/profile/${notification.from.username}`);
+    if (e.target.tagName !== "DIV") return;
+    navigate(`/profile/${notification.from.username}`);
   };
 
   return (
@@ -63,20 +63,38 @@ const NotificationDisplayer = ({
       className="p-2 py-3 border-b border-gray-600/80 "
       onClick={(e: any) => handleClick(e)}
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center ">
         <img
           src={notification.from.profilePic}
-          className="size-10 rounded-full object-cover "
+          className="size-10 rounded-full object-cover shrink-0"
+          onClick={() => navigate(`/profile/${notification.from.username}`)}
         />
         {notification.topic === "like" ? (
-          <div className="text-sm ">
-            <span
-              className="font-bold hover:underline text-pink-400"
-              onClick={() => navigate(`/profile/${notification.from.username}`)}
+          <div
+            className="text-xs md:text-sm w-full flex gap-2 items-center  
+           "
+          >
+            <div className="min-w-fit">
+              <span
+                className="font-bold hover:underline text-pink-400 "
+                onClick={() =>
+                  navigate(`/profile/${notification.from.username}`)
+                }
+              >
+                {notification.from.username}
+              </span>{" "}
+              liked your post!
+            </div>
+            <p
+              className="text-xs text-gray-400/90   break-all  hover:underline self-end"
+              onClick={() =>
+                navigate(
+                  `/profile/${notification.from.username}/post/${notification.postId?._id}`
+                )
+              }
             >
-              {notification.from.username}
-            </span>{" "}
-            liked your post!
+              {notification.postId?.postContent.substring(0, 25)}...
+            </p>
           </div>
         ) : (
           <div className=" w-full flex items-center justify-between">

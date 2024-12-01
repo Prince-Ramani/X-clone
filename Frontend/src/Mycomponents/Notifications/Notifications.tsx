@@ -18,7 +18,7 @@ const Notifications = () => {
   });
 
   return (
-    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0    ">
+    <div className="min-h-full w-full  cursor-pointer  border border-gray-800 border-b-0 border-t-0    ">
       <div className="font-bold text-lg p-3">Notifications</div>
       <div className="w-full hover:bg-white/20  flex flex-col justify-center items-center gap-1 border-b border-gray-600/70">
         <div className="p-1 pt-2 font-semibold ">All</div>

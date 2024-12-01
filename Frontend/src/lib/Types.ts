@@ -30,5 +30,9 @@ export interface NotificationsType {
   from: UploadedByType;
   to: string;
   read: boolean;
+  postId?: {
+    postContent: string;
+    _id: string;
+  };
   topic: "like" | "follow";
 }

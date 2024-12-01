@@ -1,4 +1,3 @@
-const User = require("./userModel");
 const mongoose = require("mongoose");
 const postSchema = mongoose.Schema({
   postContent: {

@@ -139,6 +139,7 @@ const likePost = async (req, res) => {
                 from: userID,
                 topic: "like",
                 read: false,
+                postId : postID
               });
               await informingLike.save();
       }
@@ -149,7 +150,9 @@ const likePost = async (req, res) => {
      await post.save();
       await Notification.findOneAndDelete(
         { to: post.uploadedBy },
-        { from: userID }
+        { from: userID },{
+          postId : postID
+        }
       );
       return res.status(200).json({ message: "Post unliked successfully!" , toatlLikes : something.length });
     }

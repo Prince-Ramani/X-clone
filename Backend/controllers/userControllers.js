@@ -87,13 +87,17 @@ const getUserNotifications = async (req, res) => {
     }).populate({
       path: "from",
       select: "-password",
-    });
+    }).populate({
+      path : "postId",
+      select : "postContent _id "
+    })
     await Notification.updateMany(
       { to: myself.id, read: false },
       { read: true }
     );
     return res.status(200).json(noti);
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ message: "Internal server error" });
   }
 };

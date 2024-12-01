@@ -17,6 +17,7 @@ import FollowersList from "./Mycomponents/FollowersList/FollowersList";
 import FollowingList from "./Mycomponents/FollowersList/FollowingList";
 import ShowPost from "./Mycomponents/ShowPost/Post";
 import Notifications from "./Mycomponents/Notifications/Notifications";
+import Search from "./Mycomponents/Search/Search";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -71,6 +72,7 @@ function App() {
             path="notifications"
             element={isLoggedIn ? <Notifications /> : <Signup />}
           />
+          <Route path="search" element={isLoggedIn ? <Search /> : <Signup />} />
         </Route>
       </Routes>
     </Router>

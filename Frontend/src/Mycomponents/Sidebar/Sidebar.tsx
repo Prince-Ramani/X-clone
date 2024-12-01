@@ -5,7 +5,7 @@ import {
   BellIcon,
   CircleEllipsis,
   Ellipsis,
-  Home,
+  LucideHome,
   Search,
   UserRound,
   X,
@@ -14,50 +14,39 @@ import { useEffect, useState } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 
-enum CurrentlyOnOptions {
-  home = "home",
-  explore = "search",
-  notifications = "notifications",
-  profile = "profile",
-  more = "more",
-}
-
 const Sidebar = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+
+  const location = useLocation();
 
   const { setCreateDialog } = useCreatePostContext();
 
-  const [currentlyOn, setCurrentlyOn] = useState<CurrentlyOnOptions | null>();
+  const [currentlyOn, setCurrentlyOn] = useState<any>();
 
   const { authUser } = useAuthUser();
 
   useEffect(() => {
-    if (
-      Object.values(CurrentlyOnOptions).includes(
-        location.pathname as CurrentlyOnOptions
-      )
-    ) {
-      setCurrentlyOn(location.pathname as CurrentlyOnOptions);
-    } else {
-      setCurrentlyOn(CurrentlyOnOptions.home);
-    }
-  }, [location]);
+    let loc = location.pathname.split("/")[1];
+
+    if (!loc) setCurrentlyOn("home");
+    else setCurrentlyOn(location.pathname.split("/")[1]);
+  }, [location, navigate]);
 
   return (
-    <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen   sticky top-0    py-2    hidden md:flex flex-col   ">
+    <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen   sticky top-0    py-2    hidden md:flex flex-col    ">
       <X className="size-8 ml-3" />
-      <div className="flex flex-col py-5 gap-y-1">
+
+      <div className="flex flex-col py-5 gap-y-1 ">
         <div
-          className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors delay-75"
+          className="flex justify-start cursor-pointer  gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors delay-75"
           onClick={() => {
-            navigate("/home");
+            navigate("/");
           }}
         >
-          <Home className="size-8 shrink-0" />
+          <LucideHome className={`size-8 shrink-0 `} />
           <span
             className={` ${
-              currentlyOn === "home" ? "font-semibold" : ""
+              currentlyOn === "home" ? "font-bold" : ""
             } text-xl rounded-full select-none   `}
           >
             Home
@@ -70,7 +59,7 @@ const Sidebar = () => {
             navigate("/search");
           }}
         >
-          <Search className="size-7 ml-1 shrink-0" />
+          <Search className={`size-7  ml-1 shrink-0 `} />
           <span
             className={` ${
               currentlyOn === "search" ? "font-semibold" : ""
@@ -83,12 +72,16 @@ const Sidebar = () => {
         <div
           className={`${
             currentlyOn === "notifications" ? "font-semibold" : ""
-          }  flex justify-start cursor-pointer items-center   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-6 rounded-full transition-colors delay-75`}
+          }  flex justify-start cursor-pointer items-center   gap-4 hover:bg-gray-800/50  w-fit p-3   rounded-full transition-colors delay-75`}
           onClick={() => {
-            navigate("/Notifications");
+            navigate("/notifications");
           }}
         >
-          <BellIcon className="size-6 ml-2 shrink-0" />
+          <BellIcon
+            className={`size-6 ml-2 shrink-0   ${
+              currentlyOn === "notifications" ? "fill-white" : ""
+            } `}
+          />
           <span className=" text-xl rounded-full rounded-r-none select-none   ">
             Notifications
           </span>
