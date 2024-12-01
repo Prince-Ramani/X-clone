@@ -18,6 +18,7 @@ import FollowingList from "./Mycomponents/FollowersList/FollowingList";
 import ShowPost from "./Mycomponents/ShowPost/Post";
 import Notifications from "./Mycomponents/Notifications/Notifications";
 import Search from "./Mycomponents/Search/Search";
+import Connect from "./Mycomponents/Connect/Connect";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -73,6 +74,10 @@ function App() {
             element={isLoggedIn ? <Notifications /> : <Signup />}
           />
           <Route path="search" element={isLoggedIn ? <Search /> : <Signup />} />
+          <Route
+            path="connect_people"
+            element={isLoggedIn ? <Connect /> : <Signup />}
+          />
         </Route>
       </Routes>
     </Router>

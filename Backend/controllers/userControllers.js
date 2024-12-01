@@ -227,8 +227,9 @@ const updateBannerPic = async(req,res)=>{
 const suggestUser = async (req, res) => {
   try {
     const user = await User.findById(req.user);
+    const limit = parseInt(req.query.limit) || 3
 
-    const suggest = await User.aggregate([{ $match: { _id: { $ne: user._id, $nin: user.following } } }, { $sample: { size: 5 } }]);
+    const suggest = await User.aggregate([{ $match: { _id: { $ne: user._id, $nin: user.following } } }, { $sample: { size: limit } }]);
     return res.status(200).json(suggest);
   } catch (err) {
     console.log(err)

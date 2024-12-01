@@ -9,7 +9,7 @@ router.post("/follow/:id",protectRoute,followPerson);
 router.get("/getnoti",protectRoute,getUserNotifications);
 router.post("/updateprofile",protectRoute,updateProfile);
 router.post("/finduser/:name",protectRoute,findUser)
-router.post("/suggestion",protectRoute,suggestUser)
+router.get("/suggestion",protectRoute,suggestUser)
 router.post("/updatepicture",protectRoute,upload.single('profilePic'),uploadProfilePic)
 router.post("/updatebanner",protectRoute,upload.single('banner'),updateBannerPic)
 router.get("/getfollowers",protectRoute,getFollowersList)

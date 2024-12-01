@@ -16,6 +16,7 @@ import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
 import Media from "./Media";
 import LikedPosts from "./LikedPosts";
+import FollowButton from "@/customComponents/FollowButton";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -36,7 +37,6 @@ const Profile = () => {
   if (!userId) return;
 
   const [isFollowing, setIsFollowing] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: profile } = useQuery({
     queryKey: [personUsername, "Profile"],
@@ -76,27 +76,6 @@ const Profile = () => {
     },
 
     refetchOnWindowFocus: false,
-  });
-
-  const { mutate: follow, isPending: pendingFollow } = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/follow/${profile._id}`, {
-        method: "POST",
-      });
-      const data = await res.json();
-
-      if ("error" in data) toast.error(data.error);
-      return data;
-    },
-    onSuccess: (data) => {
-      if ("error" in data) return;
-
-      queryClient.invalidateQueries({
-        queryKey: [personUsername, "followers"],
-      });
-
-      toast.success(data.message);
-    },
   });
 
   return (
@@ -153,22 +132,7 @@ const Profile = () => {
             <Search className="size-4 m-1 " />
           </button>
         </CustomTooltip>
-        <button
-          className={`font-bold relative flex justify-center items-center group  ${
-            isFollowing
-              ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
-              : "bg-white text-black"
-          } text-black w-20 h-8    rounded-full`}
-          disabled={pendingFollow}
-          onClick={() => follow()}
-        >
-          <span className={`absolute opacity-100 group-hover:opacity-0 `}>
-            {isFollowing ? "Following" : "Follow"}
-          </span>
-          <span className={`absolute opacity-0  group-hover:opacity-100 `}>
-            {isFollowing ? "Unfollow" : "Follow"}
-          </span>
-        </button>
+        <FollowButton personId={profile?._id} username={profile?.username} />
       </div>
 
       <div className="p-2 px-5 relative bottom-20 md:bottom-20 ">
