@@ -121,13 +121,21 @@ const Profile = () => {
       </div>
 
       <div className="h-40  md:h-44 w-full   ">
-        <a href={profile?.banner} target="_blank">
-          <img src={profile?.banner} className="h-full w-full" />
+        <a
+          href={profile?.banner}
+          target="_blank"
+          className="focus:outline-none"
+        >
+          <img src={profile?.banner} className="h-full w-full " />
         </a>
       </div>
 
       <div className="relative   p-1 md:p-2 bg-black h-fit w-fit rounded-full bottom-10 left-3 sm:bottom-14 sm:left-4  md:bottom-16 md:left-5">
-        <a href={profile?.profilePic} target="_blank">
+        <a
+          href={profile?.profilePic}
+          target="_blank"
+          className="focus:outline-none"
+        >
           <img
             src={profile?.profilePic}
             className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "

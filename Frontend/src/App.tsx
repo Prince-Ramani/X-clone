@@ -16,6 +16,7 @@ import Profile from "./Mycomponents/Profile/Profile";
 import FollowersList from "./Mycomponents/FollowersList/FollowersList";
 import FollowingList from "./Mycomponents/FollowersList/FollowingList";
 import ShowPost from "./Mycomponents/ShowPost/Post";
+import Notifications from "./Mycomponents/Notifications/Notifications";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -65,6 +66,10 @@ function App() {
           <Route
             path="profile/:username/post/:postId"
             element={isLoggedIn ? <ShowPost /> : <Signup />}
+          />
+          <Route
+            path="notifications"
+            element={isLoggedIn ? <Notifications /> : <Signup />}
           />
         </Route>
       </Routes>

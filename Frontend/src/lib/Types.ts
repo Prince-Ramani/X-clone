@@ -1,3 +1,5 @@
+import { UploadedByType } from "@/Mycomponents/Home/ForYou";
+
 export interface CommentType {
   commenter: Commenter;
   createdAt: string;
@@ -19,4 +21,14 @@ export interface Commenter {
   profilePic: string;
   username: string;
   _id: string;
+}
+
+export interface NotificationsType {
+  _id: string;
+  createdAt: string;
+  updated: string;
+  from: UploadedByType;
+  to: string;
+  read: boolean;
+  topic: "like" | "follow";
 }
