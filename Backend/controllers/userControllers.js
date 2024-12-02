@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const {cloudinary} = require("../Cloudinary/cloudinary")
 
-const {unlink} = require("fs");
+const fs = require("fs");
 const { default: mongoose } = require("mongoose");
 const Post = require("../models/postmodel");
 
@@ -123,7 +123,7 @@ const updateProfile = async (req, res) => {
     }
     if (username && username!== "") {
       username = username.trim();
-      const userNameAvailable = await User.find({ username });
+      const userNameAvailable = await User.exists({ username });
       if (userNameAvailable.length === 0) {
         newUserName = username;
       } else {
@@ -148,7 +148,7 @@ const updateProfile = async (req, res) => {
       const uploadRes = await cloudinary.uploader.upload(banner[0].path,{
         folder : "X-clone/Banners"
       });
-      unlink(banner[0].path,(err)=>{
+      fs.unlink(banner[0].path,(err)=>{
           if(err){
             console.log(err)
           }
@@ -173,7 +173,8 @@ const updateProfile = async (req, res) => {
       const uploadRes = await cloudinary.uploader.upload(profilePic[0].path,{
         folder : "X-clone/Profile_pics"
       });
-      unlink(profilePic[0].path,(err)=>{
+      fs.unlink(profilePic[0].path,(err,data)=>{
+        console.log(data)
           if(err){
             console.log(err)
           }
@@ -226,7 +227,7 @@ const uploadProfilePic = async(req,res)=>{
       const uploadRes = await cloudinary.uploader.upload(req.file.path,{
         folder : "X-clone/Profile_pics"
       });
-      unlink(req.file.path,(err)=>{
+      fs.unlink(req.file.path,(err)=>{
           if(err){
             console.log(err)
           }
@@ -253,7 +254,7 @@ const updateBannerPic = async(req,res)=>{
       const uploadRes = await cloudinary.uploader.upload(req.file.path,{
         folder : "X-clone/Banners"
       });
-      unlink(req.file.path,(err)=>{
+      fs.unlink(req.file.path,(err)=>{
           if(err){
             console.log(err)
           }
