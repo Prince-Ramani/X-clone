@@ -4,13 +4,14 @@ import { useState } from "react";
 
 import TextareaAutosize from "react-textarea-autosize";
 import ForYou from "./ForYou";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Following from "./Following";
 import CustomTooltip from "@/customComponents/ToolTip";
 
 const Home = () => {
   const { authUser } = useAuthUser();
+  const queryClient = useQueryClient();
 
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
   const [textareaValue, setTextareaValue] = useState<string | null>("");
@@ -33,6 +34,11 @@ const Home = () => {
       else {
         setFile(null);
         setTextareaValue("");
+
+        queryClient.invalidateQueries({
+          queryKey: [authUser?.username, "Posts"],
+        });
+
         return toast.success("Post created successfully!");
       }
     },

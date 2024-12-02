@@ -90,7 +90,7 @@ const Sidebar = () => {
         <div
           className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  delay-75"
           onClick={() => {
-            navigate("/profile");
+            navigate(`/profile/${authUser?.username}`);
           }}
         >
           <UserRound className="size-7 ml-2 shrink-0" />

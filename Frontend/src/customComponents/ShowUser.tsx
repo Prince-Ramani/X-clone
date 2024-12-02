@@ -7,7 +7,7 @@ const ShowUser = ({
   showBio = false,
 }: {
   suggestion: UploadedByType;
-  showBio: boolean;
+  showBio?: boolean;
 }) => {
   const navigate = useNavigate();
   const handleDivClick = (e: any) => {
@@ -15,7 +15,7 @@ const ShowUser = ({
       navigate(`/profile/${suggestion.username}`);
     }
 
-    e.stopPropogation();
+    e.stopPropagation();
   };
   return (
     <div
@@ -27,11 +27,11 @@ const ShowUser = ({
     >
       <img
         src={suggestion.profilePic}
-        className="size-10 rounded-full object-cover "
+        className="size-10 lg:size-9 xl:size-10  rounded-full object-cover "
         onClick={() => navigate(`/profile/${suggestion.username}`)}
       />
       <div className="flex flex-col w-full">
-        <div className="text-sm flex w-full items-center ">
+        <div className=" text-xs xl:text-sm flex w-full items-center ">
           <div className="flex flex-col ">
             <span
               className="font-bold hover:underline "
@@ -44,7 +44,7 @@ const ShowUser = ({
           <FollowButton
             personId={suggestion._id}
             username={suggestion.username}
-            className="ml-auto text-sm font-semibold  "
+            className="ml-auto text-sm font-semibold lg:w-20 lg:text-sm "
           />
         </div>
         {showBio ? (

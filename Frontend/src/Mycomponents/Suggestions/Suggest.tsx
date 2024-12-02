@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { UploadedByType } from "../Home/ForYou";
 import { useNavigate } from "react-router-dom";
 
-const Suggest = () => {
+const Suggest = ({ className }: { className?: string }) => {
   const navigate = useNavigate();
   const { data: suggestions } = useQuery({
     queryKey: ["suggestions"],
@@ -18,7 +18,9 @@ const Suggest = () => {
   });
 
   return (
-    <div className="border border-gray-700/80 rounded-lg p-2 m-1 cursor-pointer flex flex-col gap-3">
+    <div
+      className={`border border-gray-700/80 rounded-lg p-2 m-1 cursor-pointer flex flex-col gap-3 ${className}`}
+    >
       <div className="font-bold text-lg pl-2">Who to follow</div>
       <div>
         {suggestions?.map((suggestion: UploadedByType) => (

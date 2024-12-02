@@ -104,24 +104,19 @@ const getUserNotifications = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    var { username, email, newpass, password, bio, links } = req.body;
+    var { username, newpass, password, bio } = req.body;
     var newPassword, newUserName;
-    if (!email || !password) {
+    const {banner,profilePic} = req.files
+    var newProfilePic ,newBanner
+
+
+    if (!password) {
       return res
         .status(400)
-        .json({ error: "Email and password is required to update profile!" });
-    }
-    const valid = validateEmail(email);
-    if (!valid) {
-      return res.json({
-        error: "Invalid email formate!",
-      });
+        .json({ error: "password is required to update profile!" });
     }
     const user = await User.findById(req.user);
     
-    if (user.email !== email) {
-      return res.status(400).json({ error: "Invalid email!" });
-    }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(404).json({ error: "Incorrect password" });
@@ -139,16 +134,64 @@ const updateProfile = async (req, res) => {
       newpass = newpass.trim();
       newPassword = await bcrypt.hash(newpass, 10);
     }
-    if(links){
-      var newLinks = links.split(",");
-      if(newLinks.length>5)
-        return res.json({error : "Maximum number of links allowed are 5"})
+
+    
+
+    if(banner && banner[0].path) {
+      try{
+      if (user.banner!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1732515390/jeremy-thomas-4dpAqfTbvKA-unsplash_xwdeqn.jpg") {
+        const imgID= user.banner.split('/').slice(-1)[0].split('.')[0];
+        const foldername = "X-clone/Banners"
+        const picID = `${foldername}/${imgID}`
+       const result =  await cloudinary.uploader.destroy(picID)
+       }
+      const uploadRes = await cloudinary.uploader.upload(banner[0].path,{
+        folder : "X-clone/Banners"
+      });
+      unlink(banner[0].path,(err)=>{
+          if(err){
+            console.log(err)
+          }
+        })
+        newBanner = uploadRes.secure_url;
+        
+      }catch(err) {
+        console.log(err)
+        return res.status(400).json({error: "Make sure the Internet is ON!"})
+      }
+       
     }
+
+    if(profilePic && profilePic[0].path){
+      try{
+      if (user.profilePic!=="https://res.cloudinary.com/dwxzguawt/image/upload/v1727403075/defaultXprofile_siuopn.jpg") {
+        const imgID= user.profilePic.split('/').slice(-1)[0].split('.')[0];
+        const foldername = "X-clone/Profile_pics"
+        const picID = `${foldername}/${imgID}`
+       const result =  await cloudinary.uploader.destroy(picID)
+      }
+      const uploadRes = await cloudinary.uploader.upload(profilePic[0].path,{
+        folder : "X-clone/Profile_pics"
+      });
+      unlink(profilePic[0].path,(err)=>{
+          if(err){
+            console.log(err)
+          }
+        })
+        const pic = uploadRes.secure_url;
+        newProfilePic = pic
+      }catch(err) {
+        console.log(err)
+        return res.status(400).json({error : "Make sure the Internet is ON!"})
+      }
+    }
+
+
     user.username = newUserName || user.username;
-    user.email = email;
     user.password = newPassword || user.password;
     user.bio = bio || user.bio;
-    user.links = newLinks|| user.links;
+    user.profilePic = newProfilePic || user.profilePic
+    user.banner = newBanner || user.banner
     let data = await user.save();
     return res.status(200).json({message :"Profile updated"});
   } catch (err) {
@@ -334,12 +377,18 @@ const getFollowersNumber = async( req,res)=>{
   try {
 
     const {username} = req.query
+    
 
-    const user = await User.findOne({username}).select("followers")
+    const user = await User.findOne({username : username})
+
+
+    if(!user) return  res.status(404).json({error : "No such account exists!"})
+
+    if(user && user.followers.length === 0)   return res.json([]).status(200);
 
     return res.json([...user.followers]).status(200);
 
-  } catch (error) {
+  } catch (err) {
     console.log(err)
     return res.status(500).json({error : "Internal server error"})
   }

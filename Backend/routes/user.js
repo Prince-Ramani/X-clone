@@ -7,7 +7,10 @@ const router = express.Router();
 router.get("/profile/:username",protectRoute,getProfile);
 router.post("/follow/:id",protectRoute,followPerson);
 router.get("/getnoti",protectRoute,getUserNotifications);
-router.post("/updateprofile",protectRoute,updateProfile);
+router.post("/updateprofile",protectRoute, upload.fields([
+    { name: "banner" },    
+    { name: "profilePic"}, 
+  ]),updateProfile);
 router.post("/finduser/:name",protectRoute,findUser)
 router.get("/suggestion",protectRoute,suggestUser)
 router.post("/updatepicture",protectRoute,upload.single('profilePic'),uploadProfilePic)

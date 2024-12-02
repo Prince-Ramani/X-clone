@@ -80,7 +80,10 @@ const ReplyDialog = () => {
         <div className="bg-black p-3 rounded-3xl max-w-xl w-full">
           <DialogClose asChild>
             <button
-              className="  text-white  p-2 rounded-full hover:bg-gray-800/50  "
+              className={`  text-white  p-2 rounded-full${
+                isPending ? "opacity-70" : " hover:bg-gray-800/50 "
+              } `}
+              disabled={isPending}
               onClick={() => {
                 setTextareaValue("");
               }}
@@ -166,12 +169,12 @@ const ReplyDialog = () => {
                   <Smile className="size-5 text-blue-400" />
                 </span>
                 <div
-                  className={`ml-auto lg:size-8 size-5 md:size-6 text-sm flex justify-center items-center rounded-full ${
+                  className={`ml-auto text-xs lg:size-8 size-5 md:size-6 md:text-sm flex justify-center items-center rounded-full ${
                     textareaValue && textareaValue.length >= 280
                       ? "bg-red-600"
                       : "bg-green-600"
                   } 
-                     ${!textareaValue ? "hidden" : "block"} `}
+                     ${textareaValue ? "hidden" : "block"} `}
                 >
                   {textareaValue?.length}
                 </div>

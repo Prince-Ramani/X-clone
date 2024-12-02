@@ -16,10 +16,13 @@ import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
 import Media from "./Media";
 import LikedPosts from "./LikedPosts";
-import FollowButton from "@/customComponents/FollowButton";
+import Suggest from "../Suggestions/Suggest";
+import { useEditProfileContext } from "@/context/EditProfileContext";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { setIsEditProfileDialog } = useEditProfileContext();
 
   const [currentPath, setCurrentPath] = useState<string | null | undefined>(
     null
@@ -63,6 +66,28 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
+  const { mutate: follow, isPending: pendingFollow } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/follow/${profile?._id}`, {
+        method: "POST",
+      });
+      const data = await res.json();
+
+      if ("error" in data) toast.error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      if ("error" in data) return;
+
+      queryClient.invalidateQueries({
+        queryKey: [profile?.username, "followers"],
+      });
+      setIsFollowing((prev) => !prev);
+
+      toast.success(data.message);
+    },
+  });
+
   const { data: followers } = useQuery({
     queryKey: [personUsername, "followers"],
     queryFn: async () => {
@@ -80,7 +105,7 @@ const Profile = () => {
 
   return (
     <div className="border border-b-0 border-gray-800 min-h-full  cursor-pointer">
-      <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-50 ">
+      <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-10 ">
         <CustomTooltip title="Back">
           <div
             className="h-fit w-fit p-2 hover:bg-gray-500/20 rounded-full"
@@ -103,7 +128,7 @@ const Profile = () => {
         <a
           href={profile?.banner}
           target="_blank"
-          className="focus:outline-none"
+          className="focus:outline-none object-fill"
         >
           <img src={profile?.banner} className="h-full w-full " />
         </a>
@@ -132,7 +157,32 @@ const Profile = () => {
             <Search className="size-4 m-1 " />
           </button>
         </CustomTooltip>
-        <FollowButton personId={profile?._id} username={profile?.username} />
+
+        {authUser._id === profile?._id ? (
+          <button
+            className="bg-transparent border rounded-full w-24 border-gray-200/90 hover:bg-white/10 h-8 text-sm font-bold"
+            onClick={() => setIsEditProfileDialog(true)}
+          >
+            Edit profile
+          </button>
+        ) : (
+          <button
+            className={`font-bold relative flex justify-center items-center z-10   ${
+              isFollowing
+                ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
+                : "bg-white text-black"
+            } text-black w-20 h-8     rounded-full`}
+            disabled={pendingFollow}
+            onClick={() => follow()}
+          >
+            <span className={`absolute opacity-100 group-hover:opacity-0 `}>
+              {isFollowing ? "Following" : "Follow"}
+            </span>
+            <span className={`absolute opacity-0  group-hover:opacity-100 `}>
+              {isFollowing ? "Unfollow" : "Follow"}
+            </span>
+          </button>
+        )}
       </div>
 
       <div className="p-2 px-5 relative bottom-20 md:bottom-20 ">
@@ -141,7 +191,7 @@ const Profile = () => {
       </div>
 
       <div className="  relative bottom-16 md:bottom-20  px-2 md:px-4 flex flex-col gap-2">
-        web dev for rest of us
+        {profile?.bio}
         <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
           <MapPin className="size-4" />
           {profile?.location || "India"}
@@ -230,6 +280,12 @@ const Profile = () => {
               key={post?._id}
             />
           ))}
+
+          {posts?.length === 0 && authUser._id === profile._id ? (
+            <Suggest className="border-none" />
+          ) : (
+            ""
+          )}
         </div>
       ) : (
         ""

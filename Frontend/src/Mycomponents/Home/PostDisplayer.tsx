@@ -7,6 +7,7 @@ import CustomTooltip from "@/customComponents/ToolTip";
 import { useNavigate } from "react-router-dom";
 import { FormateDate } from "@/lib/Date";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
+import DeletPost from "@/customComponents/DeletePostsIcon";
 
 const PostDisplayer = memo(
   ({
@@ -75,20 +76,27 @@ const PostDisplayer = memo(
         />
 
         <div className=" w-full h-fit ml-2 flex-flex-col ">
-          <div className="flex gap-2 items-center ">
+          <div className="flex gap-2 items-center  w-full ">
             <span
               className="font-bold hover:underline decoration-white decoration-1"
               onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
             >
               {uploadedBy.username}
             </span>
-            <div className="flex items-center   text-gray-400/90">
+            <div className="flex items-center   text-gray-400/90 ">
               <span className="text-sm">@{uploadedBy.username}</span>
               <span>
                 <Dot className="size-3" />
               </span>
               <span className="text-sm">{FormateDate(createdAt)}</span>
             </div>
+            {authUserId === uploadedBy._id ? (
+              <div className="ml-auto">
+                <DeletPost postID={post._id} username={uploadedBy.username} />
+              </div>
+            ) : (
+              ""
+            )}
           </div>
 
           <div className="leading-normal text-sm tracking-wide break-all break-words ">

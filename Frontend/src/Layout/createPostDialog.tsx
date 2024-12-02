@@ -11,12 +11,13 @@ import { useCreatePostContext } from "@/context/createPostContext";
 import { ArrowUpDown, ImageIcon, Smile, VideoIcon, X } from "lucide-react";
 import { useAuthUser } from "@/context/userContext";
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const CreatePostDialog = () => {
   const { isCreateDialogOpen, setCreateDialog } = useCreatePostContext();
   const { authUser } = useAuthUser();
+  const queryClient = useQueryClient();
 
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
@@ -40,6 +41,12 @@ const CreatePostDialog = () => {
       if ("error" in data) return toast.error(data.error);
       else {
         setCreateDialog(false);
+        queryClient.invalidateQueries({
+          queryKey: [authUser?.username, "Posts"],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [authUser?.username, "Media"],
+        });
         return toast.success("Post created successfully!");
       }
     },
@@ -86,7 +93,10 @@ const CreatePostDialog = () => {
         <div className="bg-black p-3 rounded-3xl max-w-xl w-full">
           <DialogClose asChild>
             <button
-              className="  text-white  p-2 rounded-full hover:bg-gray-800/50  "
+              className={`  text-white  p-2 rounded-full hover:bg-gray-800/50 cursor-pointer ${
+                isPending ? "opacity-70" : ""
+              }  `}
+              disabled={isPending}
               onClick={() => {
                 setTextareaValue("");
                 setFile(null);
@@ -137,6 +147,8 @@ const CreatePostDialog = () => {
                 </span>
                 <div
                   className={`ml-auto lg:size-8 size-5 md:size-6 text-sm flex justify-center items-center bg-green-600 rounded-full ${
+                    !textareaValue ? "hidden" : "flex"
+                  } ${
                     textareaValue && textareaValue.length >= 280
                       ? "bg-red-600"
                       : "bg-green-600"
@@ -145,7 +157,11 @@ const CreatePostDialog = () => {
                   {textareaValue?.length}
                 </div>
                 <button
-                  className="bg-blue-400 rounded-full  w-2/12 p-2 ml-auto hover:opacity-90 active:bg-green-500"
+                  className={`bg-blue-400 rounded-full  w-2/12 p-2 ml-auto  ${
+                    isPending
+                      ? "opactiy-75"
+                      : "hover:opacity-90 active:bg-green-500 "
+                  }`}
                   onClick={() => handlePostSubmit()}
                   disabled={isPending}
                 >
