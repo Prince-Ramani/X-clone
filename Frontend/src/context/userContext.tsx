@@ -10,6 +10,7 @@ export interface User {
   followers: string[];
   following: string[];
   links: string[];
+  location?: string;
 }
 
 interface UserContextType {

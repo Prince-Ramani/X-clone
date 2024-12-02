@@ -26,12 +26,14 @@ const EditProfileDialog = () => {
   const [file2, setFile2] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imagePreview2, setImagePreview2] = useState<string | null>(null);
+  console.log(authUser);
 
   const [info, setInfo] = useState({
     username: authUser?.username,
     bio: authUser?.bio,
     password: "",
     newpass: "",
+    location: authUser?.location || "",
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,6 +101,7 @@ const EditProfileDialog = () => {
     formData.append("password", info.password);
     if (file) formData.append("banner", file);
     if (file2) formData.append("profilePic", file2);
+    if (location) formData.append("location", info.location);
     mutate(formData);
   };
 
@@ -230,7 +233,14 @@ const EditProfileDialog = () => {
                   </div>
                   <div className="flex flex-col gap-2">
                     <div>Location</div>
-                    <Input placeholder="Location" className="h-14" max={30} />
+                    <Input
+                      placeholder="Location"
+                      className="h-14"
+                      max={30}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setInfo({ ...info, location: e.target.value })
+                      }
+                    />
                   </div>
                   <div className="flex flex-col gap-2">
                     <div>Password*</div>

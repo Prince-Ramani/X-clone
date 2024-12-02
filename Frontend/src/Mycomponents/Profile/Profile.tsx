@@ -194,7 +194,7 @@ const Profile = () => {
         {profile?.bio}
         <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
           <MapPin className="size-4" />
-          {profile?.location || "India"}
+          {profile?.location || "unknown"}
           <LucideCalendarRange className="size-4" /> Joined{" "}
           {profile ? format(profile?.createdAt, "MMMM yyyy") : ""}
         </div>

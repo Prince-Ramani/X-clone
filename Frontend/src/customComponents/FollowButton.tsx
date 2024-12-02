@@ -1,3 +1,4 @@
+import { useUnfollowContext } from "@/context/UnfollowContext";
 import { useAuthUser } from "@/context/userContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { memo, useState } from "react";
@@ -15,6 +16,7 @@ const FollowButton = memo(
   }) => {
     const queryClient = useQueryClient();
     const { authUser } = useAuthUser();
+    const { setPersonInfo, setUnfollowContext } = useUnfollowContext();
     const isHimself = authUser?._id === personId;
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
@@ -34,11 +36,19 @@ const FollowButton = memo(
         queryClient.invalidateQueries({
           queryKey: [username, "followers"],
         });
-        setIsFollowing((prev) => !prev);
+        setIsFollowing(true);
 
         toast.success(data.message);
       },
     });
+
+    const handleClick = () => {
+      if (isFollowing) {
+        setPersonInfo({ personId: personId, username: username });
+        return setUnfollowContext(true);
+      }
+      follow();
+    };
 
     return (
       <>
@@ -51,7 +61,7 @@ const FollowButton = memo(
               : "bg-white text-black"
           } text-black w-20  lg:w-14  xl:w-20 h-8 ${className}    rounded-full`}
           disabled={pendingFollow}
-          onClick={() => follow()}
+          onClick={() => handleClick()}
         >
           <span className={`absolute opacity-100 group-hover:opacity-0 `}>
             {isFollowing ? "Following" : "Follow"}

@@ -10,6 +10,7 @@ import UserContextProvider from "./context/userContext";
 import CreatePostContextProvider from "./context/createPostContext";
 import ReplyDialogContextProvider from "./context/ReplyPostContext";
 import EditProfileContextProvider from "./context/EditProfileContext";
+import UnfollowContextProvider from "./context/UnfollowContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,11 +29,13 @@ if (rootElement) {
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
           <EditProfileContextProvider>
-            <ReplyDialogContextProvider>
-              <CreatePostContextProvider>
-                <App />
-              </CreatePostContextProvider>
-            </ReplyDialogContextProvider>
+            <UnfollowContextProvider>
+              <ReplyDialogContextProvider>
+                <CreatePostContextProvider>
+                  <App />
+                </CreatePostContextProvider>
+              </ReplyDialogContextProvider>
+            </UnfollowContextProvider>
           </EditProfileContextProvider>
         </UserContextProvider>
       </QueryClientProvider>

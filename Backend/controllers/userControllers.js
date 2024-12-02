@@ -104,7 +104,7 @@ const getUserNotifications = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    var { username, newpass, password, bio } = req.body;
+    var { username, newpass, password, bio,location } = req.body;
     var newPassword, newUserName;
     const {banner,profilePic} = req.files
     var newProfilePic ,newBanner
@@ -192,6 +192,7 @@ const updateProfile = async (req, res) => {
     user.password = newPassword || user.password;
     user.bio = bio || user.bio;
     user.profilePic = newProfilePic || user.profilePic
+    user.location = location || user.location || ""
     user.banner = newBanner || user.banner
     let data = await user.save();
     return res.status(200).json({message :"Profile updated"});

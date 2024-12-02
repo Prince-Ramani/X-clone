@@ -24,6 +24,7 @@ export interface UploadedByType {
   profilePic: string;
   username: string;
   _id: string;
+  location?: string;
 }
 
 const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
