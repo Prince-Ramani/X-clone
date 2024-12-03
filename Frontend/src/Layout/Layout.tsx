@@ -17,14 +17,25 @@ const Layout = () => {
   const { isUnfollowContextOpen } = useUnfollowContext();
 
   return (
-    <div className={`flex  h-full w-full  justify-center  `}>
+    <div
+      className={`flex  h-full w-full  justify-center ${
+        isCreateDialogOpen ||
+        isEditProfileDialogOpen ||
+        isReplyDialogOpen ||
+        isUnfollowContextOpen
+          ? "fixed"
+          : ""
+      } `}
+    >
       {isCreateDialogOpen ? <CreatePostDialog /> : ""}
       {isReplyDialogOpen ? <ReplyDialog /> : ""}
       {isEditProfileDialogOpen ? <EditProfileDialog /> : ""}
       {isUnfollowContextOpen ? <UnfollowDialog /> : ""}
 
       <Sidebar />
-      <main className=" lg:w-5/12 min-h-screen  no-scrollbar  w-full  md:w-3/5">
+      <main
+        className={` lg:w-5/12 min-h-screen   no-scrollbar  w-full  md:w-3/5  `}
+      >
         <Outlet />
       </main>
       <Suggestions />

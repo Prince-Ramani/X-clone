@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import Following from "./Following";
 import CustomTooltip from "@/customComponents/ToolTip";
+import EmojiPicker from "@/customComponents/EmojiPicker";
 
 const Home = () => {
   const { authUser } = useAuthUser();
@@ -17,6 +18,8 @@ const Home = () => {
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [_, setSelectedEmoji] = useState();
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
 
   const { mutate: createPost, isPending } = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -34,6 +37,7 @@ const Home = () => {
       else {
         setFile(null);
         setTextareaValue("");
+        setIsEmojiOpen(false);
 
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Posts"],
@@ -74,12 +78,17 @@ const Home = () => {
     }
   };
 
+  const handleEmojiSelect = (emoji: any) => {
+    setSelectedEmoji(emoji.native);
+    setTextareaValue((prevText) => prevText + emoji.native);
+  };
+
   return (
     <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0    ">
       {/* Top */}
-      <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0  ">
+      <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0 z-10  ">
         <div
-          className="h-full w-1/2 text-center hover:bg-gray-700/30   "
+          className="h-full w-1/2 text-center hover:bg-gray-700/30    "
           onClick={() => setIsActive("For you")}
         >
           <div className="h-full flex flex-col justify-center items-center pt-3">
@@ -164,8 +173,19 @@ const Home = () => {
                 </span>
               </CustomTooltip>
               <CustomTooltip title="Emoji">
-                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                <span
+                  className=" relative rounded-full p-2 hover:bg-gray-800/70 cursor-pointer"
+                  onClick={() => setIsEmojiOpen((prev) => !prev)}
+                >
                   <Smile className="size-5 text-blue-400" />
+                  {isEmojiOpen ? (
+                    <EmojiPicker
+                      onSelect={handleEmojiSelect}
+                      isOpen={isEmojiOpen}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </span>
               </CustomTooltip>
 

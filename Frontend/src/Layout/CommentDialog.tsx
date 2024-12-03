@@ -15,6 +15,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import { FormateDate } from "@/lib/Date";
+import Loading from "@/components/ui/Loading";
+import EmojiPicker from "@/customComponents/EmojiPicker";
 
 const ReplyDialog = () => {
   const { authUser } = useAuthUser();
@@ -24,14 +26,19 @@ const ReplyDialog = () => {
   const querClient = useQueryClient();
 
   const [textareaValue, setTextareaValue] = useState<string>("");
+  const [_, setSelectedEmoji] = useState();
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutate: postReply, isPending } = useMutation({
-    mutationFn: async (formData: FormData) => {
+    mutationFn: async (value: string) => {
       const res = await fetch(`/api/post/comment/${postContent._id}`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: value }),
       });
 
       const data = await res.json();
@@ -42,6 +49,7 @@ const ReplyDialog = () => {
       if ("error" in data) return toast.error(data.error);
       else {
         setIsReplyDialog(false);
+        setIsEmojiOpen(false);
         setPostContent(null);
         querClient.invalidateQueries({
           queryKey: [postContent?._id, postContent?.uploadedBy.username],
@@ -58,16 +66,17 @@ const ReplyDialog = () => {
     }
   }, [isReplyDialogOpen]);
 
+  const handleEmojiSelect = (emoji: any) => {
+    setSelectedEmoji(emoji.native);
+    setTextareaValue((prevText) => prevText + emoji.native);
+  };
+
   const handleReplySubmit = () => {
     if (textareaValue) {
       if (textareaValue.length >= 280)
         return toast.error("Post length must be less than 280 characters!");
 
-      const formData = new FormData();
-
-      formData.append("text", textareaValue);
-
-      postReply(formData);
+      postReply(textareaValue);
     } else {
       toast.error("Reply content required!");
     }
@@ -77,7 +86,14 @@ const ReplyDialog = () => {
     <Dialog open={isReplyDialogOpen} onOpenChange={setIsReplyDialog}>
       <DialogContent className="fixed inset-0 flex items-center pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50  ">
         <DialogTitle />
-        <div className="bg-black p-3 rounded-3xl max-w-xl w-full">
+        <div className="relative bg-black p-3 rounded-3xl max-w-xl w-full">
+          {isPending ? (
+            <div className=" absolute inset-0 z-[51] flex justify-center items-center rounded-2xl bg-blue-50/20 cursor-not-allowed">
+              <Loading />
+            </div>
+          ) : (
+            ""
+          )}
           <DialogClose asChild>
             <button
               className={`  text-white  p-2 rounded-full${
@@ -155,9 +171,7 @@ const ReplyDialog = () => {
               </div>
               <div className="flex gap-1 p-2 items-center h-full  pb-0 border-t-2 border-gray-800/50 ">
                 <span className="rounded-full p-2 hover:bg-gray-800/70   cursor-pointer  ">
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                    <ImageIcon className="size-5 text-blue-400" />
-                  </label>
+                  <ImageIcon className="size-5 text-blue-400" />
                 </span>
                 <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
                   <VideoIcon className="size-5 text-blue-400" />
@@ -165,8 +179,19 @@ const ReplyDialog = () => {
                 <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
                   <ArrowUpDown className="size-5 text-blue-400" />
                 </span>
-                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                <span
+                  className="rounded-full p-2 hover:bg-gray-800/70 relative cursor-pointer"
+                  onClick={() => setIsEmojiOpen((prev) => !prev)}
+                >
                   <Smile className="size-5 text-blue-400" />
+                  {isEmojiOpen ? (
+                    <EmojiPicker
+                      onSelect={handleEmojiSelect}
+                      isOpen={isEmojiOpen}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </span>
                 <div
                   className={`ml-auto text-xs lg:size-8 size-5 md:size-6 md:text-sm flex justify-center items-center rounded-full ${
@@ -174,7 +199,7 @@ const ReplyDialog = () => {
                       ? "bg-red-600"
                       : "bg-green-600"
                   } 
-                     ${textareaValue ? "hidden" : "block"} `}
+                     ${!textareaValue ? "hidden" : "block"} `}
                 >
                   {textareaValue?.length}
                 </div>

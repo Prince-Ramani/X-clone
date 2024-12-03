@@ -13,6 +13,9 @@ import { useAuthUser } from "@/context/userContext";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import CustomTooltip from "@/customComponents/ToolTip";
+import Loading from "@/components/ui/Loading";
+import EmojiPicker from "@/customComponents/EmojiPicker";
 
 const CreatePostDialog = () => {
   const { isCreateDialogOpen, setCreateDialog } = useCreatePostContext();
@@ -23,6 +26,9 @@ const CreatePostDialog = () => {
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [_, setSelectedEmoji] = useState();
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
 
   //post
 
@@ -41,6 +47,7 @@ const CreatePostDialog = () => {
       if ("error" in data) return toast.error(data.error);
       else {
         setCreateDialog(false);
+        setIsEmojiOpen(false);
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Posts"],
         });
@@ -74,6 +81,11 @@ const CreatePostDialog = () => {
     }
   };
 
+  const handleEmojiSelect = (emoji: any) => {
+    setSelectedEmoji(emoji.native);
+    setTextareaValue((prevText) => prevText + emoji.native);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileExists = e.target.files?.[0];
     if (fileExists) {
@@ -88,13 +100,20 @@ const CreatePostDialog = () => {
   };
   return (
     <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialog}>
-      <DialogContent className="fixed inset-0 flex items-center pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
+      <DialogContent className="fixed inset-0 p-3 pt-20 sm:pt-36 flex items-center md:p-0 md:pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
         <DialogTitle />
-        <div className="bg-black p-3 rounded-3xl max-w-xl w-full">
+        <div className="bg-black p-3 relative rounded-3xl max-w-xl w-full ">
+          {isPending ? (
+            <div className=" absolute inset-0 z-[51] flex justify-center items-center rounded-3xl bg-blue-50/20 cursor-not-allowed">
+              <Loading />
+            </div>
+          ) : (
+            ""
+          )}
           <DialogClose asChild>
             <button
-              className={`  text-white  p-2 rounded-full hover:bg-gray-800/50 cursor-pointer ${
-                isPending ? "opacity-70" : ""
+              className={`  text-white  p-2 rounded-full cursor-pointer ${
+                isPending ? "opacity-70" : "hover:bg-gray-800/50 "
               }  `}
               disabled={isPending}
               onClick={() => {
@@ -142,8 +161,19 @@ const CreatePostDialog = () => {
                 <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
                   <ArrowUpDown className="size-5 text-blue-400" />
                 </span>
-                <span className="rounded-full p-2 hover:bg-gray-800/70 cursor-pointer">
+                <span
+                  className=" relative rounded-full p-2 hover:bg-gray-800/70 cursor-pointer "
+                  onClick={() => setIsEmojiOpen((prev) => !prev)}
+                >
                   <Smile className="size-5 text-blue-400" />
+                  {isEmojiOpen ? (
+                    <EmojiPicker
+                      onSelect={handleEmojiSelect}
+                      isOpen={isEmojiOpen}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </span>
                 <div
                   className={`ml-auto lg:size-8 size-5 md:size-6 text-sm flex justify-center items-center bg-green-600 rounded-full ${
@@ -175,13 +205,21 @@ const CreatePostDialog = () => {
                     alt="Selected preview"
                     className=" size-24 object-cover rounded-md"
                   />
-                  <X
-                    className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70"
-                    onClick={() => {
-                      setFile(null);
-                      setImagePreview(null);
-                    }}
-                  />
+                  <CustomTooltip title="Close">
+                    <button
+                      className={`  text-white  p-2 rounded-full ${
+                        isPending ? "" : "hover:bg-gray-800/50"
+                      }   `}
+                      onClick={() => {
+                        setCreateDialog(false);
+                        setFile(null);
+                        setImagePreview(null);
+                      }}
+                      disabled={isPending}
+                    >
+                      <X className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70" />
+                    </button>
+                  </CustomTooltip>
                 </div>
               ) : (
                 ""

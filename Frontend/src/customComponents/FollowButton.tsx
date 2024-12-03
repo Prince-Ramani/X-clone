@@ -1,6 +1,6 @@
 import { useUnfollowContext } from "@/context/UnfollowContext";
 import { useAuthUser } from "@/context/userContext";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { memo, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -40,6 +40,21 @@ const FollowButton = memo(
 
         toast.success(data.message);
       },
+    });
+
+    const {} = useQuery({
+      queryKey: [username, "followers"],
+      queryFn: async () => {
+        const res = await fetch(
+          `/api/getfollowersnumbers?username=${username}`
+        );
+        const data = await res.json();
+        if ("error" in data) toast.error(data.error);
+        setIsFollowing(data.includes(authUser?._id));
+        return data;
+      },
+
+      refetchOnWindowFocus: false,
     });
 
     const handleClick = () => {

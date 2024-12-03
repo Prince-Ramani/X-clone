@@ -15,6 +15,7 @@ import { ChangeEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import Loading from "@/components/ui/Loading";
 
 const EditProfileDialog = () => {
   const { isEditProfileDialogOpen, setIsEditProfileDialog } =
@@ -73,6 +74,7 @@ const EditProfileDialog = () => {
     },
     onSuccess: async (data) => {
       if ("error" in data) return;
+
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
       queryClient.invalidateQueries({
         queryKey: [authUser?.username, "Profile"],
@@ -110,14 +112,24 @@ const EditProfileDialog = () => {
       open={isEditProfileDialogOpen}
       onOpenChange={setIsEditProfileDialog}
     >
-      <DialogContent className="fixed inset-0 flex items-center pt-9 p-2 sm:pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
+      <DialogContent
+        className={`fixed inset-0  flex items-center   pt-9 p-2 sm:pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 `}
+      >
         <DialogTitle />
-        <div className="bg-black  rounded-2xl max-w-xl w-full">
+
+        <div className="bg-black relative   rounded-2xl max-w-xl w-full">
+          {isPending ? (
+            <div className=" absolute inset-0 z-[51] flex justify-center items-center rounded-2xl bg-blue-50/20 cursor-not-allowed">
+              <Loading />
+            </div>
+          ) : (
+            ""
+          )}
           <div className="flex  items-center gap-4 p-3 pb-2 ">
             <CustomTooltip title="Close">
               <button
                 className={`  text-white  p-2 rounded-full ${
-                  isPending ? "" : "hover:bg-gray-800/50"
+                  isPending ? "opacity-70" : "hover:bg-gray-800/50"
                 }   `}
                 onClick={() => setIsEditProfileDialog(false)}
                 disabled={isPending}
@@ -139,7 +151,7 @@ const EditProfileDialog = () => {
           </div>
 
           <DialogDescription>
-            <div className="  w-full overflow-y-auto h-[500px] no-scrollbar  flex flex-col p-0.5 ">
+            <div className=" w-full overflow-y-auto h-[500px] no-scrollbar  flex flex-col p-0.5 ">
               <div className=" relative flex justify-center items-center">
                 {imagePreview ? (
                   <img
@@ -167,7 +179,11 @@ const EditProfileDialog = () => {
                     </div>
                   </label>
                   {imagePreview ? (
-                    <div className=" rounded-full  bg-black/30 hover:bg-white/10 transition-colors">
+                    <div
+                      className={` rounded-full  bg-black/30 ${
+                        isPending ? "" : "hover:bg-white/10 "
+                      }transition-colors`}
+                    >
                       <X
                         className="cursor-pointer p-3 size-12 opacity-70 hover:opacity-100"
                         onClick={() => setImagePreview(null)}

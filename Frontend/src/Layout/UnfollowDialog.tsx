@@ -1,3 +1,4 @@
+import Loading from "@/components/ui/Loading";
 import { useUnfollowContext } from "@/context/UnfollowContext";
 
 import {
@@ -37,6 +38,9 @@ const UnfollowDialog = () => {
       });
       setPersonInfo(undefined);
       setUnfollowContext(false);
+      queryClient.invalidateQueries({
+        queryKey: [personInfo.username, "followers"],
+      });
 
       toast.success(data.message);
     },
@@ -44,9 +48,16 @@ const UnfollowDialog = () => {
 
   return (
     <Dialog open={isUnfollowContextOpen} onOpenChange={setUnfollowContext}>
-      <DialogContent className="fixed inset-0 flex items-center lg:pt-32 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
+      <DialogContent className="fixed inset-0 flex items-center justify-center pb-10   z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
         <DialogTitle />
-        <div className="bg-black p-3 rounded-3xl max-w-xs w-full">
+        <div className="bg-black p-3 rounded-3xl max-w-[275px] sm:max-w-[300px] md:max-w-xs w-full">
+          {pendingFollow ? (
+            <div className=" absolute inset-0 z-[51] flex justify-center items-center rounded-2xl bg-blue-50/20 cursor-not-allowed">
+              <Loading />
+            </div>
+          ) : (
+            ""
+          )}
           <DialogDescription>
             <div className=" w-full  flex flex-col p-4 ">
               <div className="font-bold">

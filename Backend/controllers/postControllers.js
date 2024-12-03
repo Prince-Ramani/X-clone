@@ -52,6 +52,8 @@ const commentOnPost = async (req, res) => {
     const commenter = req.user;
     const { text } = req.body;
 
+
+
     const newComment = await Post.findByIdAndUpdate(
       postID,
       { $push: { comments: { text, commenter } } },
