@@ -296,8 +296,8 @@ const Profile = () => {
         ""
       )}
 
-      {fetchingPosts || !pendingPosts || loadingPosts ? (
-        <PostSkeleton />
+      {(fetchingPosts || pendingPosts || loadingPosts) && !currentPath ? (
+        [...Array(5)].map((_, index) => <PostSkeleton key={index} />)
       ) : (
         <>
           {!currentPath && profile ? (
