@@ -3,9 +3,10 @@ import ShowUser from "@/customComponents/ShowUser";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { UploadedByType } from "../Home/ForYou";
+import Loading from "@/components/ui/Loading";
 
 const Connect = () => {
-  const { data: suggestions } = useQuery({
+  const { data: suggestions, isPending } = useQuery({
     queryKey: ["suggestions"],
     queryFn: async () => {
       const res = await fetch("/api/suggestion?limit=50");
@@ -29,6 +30,14 @@ const Connect = () => {
         </div>
       </div>
       <div className="font-bold text-lg p-3">Suggested for you</div>
+      {isPending ? (
+        <div className=" min-h-52  w-full flex  justify-center items-center">
+          <Loading />
+        </div>
+      ) : (
+        ""
+      )}
+
       {suggestions?.map((suggestion: UploadedByType) => (
         <ShowUser suggestion={suggestion} key={suggestion._id} showBio={true} />
       ))}

@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const {cloudinary} = require("../Cloudinary/cloudinary")
 
-const fs = require("fs");
+const fs = require("fs").promises;
 const { default: mongoose } = require("mongoose");
 const Post = require("../models/postmodel");
 
@@ -148,11 +148,13 @@ const updateProfile = async (req, res) => {
       const uploadRes = await cloudinary.uploader.upload(banner[0].path,{
         folder : "X-clone/Banners"
       });
-      fs.unlink(banner[0].path,(err)=>{
-          if(err){
-            console.log(err)
-          }
-        })
+
+      try{
+        await fs.unlink(banner[0].path)
+      }catch(err){
+        console.log(err)
+      }
+        
         newBanner = uploadRes.secure_url;
         
       }catch(err) {
@@ -173,12 +175,12 @@ const updateProfile = async (req, res) => {
       const uploadRes = await cloudinary.uploader.upload(profilePic[0].path,{
         folder : "X-clone/Profile_pics"
       });
-      fs.unlink(profilePic[0].path,(err,data)=>{
-        console.log(data)
-          if(err){
-            console.log(err)
-          }
-        })
+      try{
+        await fs.unlink(profilePic[0].path)
+      }catch(err){
+        console.log(err)
+      }
+        
         const pic = uploadRes.secure_url;
         newProfilePic = pic
       }catch(err) {

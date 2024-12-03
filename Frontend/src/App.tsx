@@ -19,11 +19,13 @@ import ShowPost from "./Mycomponents/ShowPost/Post";
 import Notifications from "./Mycomponents/Notifications/Notifications";
 import Search from "./Mycomponents/Search/Search";
 import Connect from "./Mycomponents/Connect/Connect";
+import NotFoundPage from "./Mycomponents/NotFound.tsx/NotFoundPage";
+import Loading from "./components/ui/Loading";
 
 function App() {
   const { setAuthUser } = useAuthUser();
 
-  const { data } = useQuery({
+  const { data, isFetching, isLoading, isPending } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       const res = await fetch("/api/auth/me");
@@ -40,45 +42,69 @@ function App() {
 
   const isLoggedIn = data && !data.error;
 
+  if (isPending || isFetching || isLoading) {
+    return (
+      <div className="h-screen flex justify-center items-center ">
+        <Loading />
+      </div>
+    );
+  }
   return (
     <Router>
       <Routes>
         <Route
           path="/sign-in"
-          element={!isLoggedIn ? <Signin /> : <Navigate to="/home" />}
+          element={!isLoggedIn ? <Signin /> : <Navigate to="/" />}
         />
         <Route
           path="/sign-up"
-          element={!isLoggedIn ? <Signup /> : <Navigate to="/home" />}
+          element={!isLoggedIn ? <Signup /> : <Navigate to="/" />}
         />
-        <Route path="/" element={<Layout />}>
-          <Route index element={isLoggedIn ? <Home /> : null} />
+        <Route
+          path="/"
+          element={isLoggedIn ? <Layout /> : <Navigate to="/sign-up" />}
+        >
+          <Route
+            index
+            element={isLoggedIn ? <Home /> : <Navigate to="/sign-up" />}
+          />
           <Route
             path="profile/:username/*"
-            element={isLoggedIn ? <Profile /> : <Signup />}
+            element={isLoggedIn ? <Profile /> : <Navigate to="/sign-up" />}
           />
           <Route
             path="profile/:username/followers"
-            element={isLoggedIn ? <FollowersList /> : <Signup />}
+            element={
+              isLoggedIn ? <FollowersList /> : <Navigate to="/sign-up" />
+            }
           />
           <Route
             path="profile/:username/following"
-            element={isLoggedIn ? <FollowingList /> : <Signup />}
+            element={
+              isLoggedIn ? <FollowingList /> : <Navigate to="/sign-up" />
+            }
           />
           <Route
             path="profile/:username/post/:postId"
-            element={isLoggedIn ? <ShowPost /> : <Signup />}
+            element={isLoggedIn ? <ShowPost /> : <Navigate to="/sign-up" />}
           />
           <Route
             path="notifications"
-            element={isLoggedIn ? <Notifications /> : <Signup />}
+            element={
+              isLoggedIn ? <Notifications /> : <Navigate to="/sign-up" />
+            }
           />
-          <Route path="search" element={isLoggedIn ? <Search /> : <Signup />} />
+          <Route
+            path="search"
+            element={isLoggedIn ? <Search /> : <Navigate to="/sign-up" />}
+          />
+
           <Route
             path="connect_people"
-            element={isLoggedIn ? <Connect /> : <Signup />}
+            element={isLoggedIn ? <Connect /> : <Navigate to="/sign-up" />}
           />
         </Route>
+        <Route path="*" element={isLoggedIn ? <NotFoundPage /> : ""} />
       </Routes>
     </Router>
   );

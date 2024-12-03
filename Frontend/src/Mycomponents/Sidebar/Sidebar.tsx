@@ -1,5 +1,11 @@
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useCreatePostContext } from "@/context/createPostContext";
 import { useAuthUser } from "@/context/userContext";
+import { useMutation } from "@tanstack/react-query";
 
 import {
   BellIcon,
@@ -11,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -23,7 +30,7 @@ const Sidebar = () => {
 
   const [currentlyOn, setCurrentlyOn] = useState<any>();
 
-  const { authUser } = useAuthUser();
+  const { authUser, setAuthUser } = useAuthUser();
 
   useEffect(() => {
     let loc = location.pathname.split("/")[1];
@@ -31,6 +38,22 @@ const Sidebar = () => {
     if (!loc) setCurrentlyOn("home");
     else setCurrentlyOn(location.pathname.split("/")[1]);
   }, [location, navigate]);
+
+  const { mutate: logout } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if ("error" in data) toast.error(data.error);
+      else {
+        toast.success(data.message);
+        navigate("/");
+        setAuthUser(null);
+      }
+      return data;
+    },
+  });
 
   return (
     <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen   sticky top-0    py-2    hidden md:flex flex-col    ">
@@ -124,21 +147,34 @@ const Sidebar = () => {
           Post
         </button>
       </div>
-      <div className=" mt-auto flex items-center gap-2 p-2 mx-2 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
-        <img
-          src={authUser?.profilePic}
-          className="bg-white rounded-full h-10 w-10 shrink-0 object-cover"
-        />
-        <div className="flex flex-col gap-0">
-          <span className="font-semibold">{authUser?.username}</span>
-          <span className="text-gray-500 text-sm/6 tracking-wide">
-            {authUser?.username}
-          </span>
-        </div>
-        <div className=" h-fit w-fit shrink-0 ml-auto mr-1  hidden lg:block ">
-          <Ellipsis className="size-5 shrink-0" />
-        </div>
-      </div>
+
+      <Popover>
+        <PopoverTrigger className="  mt-auto ">
+          <div className=" mt-auto flex items-center  gap-2 p-2 mx-2 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
+            <img
+              src={authUser?.profilePic}
+              className="bg-white rounded-full h-10 w-10 shrink-0 object-cover"
+            />
+            <div className="flex flex-col gap-0 ">
+              <span className="font-semibold">{authUser?.username}</span>
+              <span className="text-gray-500 text-sm/6 tracking-wide">
+                {authUser?.username}
+              </span>
+            </div>
+            <div className=" h-fit w-fit shrink-0 ml-auto mr-1  hidden lg:block ">
+              <Ellipsis className="size-5 shrink-0" />
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="bg-black text-white p-0 border-none shadow-sm   ring-1 shadow-white">
+          <div
+            className="font-bold hover:bg-white/10 p-4 cursor-pointer active:bg-red-600/50 rounded-md select-none"
+            onClick={() => logout()}
+          >
+            Logout
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

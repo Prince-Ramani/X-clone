@@ -18,6 +18,7 @@ import Media from "./Media";
 import LikedPosts from "./LikedPosts";
 import Suggest from "../Suggestions/Suggest";
 import { useEditProfileContext } from "@/context/EditProfileContext";
+import PostSkeleton from "@/customComponents/PostSkeleton";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -41,7 +42,12 @@ const Profile = () => {
 
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const { data: profile } = useQuery({
+  const {
+    data: profile,
+    isFetching,
+    isLoading,
+    isPending,
+  } = useQuery({
     queryKey: [personUsername, "Profile"],
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
@@ -52,7 +58,12 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { data: posts } = useQuery({
+  const {
+    data: posts,
+    isFetching: fetchingPosts,
+    isLoading: loadingPosts,
+    isPending: pendingPosts,
+  } = useQuery({
     queryKey: [personUsername, "Posts"],
     queryFn: async () => {
       const res = await fetch(`/api/post/profile/${profile?._id}`);
@@ -125,26 +136,34 @@ const Profile = () => {
       </div>
 
       <div className="h-40  md:h-44 w-full   ">
-        <a
-          href={profile?.banner}
-          target="_blank"
-          className="focus:outline-none object-fill"
-        >
-          <img src={profile?.banner} className="h-full w-full " />
-        </a>
+        {isPending || isFetching || isLoading ? (
+          <div className="h-full w-full bg-white/10 animate-pulse duration-600 " />
+        ) : (
+          <a
+            href={profile?.banner}
+            target="_blank"
+            className="focus:outline-none object-fill"
+          >
+            <img src={profile?.banner} className="h-full w-full " />
+          </a>
+        )}
       </div>
 
       <div className="relative   p-1 md:p-2 bg-black h-fit w-fit rounded-full bottom-10 left-3 sm:bottom-14 sm:left-4  md:bottom-16 md:left-5">
-        <a
-          href={profile?.profilePic}
-          target="_blank"
-          className="focus:outline-none"
-        >
-          <img
-            src={profile?.profilePic}
-            className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "
-          />
-        </a>
+        {isPending || isFetching || isLoading ? (
+          <div className="size-20 sm:size-24 md:size-32 rounded-full bg-white/10 animate-pulse duration-600 " />
+        ) : (
+          <a
+            href={profile?.profilePic}
+            target="_blank"
+            className="focus:outline-none"
+          >
+            <img
+              src={profile?.profilePic}
+              className=" size-20 sm:size-24 md:size-32 rounded-full object-cover "
+            />
+          </a>
+        )}
       </div>
       <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
         <CustomTooltip title="More">
@@ -185,36 +204,42 @@ const Profile = () => {
         )}
       </div>
 
-      <div className="p-2 px-5 relative bottom-20 md:bottom-20 ">
-        <div className="font-bold text-xl "> {profile?.username}</div>
-        <div className="text-gray-400/80">@{profile?.username}</div>
-      </div>
+      {isFetching || isLoading || isPending ? (
+        <div className="bg-white/5 animate-pulse duration-600 size-28 relative bottom-20 rounded-md w-2/3 m-2 mx-5"></div>
+      ) : (
+        <>
+          <div className="p-2 px-5 relative bottom-20 md:bottom-20  ">
+            <div className="font-bold text-xl "> {profile?.username}</div>
+            <div className="text-gray-400/80">@{profile?.username}</div>
+          </div>
 
-      <div className="  relative bottom-16 md:bottom-20  px-2 md:px-4 flex flex-col gap-2">
-        {profile?.bio}
-        <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
-          <MapPin className="size-4" />
-          {profile?.location || "unknown"}
-          <LucideCalendarRange className="size-4" /> Joined{" "}
-          {profile ? format(profile?.createdAt, "MMMM yyyy") : ""}
-        </div>
-        <div className=" px-1 mt-2 flex  gap-4 text-sm ">
-          <div
-            className="flex gap-1 hover:border-b"
-            onClick={() => navigate(`/profile/${personUsername}/following`)}
-          >
-            <span className="font-bold">{profile?.following.length}</span>
-            <span className="text-gray-400/70">Following</span>
+          <div className="  relative bottom-16 md:bottom-20  px-2 md:px-4 flex flex-col gap-2">
+            {profile?.bio}
+            <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
+              <MapPin className="size-4" />
+              {profile?.location || "unknown"}
+              <LucideCalendarRange className="size-4" /> Joined{" "}
+              {profile ? format(profile?.createdAt, "MMMM yyyy") : ""}
+            </div>
+            <div className=" px-1 mt-2 flex  gap-4 text-sm ">
+              <div
+                className="flex gap-1 hover:border-b"
+                onClick={() => navigate(`/profile/${personUsername}/following`)}
+              >
+                <span className="font-bold">{profile?.following.length}</span>
+                <span className="text-gray-400/70">Following</span>
+              </div>
+              <div
+                className="flex gap-1 hover:border-b"
+                onClick={() => navigate(`/profile/${personUsername}/followers`)}
+              >
+                <span className="font-bold">{followers?.length}</span>
+                <span className="text-gray-400/70">Followers</span>
+              </div>
+            </div>
           </div>
-          <div
-            className="flex gap-1 hover:border-b"
-            onClick={() => navigate(`/profile/${personUsername}/followers`)}
-          >
-            <span className="font-bold">{followers?.length}</span>
-            <span className="text-gray-400/70">Followers</span>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <div className="font-semibold relative bottom-12  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
         <div
@@ -271,24 +296,30 @@ const Profile = () => {
         ""
       )}
 
-      {!currentPath && profile ? (
-        <div className="min-h-fit relative bottom-10">
-          {posts?.map((post: PostType) => (
-            <PostDisplayer
-              post={post}
-              authUserId={authUser?._id}
-              key={post?._id}
-            />
-          ))}
+      {fetchingPosts || !pendingPosts || loadingPosts ? (
+        <PostSkeleton />
+      ) : (
+        <>
+          {!currentPath && profile ? (
+            <div className="min-h-fit relative bottom-10">
+              {posts?.map((post: PostType) => (
+                <PostDisplayer
+                  post={post}
+                  authUserId={authUser?._id}
+                  key={post?._id}
+                />
+              ))}
 
-          {posts?.length === 0 && authUser._id === profile._id ? (
-            <Suggest className="border-none" />
+              {posts?.length === 0 && authUser._id === profile._id ? (
+                <Suggest className="border-none" />
+              ) : (
+                ""
+              )}
+            </div>
           ) : (
             ""
           )}
-        </div>
-      ) : (
-        ""
+        </>
       )}
     </div>
   );

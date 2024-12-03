@@ -1,7 +1,7 @@
 const Post = require("../models/postmodel");
 const User = require("../models/userModel");
 const Notification = require("../models/notification");
-const {unlink} = require("fs")
+const {unlink} = require("fs").promises
 const {v2:cloudinary} = require("cloudinary");
 const { error } = require("console");
 
@@ -20,11 +20,12 @@ const createPost = async (req, res) => {
         const uploadRes = await cloudinary.uploader.upload(req.file.path, {
           folder: 'X-clone/Posts'
         });
-        unlink(req.file.path,(err,data)=>{
-          if(err){
-            console.log(err)
-          }
-        })
+
+        try{  
+          await unlink(req.file.path)
+        }catch(err){
+          console.error('Error deleting the file:', err);
+        }
         const uploadedPhoto = uploadRes.secure_url;
         const post = new Post({
           postContent,

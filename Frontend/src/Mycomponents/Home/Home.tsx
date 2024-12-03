@@ -38,6 +38,7 @@ const Home = () => {
         setFile(null);
         setTextareaValue("");
         setIsEmojiOpen(false);
+        setImagePreview(null);
 
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Posts"],
@@ -84,7 +85,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0    ">
+    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0 ">
       {/* Top */}
       <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0 z-10  ">
         <div

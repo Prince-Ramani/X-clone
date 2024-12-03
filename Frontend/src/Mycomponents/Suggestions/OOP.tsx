@@ -3,18 +3,18 @@ import { Search, X } from "lucide-react";
 import { useState } from "react";
 import { UploadedByType } from "../Home/ForYou";
 import SearchDisplayer from "./SearchDisplayer";
+import Loading from "@/components/ui/Loading";
 
 const OOP = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const { data, mutate } = useMutation({
+  const { data, mutate, isPending } = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/finduser/${searchValue}`, {
         method: "POST",
       });
       const data = await res.json();
-      console.log(data);
       return data;
     },
   });
@@ -49,11 +49,19 @@ const OOP = () => {
       </div>
       {isSearching ? (
         <div className=" border  border-gray-800 rounded-lg min-h-[100px] shadow-sm overflow-x-hidden  shadow-gray-400/90  ">
-          {!searchValue ? (
+          {!searchValue && !isPending ? (
             <div className=" pt-5 flex justify-center items-start select-none  h-[80px] text-gray-300/90 font-thin tracking-wide   ">
               Try searching for people, lists, or keywords
             </div>
           ) : null}
+
+          {isPending ? (
+            <div className=" min-h-[100px]  w-full flex  justify-center items-center">
+              <Loading />
+            </div>
+          ) : (
+            ""
+          )}
 
           {searchValue && data ? (
             <div className="">
