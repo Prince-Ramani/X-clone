@@ -1,7 +1,6 @@
 import CustomTooltip from "@/customComponents/ToolTip";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { PostType } from "../Home/ForYou";
 import {
   ArrowLeft,
   LucideCalendarRange,
@@ -11,14 +10,12 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import PostDisplayer from "../Home/PostDisplayer";
 import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
 import Media from "./Media";
 import LikedPosts from "./LikedPosts";
-import Suggest from "../Suggestions/Suggest";
 import { useEditProfileContext } from "@/context/EditProfileContext";
-import PostSkeleton from "@/customComponents/PostSkeleton";
+import ProfilePost from "./profilePosts";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -55,25 +52,6 @@ const Profile = () => {
       return data;
     },
     enabled: !!personUsername,
-    refetchOnWindowFocus: false,
-  });
-
-  const {
-    data: posts,
-    isFetching: fetchingPosts,
-    isLoading: loadingPosts,
-    isPending: pendingPosts,
-  } = useQuery({
-    queryKey: [personUsername, "Posts"],
-    queryFn: async () => {
-      const res = await fetch(`/api/post/profile/${profile?._id}`);
-      const data = await res.json();
-      if ("error" in data) toast.error(data.error);
-
-      return data;
-    },
-    enabled:
-      !!profile && currentPath !== "likedposts" && currentPath !== "media",
     refetchOnWindowFocus: false,
   });
 
@@ -129,9 +107,7 @@ const Profile = () => {
           <span className="font-bold text-lg tracking-wider">
             {profile?.username}
           </span>
-          <span className="text-xs text-gray-400">
-            {posts?.length || 0} posts
-          </span>
+          <span className="text-xs text-gray-400">0 posts</span>
         </div>
       </div>
 
@@ -296,30 +272,14 @@ const Profile = () => {
         ""
       )}
 
-      {(fetchingPosts || pendingPosts || loadingPosts) && !currentPath ? (
-        [...Array(5)].map((_, index) => <PostSkeleton key={index} />)
+      {!currentPath && profile ? (
+        <ProfilePost
+          isAuthenticated={!!profile._id}
+          authUserId={authUser._id}
+          profileId={profile._id}
+        />
       ) : (
-        <>
-          {!currentPath && profile ? (
-            <div className="min-h-fit relative bottom-10">
-              {posts?.map((post: PostType) => (
-                <PostDisplayer
-                  post={post}
-                  authUserId={authUser?._id}
-                  key={post?._id}
-                />
-              ))}
-
-              {posts?.length === 0 && authUser._id === profile._id ? (
-                <Suggest className="border-none" />
-              ) : (
-                ""
-              )}
-            </div>
-          ) : (
-            ""
-          )}
-        </>
+        ""
       )}
     </div>
   );
