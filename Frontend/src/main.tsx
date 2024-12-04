@@ -11,6 +11,7 @@ import CreatePostContextProvider from "./context/createPostContext";
 import ReplyDialogContextProvider from "./context/ReplyPostContext";
 import EditProfileContextProvider from "./context/EditProfileContext";
 import UnfollowContextProvider from "./context/UnfollowContext";
+import DeletePostContextProvider from "./context/DeletePostContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,7 +33,9 @@ if (rootElement) {
             <UnfollowContextProvider>
               <ReplyDialogContextProvider>
                 <CreatePostContextProvider>
-                  <App />
+                  <DeletePostContextProvider>
+                    <App />
+                  </DeletePostContextProvider>
                 </CreatePostContextProvider>
               </ReplyDialogContextProvider>
             </UnfollowContextProvider>

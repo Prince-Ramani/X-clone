@@ -2,8 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { PostType } from "../Home/ForYou";
 import PostDisplayer from "../Home/PostDisplayer";
-import { memo, useEffect, useState } from "react";
-import PostSkeleton from "@/customComponents/PostSkeleton";
+import { memo, useEffect, useRef, useState } from "react";
+import { useDeletePostContext } from "@/context/DeletePostContext";
+import Loading from "@/components/ui/Loading";
 const ProfilePost = memo(
   ({
     isAuthenticated,
@@ -18,20 +19,26 @@ const ProfilePost = memo(
 
     const [totalPosts, setTotalPosts] = useState([]);
     const [hasMore, setHasMore] = useState<boolean>(true);
-    const [offset, setOffset] = useState<number>(0);
+    const offset = useRef<number>(0);
+    const {
+      hasDeletedAnyPost,
+      setHasDeletedAnyPost,
+      DeletePostId,
+      setDeletePostId,
+    } = useDeletePostContext();
 
     const { isPending, isLoading, isFetching, refetch } = useQuery({
       queryKey: [personUsername, "Posts"],
       queryFn: async () => {
         const res = await fetch(
-          `/api/post/profile/${profileId}?limit=30&offset=${offset}`
+          `/api/post/profile/${profileId}?limit=30&offset=${offset.current}`
         );
         const data: [] = await res.json();
 
         if (data.length < 30) setHasMore(false);
 
         setTotalPosts((prev) => [...prev, ...data]);
-        setOffset((prev) => prev + data.length);
+        offset.current = offset.current + data.length;
 
         return data;
       },
@@ -42,11 +49,9 @@ const ProfilePost = memo(
     const handleScroll = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop + 1 >=
-          document.documentElement.scrollHeight &&
-        hasMore &&
-        (!isPending || !isFetching || !isLoading)
+        document.documentElement.scrollHeight
       ) {
-        refetch();
+        if (hasMore && !isFetching) refetch();
       }
     };
 
@@ -55,19 +60,28 @@ const ProfilePost = memo(
       return () => window.removeEventListener("scroll", handleScroll);
     }, [hasMore, isFetching]);
 
+    useEffect(() => {
+      setTotalPosts((prev) =>
+        prev.filter((p: PostType) => p._id !== DeletePostId)
+      );
+      setHasDeletedAnyPost(false);
+      setDeletePostId(undefined);
+      offset.current = offset.current - 1;
+    }, [hasDeletedAnyPost, setHasDeletedAnyPost]);
+
     return (
       <div className="min-h-fit relative bottom-10">
-        {isPending || isLoading || isFetching
-          ? [...Array(5)].map((_, index) => (
-              <PostSkeleton className="top-1" key={index} />
-            ))
-          : totalPosts?.map((post: PostType, index) => (
-              <PostDisplayer
-                post={post}
-                authUserId={authUserId}
-                key={(post?._id, index)}
-              />
-            ))}
+        {totalPosts?.map((post: PostType) => (
+          <PostDisplayer post={post} authUserId={authUserId} key={post?._id} />
+        ))}
+
+        {isPending || isLoading || isFetching ? (
+          <div className="  flex justify-center items-center p-2 ">
+            <Loading />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     );
   }
