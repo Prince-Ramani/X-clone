@@ -1,5 +1,5 @@
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -16,10 +16,10 @@ import Media from "./Media";
 import LikedPosts from "./LikedPosts";
 import { useEditProfileContext } from "@/context/EditProfileContext";
 import ProfilePost from "./profilePosts";
+import FollowButton from "@/customComponents/FollowButton";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { setIsEditProfileDialog } = useEditProfileContext();
 
   const [currentPath, setCurrentPath] = useState<string | null | undefined>(
@@ -33,11 +33,11 @@ const Profile = () => {
 
   const { username: personUsername } = useParams();
 
+  if (!personUsername) return;
+
   const { authUser } = useAuthUser();
   const userId = authUser?._id;
   if (!userId) return;
-
-  const [isFollowing, setIsFollowing] = useState(false);
 
   const {
     data: profile,
@@ -55,28 +55,6 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { mutate: follow, isPending: pendingFollow } = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/follow/${profile?._id}`, {
-        method: "POST",
-      });
-      const data = await res.json();
-
-      if ("error" in data) toast.error(data.error);
-      return data;
-    },
-    onSuccess: (data) => {
-      if ("error" in data) return;
-
-      queryClient.invalidateQueries({
-        queryKey: [profile?.username, "followers"],
-      });
-      setIsFollowing((prev) => !prev);
-
-      toast.success(data.message);
-    },
-  });
-
   const { data: followers } = useQuery({
     queryKey: [personUsername, "followers"],
     queryFn: async () => {
@@ -85,7 +63,6 @@ const Profile = () => {
       );
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      setIsFollowing(data.includes(userId));
       return data;
     },
 
@@ -161,22 +138,7 @@ const Profile = () => {
             Edit profile
           </button>
         ) : (
-          <button
-            className={`font-bold relative flex justify-center items-center z-10   ${
-              isFollowing
-                ? "bg-transparent  border w-24 text-sm text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
-                : "bg-white text-black"
-            } text-black w-20 h-8     rounded-full`}
-            disabled={pendingFollow}
-            onClick={() => follow()}
-          >
-            <span className={`absolute opacity-100 group-hover:opacity-0 `}>
-              {isFollowing ? "Following" : "Follow"}
-            </span>
-            <span className={`absolute opacity-0  group-hover:opacity-100 `}>
-              {isFollowing ? "Unfollow" : "Follow"}
-            </span>
-          </button>
+          <FollowButton personId={profile?._id} username={personUsername} />
         )}
       </div>
 
@@ -219,7 +181,9 @@ const Profile = () => {
 
       <div className="font-semibold relative bottom-12  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
         <div
-          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 text-white`}
+          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 ${
+            !currentPath ? "text-white font-bold" : ""
+          }  `}
           onClick={() => navigate(`/profile/${personUsername}`)}
         >
           <div className="p-1 pt-2">Posts</div>
@@ -230,7 +194,9 @@ const Profile = () => {
           />
         </div>
         <div
-          className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 "
+          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
+            currentPath === "likedposts" ? "text-white font-bold" : ""
+          }  `}
           onClick={() => navigate(`/profile/${personUsername}/likedposts`)}
         >
           <div className="p-1 pt-2">Liked posts</div>
@@ -241,7 +207,9 @@ const Profile = () => {
           />
         </div>
         <div
-          className="w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 "
+          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
+            currentPath === "media" ? "text-white font-bold" : ""
+          }  `}
           onClick={() => navigate(`/profile/${personUsername}/media`)}
         >
           <div className="p-1 pt-2"> Media</div>

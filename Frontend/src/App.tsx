@@ -21,6 +21,7 @@ import Search from "./Mycomponents/Search/Search";
 import Connect from "./Mycomponents/Connect/Connect";
 import NotFoundPage from "./Mycomponents/NotFound.tsx/NotFoundPage";
 import Loading from "./components/ui/Loading";
+import Bookmark from "./Mycomponents/Bookmarks/Bookmark";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -102,6 +103,11 @@ function App() {
           <Route
             path="connect_people"
             element={isLoggedIn ? <Connect /> : <Navigate to="/sign-up" />}
+          />
+
+          <Route
+            path="bookmarks"
+            element={isLoggedIn ? <Bookmark /> : <Navigate to="/sign-up" />}
           />
         </Route>
         <Route path="*" element={isLoggedIn ? <NotFoundPage /> : ""} />

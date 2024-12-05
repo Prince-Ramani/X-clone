@@ -9,7 +9,6 @@ const Notifications = () => {
     queryFn: async () => {
       const res = await fetch(`/api/getnoti`);
       const data = await res.json();
-      console.log(data);
 
       if ("error" in data) toast.error(data.error);
       return data;

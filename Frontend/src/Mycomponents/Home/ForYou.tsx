@@ -9,6 +9,7 @@ export interface PostType {
   comments: any[] | number;
   likes: any[];
   uploadedBy: UploadedByType;
+  bookmarkedBy?: any[];
   createdAt: string;
   updatedAt: string;
 }

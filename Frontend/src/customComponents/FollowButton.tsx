@@ -72,16 +72,25 @@ const FollowButton = memo(
             isHimself ? "hidden" : "flex"
           }  ${
             isFollowing
-              ? "bg-transparent  border w-24 text-[11px] xl:text-sm text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
+              ? "bg-transparent  border w-24    xl:text-base text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
               : "bg-white text-black"
-          } text-black w-20  lg:w-14  xl:w-20 h-8 ${className}    rounded-full`}
+          } text-black w-20  md:w-10  lg:w-12   xl:w-24 h-8 ${className}    rounded-full`}
           disabled={pendingFollow}
           onClick={() => handleClick()}
         >
-          <span className={`absolute opacity-100 group-hover:opacity-0 `}>
+          <span
+            className={`absolute opacity-100 group-hover:opacity-0 ${
+              isFollowing ? "md:text-[9px] xl:text-base" : ""
+            }`}
+          >
             {isFollowing ? "Following" : "Follow"}
           </span>
-          <span className={`absolute opacity-0   group-hover:opacity-100 `}>
+          <span
+            className={`absolute opacity-0   group-hover:opacity-100  ${
+              isFollowing ? "md:text-[9px] xl:text-base" : ""
+            }
+              `}
+          >
             {isFollowing ? "Unfollow" : "Follow"}
           </span>
         </button>

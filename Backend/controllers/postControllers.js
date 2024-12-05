@@ -171,7 +171,11 @@ const getLikedPosts = async (req, res) => {
     if (!person) {
       return res.status(404).json({ error: "Invalid user" });
     }
-    const postss = await Post.find({likes : {$in : req.params.personid}}).populate({
+
+    const limit = parseInt(req.query.limit) ||10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    const postss = await Post.find({likes : {$in : req.params.personid}}).skip(offset).limit(limit).populate({
       path : "uploadedBy",
       select : (" username email _id profilePic createdAt ")
     }).lean()
@@ -240,14 +244,23 @@ const getProfilePost = async(req,res) =>{
 
 const getPost= async (req, res) => {
   try {
-    const posts = await Post.find({_id : req.params.postID}).populate({
+    const posts = await Post.find({_id : req.params.postID}).sort({ "comments.createdAt": -1 }).populate({
       path: "uploadedBy",
       select: "-password",
     }).populate({
       path : "comments.commenter",
-      select : "-password"
-    }).sort()
+      select : "username _id profilePic"
+    }) 
+
+
+
     if (!posts) return res.status(200).json([]);
+
+    if (posts && posts.length > 0) {
+      posts[0].comments.sort((a, b) => b.createdAt - a.createdAt); 
+    }
+
+
     return res.status(200).json(...posts);
   } catch (err) {
     console.log(err)

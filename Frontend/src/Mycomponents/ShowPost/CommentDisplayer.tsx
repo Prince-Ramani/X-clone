@@ -46,7 +46,7 @@ const CommentDisplayer = memo(
     const isFollowing = totalLikes.includes(authUserId);
 
     return (
-      <div className="w-full border-b border-gray-400/20">
+      <div className="w-full border-b border-gray-400/20 break-all">
         <div className="p-2 flex gap-1 w-full ">
           <img
             src={comment.commenter.profilePic}

@@ -12,7 +12,6 @@ const Suggest = ({ className }: { className?: string }) => {
       const res = await fetch("/api/suggestion");
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      console.log(data);
       return data;
     },
   });

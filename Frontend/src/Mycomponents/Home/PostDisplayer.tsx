@@ -1,4 +1,4 @@
-import { Bookmark, Dot, Heart, MessageCircle, Share } from "lucide-react";
+import { BookmarkPlus, Dot, Heart, MessageCircle, Share } from "lucide-react";
 import { PostType } from "./ForYou";
 import { memo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -27,6 +27,9 @@ const PostDisplayer = memo(
     } = post;
 
     const { setIsReplyDialog, setPostContent } = useReplyDialogContext();
+    const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>(
+      post.bookmarkedBy?.includes(authUserId)
+    );
 
     const navigate = useNavigate();
     const [totalLikes, setTotalLikes] = useState(likes);
@@ -58,9 +61,29 @@ const PostDisplayer = memo(
       },
     });
 
+    const { mutate: addToBookmark } = useMutation({
+      mutationFn: async () => {
+        const res = await fetch(`/api/add/bookmark/${post._id}`, {
+          method: "POST",
+        });
+
+        const data = await res.json();
+        if ("error" in data) toast.error(data.error);
+
+        return data;
+      },
+      onSuccess: (data) => {
+        if ("error" in data) return;
+
+        if (data.message === "Removed from bookmarks!") setHasBookmarked(false);
+        else setHasBookmarked(true);
+        toast.success(data.message);
+      },
+    });
+
     const handlPostClick = (e: any) => {
       if (e.target.tagName !== "DIV") return;
-      navigate(`/profile/${uploadedBy.username}/post/${post._id}`);
+      navigate(`/profile/${uploadedBy?.username}/post/${post._id}`);
     };
 
     return (
@@ -69,7 +92,7 @@ const PostDisplayer = memo(
         onClick={(e: any) => handlPostClick(e)}
       >
         <img
-          src={uploadedBy.profilePic}
+          src={uploadedBy?.profilePic}
           className="size-10   rounded-full object-cover border "
           loading="lazy"
           onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
@@ -81,18 +104,18 @@ const PostDisplayer = memo(
               className="font-bold hover:underline decoration-white decoration-1"
               onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
             >
-              {uploadedBy.username}
+              {uploadedBy?.username}
             </span>
             <div className="flex items-center   text-gray-400/90 ">
-              <span className="text-sm">@{uploadedBy.username}</span>
+              <span className="text-sm">@{uploadedBy?.username}</span>
               <span>
                 <Dot className="size-3" />
               </span>
               <span className="text-sm">{FormateDate(createdAt)}</span>
             </div>
-            {authUserId === uploadedBy._id ? (
+            {authUserId === uploadedBy?._id ? (
               <div className="ml-auto">
-                <DeletPost postID={post._id} username={uploadedBy.username} />
+                <DeletPost postID={post._id} username={uploadedBy?.username} />
               </div>
             ) : (
               ""
@@ -146,8 +169,15 @@ const PostDisplayer = memo(
 
             <div className="flex items-center gap-1">
               <CustomTooltip title="Save">
-                <span className="flex gap-2 items-end text-sm group">
-                  <Bookmark className="size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white" />
+                <span
+                  className="flex gap-2 items-end text-sm group"
+                  onClick={() => addToBookmark()}
+                >
+                  <BookmarkPlus
+                    className={`size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white ${
+                      hasBookmarked ? "fill-white text-white " : ""
+                    }`}
+                  />
                 </span>
               </CustomTooltip>
 
@@ -158,7 +188,7 @@ const PostDisplayer = memo(
                     navigator.clipboard
                       .writeText(
                         `${import.meta.env.VITE_BASE_URL}/profile/${
-                          uploadedBy.username
+                          uploadedBy?.username
                         }/post/${post?._id}`
                       )
                       .then(() => toast.success("URL copied!"))

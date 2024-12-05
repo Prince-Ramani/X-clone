@@ -27,7 +27,6 @@ const EditProfileDialog = () => {
   const [file2, setFile2] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imagePreview2, setImagePreview2] = useState<string | null>(null);
-  console.log(authUser);
 
   const [info, setInfo] = useState({
     username: authUser?.username,

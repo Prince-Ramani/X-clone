@@ -5,18 +5,20 @@ import { format } from "date-fns";
 import CommentDisplayer from "./CommentDisplayer";
 import {
   ArrowLeft,
-  Bookmark,
+  BookmarkPlus,
   Dot,
   Heart,
   MessageCircle,
   MoreHorizontal,
   Share,
+  Smile,
 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { CommentType } from "@/lib/Types";
+import EmojiPicker from "@/customComponents/EmojiPicker";
 
 const ShowPost = () => {
   const { username, postId } = useParams();
@@ -24,6 +26,9 @@ const ShowPost = () => {
   const navigate = useNavigate();
   const [textareaValue, setTextareaValue] = useState("");
   const querClient = useQueryClient();
+  const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>();
+  const [_, setSelectedEmoji] = useState();
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
 
   const { data: userExists } = useQuery({
     queryKey: [username, "sync"],
@@ -45,6 +50,7 @@ const ShowPost = () => {
 
       setTotalLikes(data.likes);
       setHasUserLiked(data.likes.includes(authUser?._id));
+      setHasBookmarked(data.bookmarkedBy.includes(authUser?._id));
 
       if ("error" in data) toast.error("Invalid post id!");
       return data;
@@ -98,9 +104,35 @@ const ShowPost = () => {
       if (data.error) return;
       querClient.invalidateQueries({ queryKey: [postId, username] });
       setTextareaValue("");
+      setIsEmojiOpen(false);
       toast.success("Replied sucessfully!");
     },
   });
+
+  const { mutate: addToBookmark } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/add/bookmark/${post._id}`, {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      if ("error" in data) toast.error(data.error);
+
+      return data;
+    },
+    onSuccess: (data) => {
+      if ("error" in data) return;
+
+      if (data.message === "Removed from bookmarks!") setHasBookmarked(false);
+      else setHasBookmarked(true);
+      toast.success(data.message);
+    },
+  });
+
+  const handleEmojiSelect = (emoji: any) => {
+    setSelectedEmoji(emoji.native);
+    setTextareaValue((prevText) => prevText + emoji.native);
+  };
 
   const handleComment = () => {
     if (textareaValue) {
@@ -201,13 +233,17 @@ const ShowPost = () => {
 
           <div className="flex justify-center items-center">
             <CustomTooltip title="Save">
-              <div className="flex gap-2 items-end text-sm group h-fit w-fit p-1  hover:bg-blue-400/20 active:bg-green-500 rounded-full">
-                <Bookmark className="size-5 group group-active:text-white transition-colors   " />
+              <div
+                className="flex gap-2 items-end text-sm group h-fit w-fit p-1  hover:bg-blue-400/20 active:bg-green-500 rounded-full"
+                onClick={() => addToBookmark()}
+              >
+                <BookmarkPlus
+                  className={`size-5 group group-active:text-white transition-colors ${
+                    hasBookmarked ? "fill-white text-white" : ""
+                  }   `}
+                />
               </div>
             </CustomTooltip>
-            <span className="text-gray-400/80">
-              {post?.comments.length || 0}
-            </span>
           </div>
 
           <CustomTooltip title="Copy url">
@@ -249,28 +285,45 @@ const ShowPost = () => {
                 />
               </div>
 
-              <div className="ml-auto flex items-center gap-4 ">
-                {textareaValue ? (
-                  <div
-                    className={` lg:size-7 size-5 md:size-6  text-xs flex justify-center items-center  bg-green-600 rounded-full ${
-                      textareaValue && textareaValue?.length >= 280
-                        ? "bg-red-600"
-                        : "bg-green-600"
-                    }`}
-                  >
-                    {textareaValue?.length}
-                  </div>
-                ) : (
-                  ""
-                )}
-                <div
-                  className={`bg-blue-400 rounded-full p-2  w-20 text-center ml-auto active:bg-green-500 focus:outline-none ${
-                    isPending ? "opacity-75" : ""
-                  } `}
+              <div className="flex w-full  items-center">
+                <span
+                  className="rounded-full h-fit p-2 hover:bg-gray-800/70 relative cursor-pointer"
+                  onClick={() => setIsEmojiOpen((prev) => !prev)}
                 >
-                  <button onClick={handleComment} disabled={isPending}>
-                    Reply
-                  </button>
+                  <Smile className="size-5 text-blue-400" />
+                  {isEmojiOpen ? (
+                    <EmojiPicker
+                      onSelect={handleEmojiSelect}
+                      isOpen={isEmojiOpen}
+                    />
+                  ) : (
+                    ""
+                  )}
+                </span>
+                <div className="ml-auto flex items-center gap-4  ">
+                  {textareaValue ? (
+                    <div
+                      className={` lg:size-7 size-5 md:size-6  text-xs flex justify-center items-center  bg-green-600 rounded-full ${
+                        textareaValue && textareaValue?.length >= 280
+                          ? "bg-red-600"
+                          : "bg-green-600"
+                      }`}
+                    >
+                      {textareaValue?.length}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                  <div
+                    className={`bg-blue-400 rounded-full p-2  w-20 text-center ml-auto  active:bg-green-500 focus:outline-none ${
+                      isPending ? "opacity-75" : ""
+                    } `}
+                  >
+                    <button onClick={handleComment} disabled={isPending}>
+                      Reply
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

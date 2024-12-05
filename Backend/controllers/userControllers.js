@@ -1,5 +1,6 @@
 const Notification = require("../models/notification");
 const User = require("../models/userModel");
+const Bookmark = require("../models/bookmark")
 const bcrypt = require("bcrypt");
 const {cloudinary} = require("../Cloudinary/cloudinary")
 
@@ -441,6 +442,86 @@ const getMediaOfUser = async(req,res)=>{
   }
 }
 
+const addToBookmarks = async(req,res)=>{
+  try{
+
+    const userID = req.user
+    const {postID}= req.params
+
+
+
+    const post = await Post.findById(postID)
+
+    if(!post) return res.status(404).json({error : "No such post exists!"})
+
+      const alredyBookmarked = await Bookmark.findOne({userID,postID})
+
+      if(alredyBookmarked){
+        await Bookmark.deleteOne({userID,postID})
+        await Post.findByIdAndUpdate(postID, {
+          $pull: { bookmarkedBy: userID },
+        });
+        return res.status(200).json({message : "Removed from bookmarks!"})
+      }
+
+     const newBookmark = new Bookmark({
+      userID,
+      postID
+     })
+
+    
+
+     await Post.findByIdAndUpdate(postID, {
+      $push: { bookmarkedBy: userID },
+    });
+
+     await newBookmark.save()
+
+      return res.status(200).json({message : "Added to bookmarks!"})
+
+      
+
+  }catch(err){
+    console.log(err)
+    res.json({error : "Internal server error!"}).status(500)
+  }
+}
+
+const getBookmarks = async(req,res)=>{
+  try{
+    const userID = req.user
+    const limit = parseInt(req.query.limit) ||10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    const data =  await Bookmark.find({userID }).skip(offset).limit(limit).select("postID").populate({
+      path : "postID",
+      populate : {
+        path : "uploadedBy",
+        select : ("username profilePic")
+      }
+    }).lean()
+    if(data.length === 0 ) return res.json([]).status(200)
+
+
+    const posts = data.map(item => {
+      const { postID } = item; 
+      const commentCount = postID.comments ? postID.comments.length : 0; 
+      return {
+        ...postID, 
+        comments : commentCount
+      };
+    })
+      return res.json(posts).status(200)
+
+
+
+  }catch(err){
+    console.log(err)
+    return res.status(500).json({error : "Internal server error!"})
+  }
+}
+
+
 
 module.exports = {
   getProfile,
@@ -458,6 +539,8 @@ module.exports = {
   getFollowersListByUsername,
   userExists,
   getFollowingListByUsername,
-  getMediaOfUser
+  getMediaOfUser,
+  addToBookmarks,
+  getBookmarks
 };
 

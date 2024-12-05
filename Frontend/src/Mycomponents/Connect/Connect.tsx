@@ -12,7 +12,7 @@ const Connect = () => {
       const res = await fetch("/api/suggestion?limit=50");
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      console.log(data);
+
       return data;
     },
     refetchOnWindowFocus: false,

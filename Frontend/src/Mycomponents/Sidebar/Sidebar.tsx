@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import {
   BellIcon,
+  Bookmark,
   CircleEllipsis,
   Ellipsis,
   LucideHome,
@@ -123,6 +124,22 @@ const Sidebar = () => {
             }  text-xl rounded-full rounded-r-none select-none   `}
           >
             Profile
+          </span>
+        </div>
+
+        <div
+          className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  delay-75"
+          onClick={() => {
+            navigate(`/bookmarks`);
+          }}
+        >
+          <Bookmark className="size-7 ml-2 shrink-0" />
+          <span
+            className={`${
+              currentlyOn === "bookmarks" ? "font-semibold" : ""
+            }  text-xl rounded-full rounded-r-none select-none   `}
+          >
+            Bookmarks
           </span>
         </div>
 

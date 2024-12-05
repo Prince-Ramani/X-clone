@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
+import { AlertOctagon } from "lucide-react";
 import toast from "react-hot-toast";
 
 const DeleteDialog = () => {
@@ -41,7 +42,7 @@ const DeleteDialog = () => {
 
   return (
     <Dialog open={isDeleteContextOpen} onOpenChange={setDeleteContext}>
-      <DialogContent className="fixed inset-0 flex items-center justify-center pb-10   z-50  flex-col bg-blue-200/20 bg-opacity-50 ">
+      <DialogContent className="fixed  inset-0 flex items-center justify-center pb-10    z-50  flex-col bg-blue-200/20 bg-opacity-50 ">
         <DialogTitle />
         <div className="bg-black p-3 rounded-3xl max-w-[275px] sm:max-w-[300px] md:max-w-xs w-full">
           {pendingFollow ? (
@@ -52,15 +53,19 @@ const DeleteDialog = () => {
             ""
           )}
           <DialogDescription>
-            <div className=" w-full  flex flex-col p-4 ">
-              <div className="font-bold">
-                <div>Unfollow</div>
-                <div className="">@?</div>
+            <div className=" w-full  flex flex-col p-4 gap-2 ">
+              <div className="font-bold tracking-tight text-red-600 flex gap-2  items-center ">
+                <div>
+                  <AlertOctagon className="size-6" />
+                </div>
+                <div className="text-xl">Delete Post</div>
               </div>
               <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                Their posts will no longer show up in your For You timeline. You
-                can still view their profile, unless their posts are protected.
+                When you delete a post, it will be permanently removed from your
+                profile and cannot be retrieved. Deleted posts will no longer
+                appear in your feed or be visible to others.
               </div>
+
               <div>
                 <div className="flex flex-col gap-2 mt-7">
                   <button

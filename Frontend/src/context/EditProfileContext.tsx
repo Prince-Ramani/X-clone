@@ -16,7 +16,7 @@ const EditProfileContextProvider = ({
 }) => {
   const [isEditProfileDialogOpen, setIsEditProfileDialog] =
     useState<boolean>(false);
-  console.log(isEditProfileDialogOpen);
+
   return (
     <EditProfileContext.Provider
       value={{ isEditProfileDialogOpen, setIsEditProfileDialog }}
