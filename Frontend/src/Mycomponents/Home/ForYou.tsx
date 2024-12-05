@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import PostDisplayer from "./PostDisplayer";
 import { useEffect, useState } from "react";
+import Loading from "@/components/ui/Loading";
 
 export interface PostType {
   _id: string;
@@ -68,6 +69,14 @@ const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
       {totalPosts?.map((post: PostType) => (
         <PostDisplayer key={post._id} post={post} authUserId={authUserId} />
       ))}
+
+      {isPending || isLoading || isFetching ? (
+        <div className="flex justify-center items-center p-2 h-full">
+          <Loading />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

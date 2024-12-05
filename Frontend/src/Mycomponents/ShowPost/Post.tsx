@@ -232,7 +232,7 @@ const ShowPost = () => {
           </CustomTooltip>
 
           <div className="flex justify-center items-center">
-            <CustomTooltip title="Save">
+            <CustomTooltip title={hasBookmarked ? "Unsave" : "Save"}>
               <div
                 className="flex gap-2 items-end text-sm group h-fit w-fit p-1  hover:bg-blue-400/20 active:bg-green-500 rounded-full"
                 onClick={() => addToBookmark()}

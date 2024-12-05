@@ -11,11 +11,12 @@ import {
   BellIcon,
   Bookmark,
   CircleEllipsis,
+  Earth,
   Ellipsis,
   LucideHome,
   Search,
-  UserRound,
   X,
+  UserRound,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -58,103 +59,137 @@ const Sidebar = () => {
 
   return (
     <div className=" md:w-3/12 lg:w-3/12 xl:w-2/12 max-h-screen   sticky top-0    py-2    hidden md:flex flex-col    ">
-      <X className="size-8 ml-3" />
+      <X className="size-8 ml-3 " />
 
       <div className="flex flex-col py-5 gap-y-1 ">
-        <div
-          className="flex justify-start cursor-pointer  gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors delay-75"
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <LucideHome className={`size-8 shrink-0 `} />
-          <span
-            className={` ${
-              currentlyOn === "home" ? "font-bold" : ""
-            } text-xl rounded-full select-none   `}
+        <div className="group w-full cursor-pointer ">
+          <div
+            className="flex justify-start   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors "
+            onClick={() => {
+              navigate("/");
+            }}
           >
-            Home
-          </span>
+            <LucideHome className={`size-8 shrink-0 `} />
+            <span
+              className={` ${
+                currentlyOn === "home" ? "font-bold" : ""
+              } text-xl rounded-full select-none   `}
+            >
+              Home
+            </span>
+          </div>
         </div>
 
-        <div
-          className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors delay-75"
-          onClick={() => {
-            navigate("/search");
-          }}
-        >
-          <Search className={`size-7  ml-1 shrink-0 `} />
-          <span
-            className={` ${
-              currentlyOn === "search" ? "font-semibold" : ""
-            }   text-xl rounded-full rounded-r-none select-none   `}
+        <div className="group w-full cursor-pointer ">
+          <div
+            className="flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors "
+            onClick={() => {
+              navigate("/search");
+            }}
           >
-            Explore
-          </span>
+            <Search className={`size-7  ml-1 shrink-0 `} />
+            <span
+              className={` ${
+                currentlyOn === "search" ? "font-semibold" : ""
+              }   text-xl rounded-full rounded-r-none select-none   `}
+            >
+              Explore
+            </span>
+          </div>
         </div>
 
-        <div
-          className={`${
-            currentlyOn === "notifications" ? "font-semibold" : ""
-          }  flex justify-start cursor-pointer items-center   gap-4 hover:bg-gray-800/50  w-fit p-3   rounded-full transition-colors delay-75`}
-          onClick={() => {
-            navigate("/notifications");
-          }}
-        >
-          <BellIcon
-            className={`size-6 ml-2 shrink-0   ${
-              currentlyOn === "notifications" ? "fill-white" : ""
-            } `}
-          />
-          <span className=" text-xl rounded-full rounded-r-none select-none   ">
-            Notifications
-          </span>
-        </div>
-
-        <div
-          className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  delay-75"
-          onClick={() => {
-            navigate(`/profile/${authUser?.username}`);
-          }}
-        >
-          <UserRound className="size-7 ml-2 shrink-0" />
-          <span
+        <div className="group w-full cursor-pointer ">
+          <div
             className={`${
-              currentlyOn === "profile" ? "font-semibold" : ""
-            }  text-xl rounded-full rounded-r-none select-none   `}
+              currentlyOn === "notifications" ? "font-semibold" : ""
+            }  flex justify-start cursor-pointer items-center   gap-4 group-hover:bg-gray-800/50  w-fit p-3   rounded-full transition-colors `}
+            onClick={() => {
+              navigate("/notifications");
+            }}
           >
-            Profile
-          </span>
+            <BellIcon
+              className={`size-6 ml-2 shrink-0   ${
+                currentlyOn === "notifications" ? "fill-white" : ""
+              } `}
+            />
+            <span className=" text-xl rounded-full rounded-r-none select-none   ">
+              Notifications
+            </span>
+          </div>
         </div>
 
-        <div
-          className="flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  delay-75"
-          onClick={() => {
-            navigate(`/bookmarks`);
-          }}
-        >
-          <Bookmark className="size-7 ml-2 shrink-0" />
-          <span
+        <div className="group w-full cursor-pointer ">
+          <div
+            className="flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  "
+            onClick={() => {
+              navigate(`/profile/${authUser?.username}`);
+            }}
+          >
+            <UserRound className="size-7 ml-2 shrink-0" />
+            <span
+              className={`${
+                currentlyOn === "profile" ? "font-semibold" : ""
+              }  text-xl rounded-full rounded-r-none select-none   `}
+            >
+              Profile
+            </span>
+          </div>
+        </div>
+
+        <div className="group w-full cursor-pointer ">
+          <div
+            className="flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  "
+            onClick={() => {
+              navigate(`/bookmarks`);
+            }}
+          >
+            <Bookmark
+              className={`size-7 ml-2 shrink-0 ${
+                currentlyOn === "bookmarks" ? "fill-white" : ""
+              }`}
+            />
+            <span
+              className={`${
+                currentlyOn === "bookmarks" ? "font-semibold " : ""
+              }  text-xl rounded-full rounded-r-none select-none   `}
+            >
+              Bookmarks
+            </span>
+          </div>
+        </div>
+
+        <div className="group w-full cursor-pointer ">
+          <div
+            className="flex justify-start  cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-5 rounded-full transition-colors  "
+            onClick={() => {
+              navigate(`/connect_people`);
+            }}
+          >
+            <Earth className="size-7 ml-2 shrink-0" />
+            <span
+              className={`${
+                currentlyOn === "connect_people" ? "font-semibold" : ""
+              }  text-xl rounded-full rounded-r-none select-none   `}
+            >
+              Suggestions
+            </span>
+          </div>
+        </div>
+
+        <div className="group w-full cursor-pointer ">
+          <div
             className={`${
-              currentlyOn === "bookmarks" ? "font-semibold" : ""
-            }  text-xl rounded-full rounded-r-none select-none   `}
+              currentlyOn === "more" ? "font-semibold" : ""
+            }  flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-6 rounded-full transition-colors `}
+            onClick={() => {
+              navigate("/search");
+            }}
           >
-            Bookmarks
-          </span>
-        </div>
-
-        <div
-          className={`${
-            currentlyOn === "more" ? "font-semibold" : ""
-          }  flex justify-start cursor-pointer   gap-4 hover:bg-gray-800/50  w-fit p-3 pr-6 rounded-full transition-colors delay-75`}
-          onClick={() => {
-            navigate("/search");
-          }}
-        >
-          <CircleEllipsis className="size-7 ml-2 shrink-0" />
-          <span className="font-medium text-xl rounded-full rounded-r-none select-none  ">
-            More
-          </span>
+            <CircleEllipsis className="size-7 ml-2 shrink-0" />
+            <span className="font-medium text-xl rounded-full rounded-r-none select-none  ">
+              More
+            </span>
+          </div>
         </div>
 
         <button
@@ -167,7 +202,7 @@ const Sidebar = () => {
 
       <Popover>
         <PopoverTrigger className="  mt-auto ">
-          <div className=" mt-auto flex items-center  gap-2 p-2 mx-2 hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
+          <div className=" mt-auto flex items-center  gap-2 p-2 mx-2 group-hover:bg-gray-800/50 transition-colors cursor-pointer rounded-full">
             <img
               src={authUser?.profilePic}
               className="bg-white rounded-full h-10 w-10 shrink-0 object-cover"

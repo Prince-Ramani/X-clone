@@ -3,6 +3,7 @@ import PostDisplayer from "./PostDisplayer";
 
 import { PostType } from "./ForYou";
 import { useEffect, useState } from "react";
+import Loading from "@/components/ui/Loading";
 
 const Following = ({
   authUserId,
@@ -48,6 +49,13 @@ const Following = ({
       {totalPosts?.map((post: PostType) => (
         <PostDisplayer key={post._id} post={post} authUserId={authUserId} />
       ))}
+      {isPending || isLoading || isFetching ? (
+        <div className="flex justify-center items-center p-2 h-full">
+          <Loading />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

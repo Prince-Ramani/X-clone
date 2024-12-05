@@ -19,7 +19,7 @@ const ShowUser = ({
   };
   return (
     <div
-      className={`flex  gap-1 md:gap-2 p-2 select-none   ${
+      className={`flex  gap-1 md:gap-2 p-2 select-none    ${
         showBio ? "p-4 hover:bg-white/5 transition-colors " : "p-2 "
       }
           `}
@@ -44,7 +44,7 @@ const ShowUser = ({
           <FollowButton
             personId={suggestion._id}
             username={suggestion.username}
-            className="ml-auto text-sm font-semibold lg:w-20 lg:text-sm "
+            className="ml-auto text-sm font-semibold  lg:w-12 lg:text-sm "
           />
         </div>
         {showBio ? (
