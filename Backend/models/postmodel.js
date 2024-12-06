@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { validate } = require("./userModel");
 const postSchema = mongoose.Schema({
   postContent: {
     type: String,
@@ -47,7 +48,31 @@ const postSchema = mongoose.Schema({
       ref: "User",
       default: []
     }
-  ] 
+  ] ,
+  type : {
+    type : String,
+    enum : ["post","poll"],
+    default : "post"
+  },
+  options : {
+    type : [String],
+    default : [],
+    required : false,
+   
+  },
+  answer : {
+    type : String,
+    required : false
+  },
+  explanation : {
+    type :String,
+    required : false,
+    default : ""
+  },
+  explanationImage : {
+    type :String,
+    required : false
+  }
 },{
   timestamps :true
 });

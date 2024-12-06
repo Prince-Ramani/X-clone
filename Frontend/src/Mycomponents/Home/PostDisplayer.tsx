@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { FormateDate } from "@/lib/Date";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import DeletPost from "@/customComponents/DeletePostsIcon";
+import { RadioGroupItem } from "@radix-ui/react-radio-group";
+import { RadioGroup } from "@radix-ui/react-dropdown-menu";
+import { Label } from "@/components/ui/label";
 
 const PostDisplayer = memo(
   ({
@@ -135,6 +138,16 @@ const PostDisplayer = memo(
                   className=" w-full h-fit rounded-2xl border-gray-400/20 border"
                 />
               </a>
+            </div>
+          ) : (
+            ""
+          )}
+
+          {post.type === "poll" ? (
+            <div className="border w-full rounded-xl">
+              <div className="p-2 flex">
+                <div className="flex flex-col gap-2 border w-full"></div>
+              </div>
             </div>
           ) : (
             ""

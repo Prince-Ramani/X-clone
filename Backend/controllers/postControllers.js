@@ -47,6 +47,59 @@ const createPost = async (req, res) => {
   }
 };
 
+const createPoll = async(req,res)=>{
+  try{
+
+    const {postContent,options,answer,explanation} = req.body
+    if(!postContent) return res.json({error : "Poll must have some content!"}).status(400)
+      if(!options || options.length <2) return res.json({error : "A poll must have minimum 2 options!"}).status(400)
+        // if(!answer) return res.json({error : "A poll must have an answer!"}).status(400)
+    console.log(options)
+
+          if (req.file) {
+            const uploadRes = await cloudinary.uploader.upload(req.file.path, {
+              folder: 'X-clone/Posts'
+            });
+    
+            try{  
+              await unlink(req.file.path)
+            }catch(err){
+              console.error('Error deleting the file:', err);
+            }
+            const explanationImage = uploadRes.secure_url;
+            const post = new Post({
+              type : "poll",
+              postContent,
+             explanationImage,
+             options,
+             answer : answer || "",
+             explanation : explanation || "",
+             uploadedBy : req.user
+            }); 
+            await post.save();
+            return res.status(201).json({message : "Poll created successfully!"});
+        }
+
+        const newPoll = new Post({
+          type : "poll",
+          postContent ,
+          options ,
+          answer : answer || "",
+          explanation : explanation || "",
+          uploadedBy : req.user
+        })
+
+        await newPoll.save()
+        return res.json({message : "Poll created successfully!"}).status(200)
+
+
+  }catch(err){
+    console.log(err)
+    return res.json({error : "Internal server error!"}).status(5000)
+  }
+
+}
+
 const commentOnPost = async (req, res) => {
   try {
     const postID = req.params.postid;
@@ -331,4 +384,5 @@ module.exports = {
   getPost,
   likeComment,
   deleteComment,
+  createPoll
 };

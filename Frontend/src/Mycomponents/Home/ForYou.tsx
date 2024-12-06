@@ -13,6 +13,8 @@ export interface PostType {
   bookmarkedBy?: any[];
   createdAt: string;
   updatedAt: string;
+  type: "poll" | "post";
+  options?: string[];
 }
 
 export interface UploadedByType {
