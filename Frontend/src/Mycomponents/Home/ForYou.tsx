@@ -15,6 +15,12 @@ export interface PostType {
   updatedAt: string;
   type: "poll" | "post";
   options?: string[];
+  answeredBy?: [
+    {
+      userAnswered: string;
+      optionSelected: number;
+    }
+  ];
 }
 
 export interface UploadedByType {

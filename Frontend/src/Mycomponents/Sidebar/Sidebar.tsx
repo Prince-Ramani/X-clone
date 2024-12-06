@@ -50,7 +50,7 @@ const Sidebar = () => {
       if ("error" in data) toast.error(data.error);
       else {
         toast.success(data.message);
-        navigate("/");
+        navigate("/sign-up");
         setAuthUser(null);
       }
       return data;

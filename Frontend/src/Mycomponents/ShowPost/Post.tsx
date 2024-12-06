@@ -252,6 +252,7 @@ const ShowPost = () => {
               onClick={() =>
                 navigator.clipboard
                   .writeText(
+                    //@ts-ignore
                     `${import.meta.env.VITE_BASE_URL}/profile/${
                       post.uploadedBy.username
                     }/post/${post?._id}`

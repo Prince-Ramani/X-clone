@@ -1,6 +1,6 @@
 import { BookmarkPlus, Dot, Heart, MessageCircle, Share } from "lucide-react";
 import { PostType } from "./ForYou";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import CustomTooltip from "@/customComponents/ToolTip";
@@ -8,9 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { FormateDate } from "@/lib/Date";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import DeletPost from "@/customComponents/DeletePostsIcon";
-import { RadioGroupItem } from "@radix-ui/react-radio-group";
-import { RadioGroup } from "@radix-ui/react-dropdown-menu";
-import { Label } from "@/components/ui/label";
 
 const PostDisplayer = memo(
   ({
@@ -39,6 +36,11 @@ const PostDisplayer = memo(
     const [hasUserLiked, setHasUserLiked] = useState<boolean>(
       likes.includes(authUserId)
     );
+    const [hasAnswered, setHasAnswered] = useState(false);
+    const [selectedOption, setSelectedOption] = useState<number | undefined>(
+      undefined
+    );
+    console.log(hasAnswered);
 
     const { mutate } = useMutation({
       mutationFn: async () => {
@@ -84,10 +86,49 @@ const PostDisplayer = memo(
       },
     });
 
+    const { mutate: answerPoll } = useMutation({
+      mutationFn: async (answerNumber: number) => {
+        const res = await fetch(`/api/post/answerpoll/${post._id}`, {
+          method: "Post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ answerNumber }),
+        });
+        const data = await res.json();
+        if ("error" in data) return toast.error(data.error);
+        setSelectedOption(answerNumber);
+        setHasAnswered(true);
+        return data;
+      },
+      onSuccess: (data) => {
+        if ("error" in data) return;
+        toast.success(data.message);
+      },
+    });
+
     const handlPostClick = (e: any) => {
       if (e.target.tagName !== "DIV") return;
       navigate(`/profile/${uploadedBy?.username}/post/${post._id}`);
     };
+
+    const submitPollAnswer = (answerNumber: number) => {
+      if (hasAnswered) return toast.error("Aleardy answered!");
+      answerPoll(answerNumber);
+    };
+
+    useEffect(() => {
+      if (post?.answeredBy && authUserId) {
+        const userHasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered === authUserId
+        );
+
+        if (userHasAnswered.length > 0) {
+          setHasAnswered(true);
+          setSelectedOption(userHasAnswered[0].optionSelected);
+        }
+      }
+    }, [post, authUserId]);
 
     return (
       <div
@@ -144,9 +185,23 @@ const PostDisplayer = memo(
           )}
 
           {post.type === "poll" ? (
-            <div className="border w-full rounded-xl">
-              <div className="p-2 flex">
-                <div className="flex flex-col gap-2 border w-full"></div>
+            <div className=" w-full rounded-xl  mt-2">
+              <div className="p-2 flex  rounded-xl">
+                <div className="flex flex-col gap-2  w-full">
+                  {post.options?.map((option, index) => (
+                    <span
+                      className={`bg-gray-100/20   rounded-lg p-3 text-sm ${
+                        selectedOption === index
+                          ? "bg-green-700"
+                          : " hover:bg-white/15"
+                      }`}
+                      key={index}
+                      onClick={() => submitPollAnswer(index)}
+                    >
+                      {option}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -200,6 +255,7 @@ const PostDisplayer = memo(
                   onClick={() =>
                     navigator.clipboard
                       .writeText(
+                        //@ts-ignore
                         `${import.meta.env.VITE_BASE_URL}/profile/${
                           uploadedBy?.username
                         }/post/${post?._id}`
