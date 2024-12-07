@@ -69,6 +69,17 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
+  const { data: totalPosts } = useQuery({
+    queryKey: [personUsername, "PostsCount"],
+    queryFn: async () => {
+      const res = await fetch(`/api/post/getpostscount`);
+      const data = await res.json();
+      return data;
+    },
+    enabled: !!personUsername,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <div className="border border-b-0 border-gray-800 min-h-full  cursor-pointer">
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-10 ">
@@ -84,7 +95,7 @@ const Profile = () => {
           <span className="font-bold text-lg tracking-wider">
             {profile?.username}
           </span>
-          <span className="text-xs text-gray-400">0 posts</span>
+          <span className="text-xs text-gray-400">{totalPosts || 0} posts</span>
         </div>
       </div>
 

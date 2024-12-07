@@ -17,6 +17,7 @@ const {
   createPoll,
   submitPollAnswer,
   getPollResult,
+  getPostsCount,
 } = require("../controllers/postControllers");
 
 router.post(
@@ -33,6 +34,7 @@ router.post(
 );
 router.post("/answerpoll/:postID", protectRoute, submitPollAnswer);
 router.get("/getallpost", protectRoute, getPosts);
+router.get("/getpostscount", protectRoute, getPostsCount);
 router.get("/getpollresult/:postID", protectRoute, getPollResult);
 router.post("/comment/:postid", protectRoute, commentOnPost);
 router.get("/followingposts", protectRoute, postOfFollowing);

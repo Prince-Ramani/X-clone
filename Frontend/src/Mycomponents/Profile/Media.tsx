@@ -69,7 +69,7 @@ const ProfilePost = memo(
       );
       setHasDeletedAnyPost(false);
       setDeletePostId(undefined);
-      offset.current = offset.current - 1;
+      offset.current = offset.current === 0 ? 0 : offset.current - 1;
     }, [hasDeletedAnyPost, setHasDeletedAnyPost]);
 
     return (

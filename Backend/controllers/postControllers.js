@@ -220,6 +220,17 @@ const getPosts = async (req, res) => {
   }
 };
 
+const getPostsCount = async (req, res) => {
+  try {
+    const posts = await Post.countDocuments({ uploadedBy: { _id: req.user } });
+    if (!posts) return res.json(0).status(200);
+    return res.json(posts).status(200);
+  } catch (err) {
+    console.log(err);
+    return res.json({ error: "Internal sever error!" }.status(500));
+  }
+};
+
 const postOfFollowing = async (req, res) => {
   try {
     const userID = req.user;
@@ -485,4 +496,5 @@ module.exports = {
   createPoll,
   submitPollAnswer,
   getPollResult,
+  getPostsCount,
 };

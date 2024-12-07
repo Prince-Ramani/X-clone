@@ -40,7 +40,6 @@ const PostDisplayer = memo(
     const [selectedOption, setSelectedOption] = useState<number | undefined>(
       undefined
     );
-    console.log(hasAnswered);
 
     const { mutate } = useMutation({
       mutationFn: async () => {
@@ -200,12 +199,15 @@ const PostDisplayer = memo(
           )}
 
           {post.type === "poll" ? (
-            <div className="w-full rounded-xl mt-2">
+            <div className="w-full rounded-xl mt-2 ">
+              <div className="text-xs text-gray-400/70 pl-3">
+                Total votes : {pollResultCount?.totalVotes || 0}
+              </div>
               <div className="p-2 flex rounded-xl ">
                 <div className="flex flex-col gap-2 w-full">
                   {post.options?.map((option, index) => (
                     <span
-                      className={`relative rounded-lg   flex bg-slate-100/10 ${
+                      className={`relative rounded-lg    flex bg-slate-100/10 ${
                         hasAnswered ? "" : "hover:bg-white/20"
                       }  `}
                       onClick={() => submitPollAnswer(index)}
@@ -226,7 +228,7 @@ const PostDisplayer = memo(
                           hasAnswered &&
                           selectedOption &&
                           selectedOption === index
-                            ? "font-semibold"
+                            ? "font-semibold break-all"
                             : ""
                         }`}
                       >

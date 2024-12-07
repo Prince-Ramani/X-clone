@@ -86,10 +86,6 @@ const CreatePostHome = memo(() => {
         setIsEmojiOpen(false);
         setImagePreview(null);
 
-        queryClient.invalidateQueries({
-          queryKey: [authUser?.username, "Polls"],
-        });
-
         return toast.success(data.message);
       }
     },
@@ -119,6 +115,14 @@ const CreatePostHome = memo(() => {
       const optionsArray = Object.values(optionValue).filter(
         (option) => option.trim() !== ""
       );
+
+      let errory: boolean = false;
+
+      for (let i = 0; i < optionsArray.length; i++) {
+        if (optionsArray[i].length > 25) errory = true;
+      }
+
+      if (errory) return toast.error("A option can have maximum 25 charcters!");
 
       if (optionsArray.length < 2)
         return toast.error("A poll must have minimum 2 options!");
@@ -222,7 +226,7 @@ const CreatePostHome = memo(() => {
                 </div>
 
                 <div
-                  className="border-t border-gray-500  text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
+                  className="border-t border-gray-500  cursor-pointer text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
                   onClick={() => setType("post")}
                 >
                   Remove poll
