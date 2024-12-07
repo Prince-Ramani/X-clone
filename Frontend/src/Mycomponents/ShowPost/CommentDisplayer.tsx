@@ -6,16 +6,21 @@ import CustomTooltip from "@/customComponents/ToolTip";
 import { memo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import DeleteComment from "@/customComponents/DeleteComment";
 
 const CommentDisplayer = memo(
   ({
     comment,
     authUserId,
     postId,
+    postUploaderId,
+    username,
   }: {
     comment: CommentType;
     authUserId?: string | undefined;
     postId: string;
+    postUploaderId?: string;
+    username: string;
   }) => {
     const [totalLikes, setTotalLikes] = useState([...comment.likes]);
 
@@ -64,6 +69,19 @@ const CommentDisplayer = memo(
               <span className="text-xs text-gray-400/90 ">
                 {FormateDate(comment.createdAt)}
               </span>
+              {comment.commenter._id === authUserId ||
+              comment.commenter._id === postUploaderId ? (
+                <div className=" ml-auto">
+                  <DeleteComment
+                    commentID={comment._id}
+                    postID={postId}
+                    username={username}
+                    isCreator={postUploaderId === authUserId}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
             </div>
             <div className="text-sm tracking-wide ">{comment?.text}</div>
             <div className=" mt-2 w-full flex justify-center items-center  text-gray-4se00/90">

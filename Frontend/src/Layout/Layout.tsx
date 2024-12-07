@@ -7,8 +7,6 @@ import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import ReplyDialog from "./CommentDialog";
 import { useEditProfileContext } from "@/context/EditProfileContext";
 import EditProfileDialog from "@/Layout/EditProfileDialog";
-import { useUnfollowContext } from "@/context/UnfollowContext";
-import UnfollowDialog from "./UnfollowDialog";
 import { useDeletePostContext } from "@/context/DeletePostContext";
 import DeleteDialog from "./DeleteDialog";
 
@@ -16,7 +14,7 @@ const Layout = () => {
   const { isCreateDialogOpen } = useCreatePostContext();
   const { isReplyDialogOpen } = useReplyDialogContext();
   const { isEditProfileDialogOpen } = useEditProfileContext();
-  const { isUnfollowContextOpen } = useUnfollowContext();
+
   const { isDeleteContextOpen } = useDeletePostContext();
 
   return (
@@ -24,7 +22,7 @@ const Layout = () => {
       {isCreateDialogOpen ? <CreatePostDialog /> : ""}
       {isReplyDialogOpen ? <ReplyDialog /> : ""}
       {isEditProfileDialogOpen ? <EditProfileDialog /> : ""}
-      {isUnfollowContextOpen ? <UnfollowDialog /> : ""}
+
       {isDeleteContextOpen ? <DeleteDialog /> : ""}
 
       <Sidebar />

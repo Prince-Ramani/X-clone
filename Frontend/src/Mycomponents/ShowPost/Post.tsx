@@ -196,11 +196,11 @@ const ShowPost = () => {
 
         <div className="flex text-sm py-2 leading-tight tracking-tighter text-gray-400/80">
           <span>
-            {post?.createdAt ? format(post?.createdAt, "h:mm a") : "hello"}
+            {post?.createdAt ? format(post?.createdAt, "h:mm a") : ""}
           </span>
           <Dot />
           <span>
-            {post?.createdAt ? format(post?.createdAt, "MMM dd, yyyy ") : "j"}
+            {post?.createdAt ? format(post?.createdAt, "MMM dd, yyyy ") : ""}
           </span>
         </div>
 
@@ -337,8 +337,10 @@ const ShowPost = () => {
           <CommentDisplayer
             comment={comment}
             authUserId={authUser?._id}
-            postId={post._id}
-            key={comment._id}
+            postId={post?._id}
+            key={comment?._id}
+            postUploaderId={post.uploadedBy?._id}
+            username={post?.uploadedBy.username}
           />
         ))}
       </div>

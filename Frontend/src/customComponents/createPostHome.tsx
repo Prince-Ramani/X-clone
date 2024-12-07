@@ -34,8 +34,6 @@ const CreatePostHome = memo(() => {
     option7: "",
   });
 
-  console.log(optionValue);
-
   const [type, setType] = useState<"post" | "poll">("post");
 
   const { mutate: createPost, isPending } = useMutation({
@@ -98,20 +96,18 @@ const CreatePostHome = memo(() => {
   });
 
   const handlePostSubmit = () => {
+    if (!textareaValue) return toast.error("Content required!");
+
     if (type === "post") {
-      if (textareaValue) {
-        if (textareaValue.length >= 280)
-          return toast.error("Post length must be less than 280 characters!");
+      if (textareaValue.length >= 280)
+        return toast.error("Post length must be less than 280 characters!");
 
-        const formData = new FormData();
+      const formData = new FormData();
 
-        formData.append("postContent", textareaValue);
-        if (file) formData.append("uploadedPhoto", file);
+      formData.append("postContent", textareaValue);
+      if (file) formData.append("uploadedPhoto", file);
 
-        createPost(formData);
-      } else {
-        toast.error("Post content required!");
-      }
+      createPost(formData);
     }
 
     if (textareaValue && type === "poll") {
@@ -130,8 +126,6 @@ const CreatePostHome = memo(() => {
       //@ts-ignore
 
       createPoll({ postContent: textareaValue, options: optionsArray });
-    } else {
-      toast.error("Post content required!");
     }
   };
 

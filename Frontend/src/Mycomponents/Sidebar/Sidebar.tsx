@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/popover";
 import { useCreatePostContext } from "@/context/createPostContext";
 import { useAuthUser } from "@/context/userContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   BellIcon,
@@ -25,6 +25,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const location = useLocation();
 
@@ -50,6 +51,8 @@ const Sidebar = () => {
       if ("error" in data) toast.error(data.error);
       else {
         toast.success(data.message);
+
+        await queryClient.invalidateQueries({ queryKey: ["authUser"] });
         navigate("/sign-up");
         setAuthUser(null);
       }

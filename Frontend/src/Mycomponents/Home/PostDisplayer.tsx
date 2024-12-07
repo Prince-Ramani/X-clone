@@ -118,7 +118,7 @@ const PostDisplayer = memo(
 
         return data;
       },
-      enabled: hasAnswered,
+      enabled: hasAnswered && post.type === "poll",
     });
 
     const handlPostClick = (e: any) => {
@@ -204,16 +204,20 @@ const PostDisplayer = memo(
               <div className="p-2 flex rounded-xl ">
                 <div className="flex flex-col gap-2 w-full">
                   {post.options?.map((option, index) => (
-                    <div className="relative rounded-lg   flex  ">
+                    <span
+                      className={`relative rounded-lg   flex bg-slate-100/10 ${
+                        hasAnswered ? "" : "hover:bg-white/20"
+                      }  `}
+                      onClick={() => submitPollAnswer(index)}
+                    >
                       <span
                         className={`h-10 rounded-lg    ${
                           selectedOption === index
-                            ? "bg-blue-500 border"
-                            : "bg-slate-100/10 hover:bg-white/20 "
+                            ? "bg-blue-500 "
+                            : "bg-red-500"
                         }`}
-                        onClick={() => submitPollAnswer(index)}
                         style={{
-                          width: `${pollResultCount?.arr[index] || 100}%`,
+                          width: `${pollResultCount?.arr[index] || 0}%`,
                         }}
                       ></span>
 
@@ -235,7 +239,7 @@ const PostDisplayer = memo(
                         )}
                         {option}
                       </span>
-                    </div>
+                    </span>
                   ))}
                 </div>
               </div>
