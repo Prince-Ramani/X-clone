@@ -101,6 +101,7 @@ const submitPollAnswer = async (req, res) => {
     const { postID } = req.params;
     const { answerNumber } = req.body;
     const userID = req.user;
+    const ans = Number(answerNumber);
 
     const post = await Post.findById(postID);
 
@@ -119,7 +120,12 @@ const submitPollAnswer = async (req, res) => {
 
     await post.answeredBy.push({
       userAnswered: userID,
-      optionSelected: Number(answerNumber),
+      optionSelected: ans,
+    });
+
+    await post.optionsCount.push({
+      optionText: post.options[ans],
+      vote: ans,
     });
 
     await post.save();
@@ -128,6 +134,39 @@ const submitPollAnswer = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.json({ error: "Internal server error!" }).status(500);
+  }
+};
+
+const getPollResult = async (req, res) => {
+  try {
+    const { postID } = req.params;
+
+    const post = await Post.findById(postID);
+
+    if (!post || post.type !== "poll")
+      return res.json({ error: "No such post exists!" }).status(404);
+
+    const totalVotes = post.optionsCount.length;
+
+    let arr = [];
+
+    for (let i = 0; i < post.options.length; i++) {
+      const matchingOptions = post.optionsCount.filter(
+        (o) => o.optionText === post.options[i]
+      );
+
+      arr.push((matchingOptions.length * 100) / totalVotes);
+    }
+
+    return res
+      .json({
+        totalVotes,
+        arr,
+      })
+      .status(200);
+  } catch (err) {
+    console.log(err);
+    return res.json({ error: "INternal server error!" }).status(500);
   }
 };
 
@@ -445,4 +484,5 @@ module.exports = {
   deleteComment,
   createPoll,
   submitPollAnswer,
+  getPollResult,
 };

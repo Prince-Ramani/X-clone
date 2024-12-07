@@ -73,6 +73,12 @@ const postSchema = mongoose.Schema(
         },
       },
     ],
+    optionsCount: [
+      {
+        optionText: { type: String, required: true },
+        votes: { type: Number, default: 0 },
+      },
+    ],
     answer: {
       type: String,
       required: false,

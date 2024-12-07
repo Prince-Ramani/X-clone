@@ -66,7 +66,7 @@ const CreatePostHome = memo(() => {
     },
   });
 
-  const { mutate: createPoll, isPending: pendingPoll } = useMutation({
+  const { mutate: createPoll } = useMutation({
     mutationFn: async (send) => {
       const res = await fetch("/api/post/createPoll", {
         method: "POST",

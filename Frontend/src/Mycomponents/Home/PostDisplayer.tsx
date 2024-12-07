@@ -1,7 +1,7 @@
 import { BookmarkPlus, Dot, Heart, MessageCircle, Share } from "lucide-react";
 import { PostType } from "./ForYou";
 import { memo, useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import CustomTooltip from "@/customComponents/ToolTip";
 import { useNavigate } from "react-router-dom";
@@ -107,6 +107,20 @@ const PostDisplayer = memo(
       },
     });
 
+    const { data: pollResultCount } = useQuery({
+      queryKey: [post._id, "PollResult"],
+      queryFn: async () => {
+        const res = await fetch(`/api/post/getpollresult/${post._id}`);
+        const data = await res.json();
+        if ("error" in data) return toast.error(data.error);
+
+        console.log(data);
+
+        return data;
+      },
+      enabled: hasAnswered,
+    });
+
     const handlPostClick = (e: any) => {
       if (e.target.tagName !== "DIV") return;
       navigate(`/profile/${uploadedBy?.username}/post/${post._id}`);
@@ -114,6 +128,7 @@ const PostDisplayer = memo(
 
     const submitPollAnswer = (answerNumber: number) => {
       if (hasAnswered) return toast.error("Aleardy answered!");
+
       answerPoll(answerNumber);
     };
 
@@ -185,21 +200,42 @@ const PostDisplayer = memo(
           )}
 
           {post.type === "poll" ? (
-            <div className=" w-full rounded-xl  mt-2">
-              <div className="p-2 flex  rounded-xl">
-                <div className="flex flex-col gap-2  w-full">
+            <div className="w-full rounded-xl mt-2">
+              <div className="p-2 flex rounded-xl ">
+                <div className="flex flex-col gap-2 w-full">
                   {post.options?.map((option, index) => (
-                    <span
-                      className={`bg-gray-100/20   rounded-lg p-3 text-sm ${
-                        selectedOption === index
-                          ? "bg-green-700"
-                          : " hover:bg-white/15"
-                      }`}
-                      key={index}
-                      onClick={() => submitPollAnswer(index)}
-                    >
-                      {option}
-                    </span>
+                    <div className="relative rounded-lg   flex  ">
+                      <span
+                        className={`h-10 rounded-lg    ${
+                          selectedOption === index
+                            ? "bg-blue-500 border"
+                            : "bg-slate-100/10 hover:bg-white/20 "
+                        }`}
+                        onClick={() => submitPollAnswer(index)}
+                        style={{
+                          width: `${pollResultCount?.arr[index] || 100}%`,
+                        }}
+                      ></span>
+
+                      <span
+                        className={`absolute left-2  top-2     bg-transparent  text-white ${
+                          hasAnswered &&
+                          selectedOption &&
+                          selectedOption === index
+                            ? "font-semibold"
+                            : ""
+                        }`}
+                      >
+                        {pollResultCount?.arr ? (
+                          <span className="font-bold pr-3 ">
+                            {Math.round(pollResultCount?.arr[index])}%
+                          </span>
+                        ) : (
+                          ""
+                        )}
+                        {option}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
