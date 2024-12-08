@@ -6,9 +6,10 @@ import CustomTooltip from "./ToolTip";
 interface BarProps {
   title: string;
   href?: string;
+  hideSettings?: boolean;
 }
 
-const Bar = memo(({ title, href }: BarProps) => {
+const Bar = memo(({ title, href, hideSettings = false }: BarProps) => {
   const navigate = useNavigate();
   const handlBackButtonClick = () => {
     if (href) {
@@ -29,11 +30,15 @@ const Bar = memo(({ title, href }: BarProps) => {
         </CustomTooltip>
       </div>
       <div className="font-bold text-lg tracking-wide">{title}</div>
-      <CustomTooltip title="Settings">
-        <div className="ml-auto h-fit w-fit  rounded-full p-2 hover:bg-white/10">
-          <Settings className="size-5" />
-        </div>
-      </CustomTooltip>
+      {hideSettings ? (
+        ""
+      ) : (
+        <CustomTooltip title="Settings">
+          <div className="ml-auto h-fit w-fit  rounded-full p-2 hover:bg-white/10">
+            <Settings className="size-5" />
+          </div>
+        </CustomTooltip>
+      )}
     </div>
   );
 });

@@ -200,7 +200,11 @@ const PostDisplayer = memo(
 
           {post.type === "poll" ? (
             <div className="w-full rounded-xl mt-2 ">
-              <div className="text-xs text-gray-400/70 pl-3">
+              <div
+                className={`text-xs text-gray-400/70 pl-3 ${
+                  pollResultCount ? "block" : "hidden"
+                } `}
+              >
                 Total votes : {pollResultCount?.totalVotes || 0}
               </div>
               <div className="p-2 flex rounded-xl ">

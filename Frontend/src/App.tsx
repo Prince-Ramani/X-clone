@@ -23,6 +23,9 @@ import NotFoundPage from "./Mycomponents/NotFound.tsx/NotFoundPage";
 import Loading from "./components/ui/Loading";
 import Bookmark from "./Mycomponents/Bookmarks/Bookmark";
 
+import YourAccount from "./Mycomponents/Settings/YourAccount";
+import BlockPage from "./Mycomponents/Settings/BlockPage";
+
 function App() {
   const { setAuthUser } = useAuthUser();
 
@@ -108,6 +111,14 @@ function App() {
           <Route
             path="bookmarks"
             element={isLoggedIn ? <Bookmark /> : <Navigate to="/sign-up" />}
+          />
+          <Route
+            path="settings"
+            element={isLoggedIn ? <YourAccount /> : <Navigate to="/sign-up" />}
+          />
+          <Route
+            path="settings/blocked"
+            element={isLoggedIn ? <BlockPage /> : <Navigate to="/sign-up" />}
           />
         </Route>
         <Route path="*" element={isLoggedIn ? <NotFoundPage /> : ""} />

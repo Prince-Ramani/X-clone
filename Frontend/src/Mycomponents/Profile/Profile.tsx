@@ -1,5 +1,5 @@
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -17,6 +17,11 @@ import LikedPosts from "./LikedPosts";
 import { useEditProfileContext } from "@/context/EditProfileContext";
 import ProfilePost from "./profilePosts";
 import FollowButton from "@/customComponents/FollowButton";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -80,6 +85,20 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
+  const { mutate: Block } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/blockuser/${profile?._id}`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if ("error" in data) return toast.error(data.error);
+
+      toast.success(data.message);
+
+      return data;
+    },
+  });
+
   return (
     <div className="border border-b-0 border-gray-800 min-h-full  cursor-pointer">
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-10 ">
@@ -131,9 +150,21 @@ const Profile = () => {
       </div>
       <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
         <CustomTooltip title="More">
-          <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center">
-            <MoreHorizontal className="size-5" />
-          </button>
+          <Popover>
+            <PopoverTrigger>
+              <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center ">
+                <MoreHorizontal className="size-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="  bg-black text-white p-0 border-none shadow-md  shadow-red-600/80  ring-1 ring-red-500/80  ">
+              <div
+                className=" h-full w-full p-2 py-3 hover:bg-white/10 active:bg-red-600/20 transition-colors cursor-pointer select-none font-semibold tracking-wide"
+                onClick={() => Block()}
+              >
+                Block
+              </div>
+            </PopoverContent>
+          </Popover>
         </CustomTooltip>
         <CustomTooltip title="Search">
           <button className="size-8 border  border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">

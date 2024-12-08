@@ -17,6 +17,7 @@ import {
   Search,
   X,
   UserRound,
+  Settings,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -191,6 +192,22 @@ const Sidebar = () => {
             <CircleEllipsis className="size-7 ml-2 shrink-0" />
             <span className="font-medium text-xl rounded-full rounded-r-none select-none  ">
               More
+            </span>
+          </div>
+        </div>
+
+        <div className="group w-full cursor-pointer ">
+          <div
+            className={`${
+              currentlyOn === "settings" ? "font-semibold" : ""
+            }  flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-6 rounded-full transition-colors `}
+            onClick={() => {
+              navigate("/settings");
+            }}
+          >
+            <Settings className="size-7 ml-2 shrink-0" />
+            <span className="font-medium text-xl rounded-full rounded-r-none select-none  ">
+              Settings
             </span>
           </div>
         </div>
