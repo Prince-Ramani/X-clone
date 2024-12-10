@@ -199,7 +199,13 @@ const getPosts = async (req, res) => {
   try {
     const offset = parseInt(req.query.offset);
     const limit = parseInt(req.query.limit) || 5;
-    const posts = await Post.find({ uploadedBy: { $ne: req.user } })
+    const user = await User.findById(req.user);
+    const posts = await Post.find({
+      $and: [
+        { uploadedBy: { $ne: req.user } },
+        { uploadedBy: { $nin: user.blocked } },
+      ],
+    })
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
@@ -216,6 +222,7 @@ const getPosts = async (req, res) => {
 
     return res.status(200).json(postss);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: "Internal servere error" });
   }
 };

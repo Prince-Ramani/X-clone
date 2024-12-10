@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import BlockUserDisplayer from "./BlockUserDisplayer";
 
+export interface blockUserType {
+  _id: string;
+  username: string;
+}
+
 const BlockPage = () => {
   const { data: blockedUsers } = useQuery({
     queryKey: ["Blocks"],
@@ -22,8 +27,8 @@ const BlockPage = () => {
         <div className={`border-2 border-blue-400 w-28 rounded-full `} />
       </div>
 
-      {blockedUsers?.blocked.map((user) => (
-        <BlockUserDisplayer />
+      {blockedUsers?.blocked.map((user: blockUserType) => (
+        <BlockUserDisplayer user={user} />
       ))}
     </div>
   );
