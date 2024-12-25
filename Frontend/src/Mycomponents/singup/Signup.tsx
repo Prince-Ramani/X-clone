@@ -105,13 +105,13 @@ function Signup() {
               />
             </div>
 
-            <div className="w-full flex  mt-4 max-w-xl hover:border-blue-500">
-              {data?.error && (
+            {data?.error && (
+              <div className=" p-1 w-fit flex    mt-4 max-w-xl hover:border-blue-500">
                 <p className="leading-tight text-sm text-red-500">
                   {data?.error}
                 </p>
-              )}
-            </div>
+              </div>
+            )}
             <button
               className={` max-w-xl lg:w-9/12 p-3 mt-3 rounded-3xl hover:bg-blue-300 active:bg-green-500 w-full ${
                 isPending ? "bg-gray-500" : "bg-blue-600"

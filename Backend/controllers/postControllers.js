@@ -204,6 +204,7 @@ const getPosts = async (req, res) => {
       $and: [
         { uploadedBy: { $ne: req.user } },
         { uploadedBy: { $nin: user.blocked } },
+        { uploadedBy: { $nin: user.blockedBy } },
       ],
     })
       .sort({ createdAt: -1 })
@@ -326,11 +327,17 @@ const getLikedPosts = async (req, res) => {
     if (!person) {
       return res.status(404).json({ error: "Invalid user" });
     }
+    const user = await User.findById(req.user).select("blocked");
 
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const postss = await Post.find({ likes: { $in: req.params.personid } })
+    const postss = await Post.find({
+      $and: [
+        { likes: { $in: req.params.personid } },
+        { uploadedBy: { $nin: user.blocked } },
+      ],
+    })
       .skip(offset)
       .limit(limit)
       .populate({
@@ -386,6 +393,14 @@ const getProfilePost = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset);
     const personID = req.params.personID;
+
+    const user = await User.findById(req.user).select("blocked");
+    const person = await User.findById(personID).select("blocked");
+
+    if (user.blocked.includes(personID) || person.blocked.includes(req.user)) {
+      return res.json([]).status(200);
+    }
+
     const postss = await Post.find({ uploadedBy: personID })
       .sort({ createdAt: -1 })
       .skip(offset)
@@ -412,7 +427,14 @@ const getProfilePost = async (req, res) => {
 
 const getPost = async (req, res) => {
   try {
-    const posts = await Post.find({ _id: req.params.postID })
+    const user = await User.findById(req.user);
+
+    const posts = await Post.find({
+      $and: [
+        { _id: req.params.postID },
+        { uploadedBy: { $nin: user.blocked } },
+      ],
+    })
       .sort({ "comments.createdAt": -1 })
       .populate({
         path: "uploadedBy",
@@ -423,7 +445,9 @@ const getPost = async (req, res) => {
         select: "username _id profilePic",
       });
 
-    if (!posts) return res.status(200).json([]);
+    if (posts.length === 0) {
+      return res.status(404).json({ error: "Invalid post Id" });
+    }
 
     if (posts && posts.length > 0) {
       posts[0].comments.sort((a, b) => b.createdAt - a.createdAt);

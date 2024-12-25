@@ -55,6 +55,7 @@ const ShowPost = () => {
       setHasBookmarked(data.bookmarkedBy.includes(authUser?._id));
 
       if ("error" in data) toast.error("Invalid post id!");
+
       return data;
     },
     enabled: !!userExists && !!username && !!postId,

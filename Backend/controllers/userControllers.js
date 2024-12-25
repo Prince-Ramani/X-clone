@@ -16,13 +16,20 @@ const validateEmail = (email) => {
 const getProfile = async (req, res) => {
   try {
     const { username: UserName } = req.params;
-    const profile = await User.findOne({ username: UserName }).select(
-      "-password"
-    );
+    const user = await User.findById(req.user).select("blocked blockedBy");
+    const profile = await User.findOne({
+      $and: [
+        { username: UserName },
+        {
+          _id: { $nin: user.blocked },
+        },
+        { _id: { $nin: user.blockedBy } },
+      ],
+    }).select("-password");
     if (!profile) {
       return res
         .status(404)
-        .json({ error: "Account with this id doesn't exists" });
+        .json({ error: "Account with this username doesn't exists!" });
     }
     return res.status(200).json(profile);
   } catch (err) {
@@ -212,8 +219,17 @@ const updateProfile = async (req, res) => {
 const findUser = async (req, res) => {
   try {
     const findUserName = req.params.name;
+    const user = await User.findById(req.user).select("blocked");
     const data = await User.find({
-      username: { $regex: `^${findUserName}`, $options: "i" },
+      $and: [
+        {
+          username: { $regex: `^${findUserName}`, $options: "i" },
+          $and: [
+            { _id: { $nin: user.blocked } },
+            { blocked: { $nin: req.user } },
+          ],
+        },
+      ],
     }).select("-password");
 
     return res.status(200).json(data);
@@ -540,12 +556,16 @@ const blockUser = async (req, res) => {
 
     if (us.blocked.includes(personToBlock)) {
       us.blocked.pull(personToBlock);
+      person.blockedBy.pull(personToBlock);
       await us.save();
+      await person.save();
       return res.json({ message: "Unblocked successfully!" }).status(200);
     }
 
     us.blocked.push(personToBlock);
+    person.blockedBy.push(personToBlock);
     await us.save();
+    await person.save();
 
     return res.json({ message: "Blocked successfully!" }).status(200);
   } catch (err) {

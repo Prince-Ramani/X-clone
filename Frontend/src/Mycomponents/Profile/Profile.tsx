@@ -54,7 +54,11 @@ const Profile = () => {
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
-      return data;
+
+      if ("error" in data) {
+        toast.error(data.error);
+        setTimeout(() => navigate(-1), 10000);
+      } else return data;
     },
     enabled: !!personUsername,
     refetchOnWindowFocus: false,
@@ -67,9 +71,13 @@ const Profile = () => {
         `/api/getfollowersnumbers?username=${personUsername}`
       );
       const data = await res.json();
-      if ("error" in data) toast.error(data.error);
+      if ("error" in data) {
+        toast.error(data.error);
+        return null;
+      }
       return data;
     },
+    enabled: !!personUsername && profile && !("error" in profile),
 
     refetchOnWindowFocus: false,
   });
@@ -81,7 +89,7 @@ const Profile = () => {
       const data = await res.json();
       return data;
     },
-    enabled: !!personUsername,
+    enabled: !!personUsername && profile && !("error" in profile),
     refetchOnWindowFocus: false,
   });
 
