@@ -70,6 +70,11 @@ const userSchema = new mongoose.Schema(
         default: [],
       },
     ],
+    accountType: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
+    },
   },
   {
     timestamps: true,

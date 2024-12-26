@@ -212,7 +212,7 @@ const getPosts = async (req, res) => {
       .limit(limit)
       .populate({
         path: "uploadedBy",
-        select: "-password",
+        select: "username profilePic accountType",
       })
       .lean();
 

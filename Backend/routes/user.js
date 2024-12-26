@@ -21,6 +21,7 @@ const {
   getBookmarks,
   blockUser,
   getBlockedPerson,
+  setPrivate,
 } = require("../controllers/userControllers");
 const { upload } = require("../Cloudinary/cloudinary");
 const router = express.Router();
@@ -60,5 +61,6 @@ router.post("/add/bookmark/:postID", protectRoute, addToBookmarks);
 router.get("/getbookmarks", protectRoute, getBookmarks);
 router.get("/totalblocks", protectRoute, getBlockedPerson);
 router.post("/blockuser/:personID", protectRoute, blockUser);
+router.patch("/setprivate", protectRoute, setPrivate);
 
 module.exports = router;

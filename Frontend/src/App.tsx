@@ -120,6 +120,10 @@ function App() {
             path="settings/blocked"
             element={isLoggedIn ? <BlockPage /> : <Navigate to="/sign-up" />}
           />
+          <Route
+            path="settings/account"
+            element={isLoggedIn ? <YourAccount /> : <Navigate to="/sign-up" />}
+          />
         </Route>
         <Route path="*" element={isLoggedIn ? <NotFoundPage /> : ""} />
       </Routes>

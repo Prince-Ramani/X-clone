@@ -160,7 +160,6 @@ const ShowPost = () => {
       const data = await res.json();
       if ("error" in data) return toast.error(data.error);
 
-
       return data;
     },
     enabled: hasAnswered && post?.type === "poll",

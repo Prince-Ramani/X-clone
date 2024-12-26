@@ -21,7 +21,11 @@ const Settings = () => {
       <Bar title="Settings" hideSettings={true} />
       <div className=" flex flex-col  mt-4">
         {settingArr.map((setting) => (
-          <SettingDisplayer title={setting.title} href={setting.href} />
+          <SettingDisplayer
+            key={setting.href}
+            title={setting.title}
+            href={setting.href}
+          />
         ))}
       </div>
     </div>

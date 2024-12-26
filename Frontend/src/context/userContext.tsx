@@ -11,6 +11,9 @@ export interface User {
   following: string[];
   links: string[];
   location?: string;
+  blocked: string[];
+  blockedBy: string[];
+  accountType: "public" | "private";
 }
 
 interface UserContextType {

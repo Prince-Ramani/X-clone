@@ -12,10 +12,11 @@ const SettingDisplayer = memo(({ title, href }: SettingDisplayerProps) => {
   const location = useLocation();
   const [currentlyOn, setCurrentlyOn] = useState<string | undefined>(undefined);
 
-
   useEffect(() => {
     if (!location.pathname.split("/")[2]) return setCurrentlyOn("account");
-    setCurrentlyOn(location.pathname.split("/")[1]);
+    setCurrentlyOn(
+      location.pathname.split("/")[1] + "/" + location.pathname.split("/")[2]
+    );
   }, [location, navigate]);
 
   return (
@@ -27,7 +28,7 @@ const SettingDisplayer = memo(({ title, href }: SettingDisplayerProps) => {
     >
       <div className="flex">
         <div
-          className={`border rounded-full border-blue-500 h-12 ${
+          className={`border rounded-full border-blue-500 h-12  ${
             currentlyOn === href ? "visible" : "invisible"
           }`}
         ></div>

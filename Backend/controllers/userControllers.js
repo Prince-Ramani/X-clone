@@ -622,6 +622,21 @@ const getBlockedPerson = async (req, res) => {
   }
 };
 
+const setPrivate = async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+
+    if (user.accountType === "public") user.accountType = "private";
+    else if (user.accountType === "private") user.accountType = "public";
+
+    await user.save();
+    return res.json({ message: "Success" }).status(200);
+  } catch (err) {
+    console.log(err);
+    return res.json({ error: "Internal sever error!" }).status(500);
+  }
+};
+
 module.exports = {
   getProfile,
   followPerson,
@@ -643,4 +658,5 @@ module.exports = {
   getBookmarks,
   blockUser,
   getBlockedPerson,
+  setPrivate,
 };

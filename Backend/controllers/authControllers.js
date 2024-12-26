@@ -25,8 +25,7 @@ const createAccount = async (req, res) => {
     const valid = validateEmail(email);
     if (!valid) {
       return res.json({
-        error:
-          "Invalid email formate!",
+        error: "Invalid email formate!",
       });
     }
 
@@ -66,6 +65,7 @@ const createAccount = async (req, res) => {
       links: newUser.links,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: "All fields required" });
   }
 };
@@ -82,8 +82,7 @@ const loginAccount = async (req, res) => {
     const validEmail = validateEmail(email);
     if (!validEmail) {
       return res.json({
-        error:
-          "Invalid email formate!",
+        error: "Invalid email formate!",
       });
     }
 
@@ -132,7 +131,7 @@ const getMe = async (req, res) => {
       return res.status(400).json({ message: "You are not loggedin" });
     }
     return res.status(200).json({
-      _id : myself._id,
+      _id: myself._id,
       username: myself.username,
       email: myself.email,
       followers: myself.followers,
@@ -141,6 +140,9 @@ const getMe = async (req, res) => {
       banner: myself.banner,
       bio: myself.bio,
       links: myself.links,
+      accountType: myself.accountType,
+      blocked: myself.blocked,
+      blockedBy: myself.blockedBy,
     });
   } catch (err) {
     return res
