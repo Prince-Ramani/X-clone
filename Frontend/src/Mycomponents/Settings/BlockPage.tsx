@@ -15,7 +15,7 @@ const BlockPage = () => {
       const res = await fetch("/api/totalblocks");
       const data = await res.json();
       if ("error" in data) return toast.error(data.error);
-      console.log(data);
+     
       return data;
     },
   });

@@ -33,14 +33,12 @@ const userSchema = new mongoose.Schema(
     profilePic: {
       type: String,
       required: false,
-      default:
-        "https://res.cloudinary.com/dwxzguawt/image/upload/v1727403075/defaultXprofile_siuopn.jpg",
+      default: process.env.defaultProfilePic,
     },
     banner: {
       type: String,
       required: false,
-      default:
-        "https://res.cloudinary.com/dwxzguawt/image/upload/v1732515390/jeremy-thomas-4dpAqfTbvKA-unsplash_xwdeqn.jpg",
+      default: process.env.defaultBanner,
     },
     bio: {
       type: String,
@@ -62,12 +60,14 @@ const userSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
     blockedBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        default: [],
       },
     ],
   },

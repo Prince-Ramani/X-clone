@@ -54,10 +54,11 @@ const Profile = () => {
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
-
+    
       if ("error" in data) {
         toast.error(data.error);
-        setTimeout(() => navigate(-1), 10000);
+        setTimeout(() => navigate(-1), 1000);
+        return null;
       } else return data;
     },
     enabled: !!personUsername,
@@ -67,29 +68,33 @@ const Profile = () => {
   const { data: followers } = useQuery({
     queryKey: [personUsername, "followers"],
     queryFn: async () => {
+      if ("error" in profile || "isBlocked" in profile) return null;
       const res = await fetch(
         `/api/getfollowersnumbers?username=${personUsername}`
       );
       const data = await res.json();
+
       if ("error" in data) {
         toast.error(data.error);
         return null;
       }
       return data;
     },
-    enabled: !!personUsername && profile && !("error" in profile),
-
+    enabled: !!profile,
     refetchOnWindowFocus: false,
   });
 
   const { data: totalPosts } = useQuery({
     queryKey: [personUsername, "PostsCount"],
+
     queryFn: async () => {
+      if ("error" in profile || "isBlocked" in profile) return null;
+
       const res = await fetch(`/api/post/getpostscount`);
       const data = await res.json();
       return data;
     },
-    enabled: !!personUsername && profile && !("error" in profile),
+    enabled: !!profile,
     refetchOnWindowFocus: false,
   });
 
@@ -126,7 +131,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="h-40  md:h-44 w-full   ">
+      <div className="h-40  md:h-44 lg:h-56 w-full   ">
         {isPending || isFetching || isLoading ? (
           <div className="h-full w-full bg-white/10 animate-pulse duration-600 " />
         ) : (
@@ -156,41 +161,51 @@ const Profile = () => {
           </a>
         )}
       </div>
-      <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
-        <CustomTooltip title="More">
-          <Popover>
-            <PopoverTrigger>
-              <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center ">
-                <MoreHorizontal className="size-5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="  bg-black text-white p-0 border-none shadow-md  shadow-red-600/80  ring-1 ring-red-500/80  ">
-              <div
-                className=" h-full w-full p-2 py-3 hover:bg-white/10 active:bg-red-600/20 transition-colors cursor-pointer select-none font-semibold tracking-wide"
-                onClick={() => Block()}
-              >
-                Block
-              </div>
-            </PopoverContent>
-          </Popover>
-        </CustomTooltip>
-        <CustomTooltip title="Search">
-          <button className="size-8 border  border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">
-            <Search className="size-4 m-1 " />
-          </button>
-        </CustomTooltip>
 
-        {authUser._id === profile?._id ? (
-          <button
-            className="bg-transparent border rounded-full w-24 border-gray-200/90 hover:bg-white/10 h-8 text-sm font-bold"
-            onClick={() => setIsEditProfileDialog(true)}
-          >
-            Edit profile
-          </button>
-        ) : (
-          <FollowButton personId={profile?._id} username={personUsername} />
-        )}
-      </div>
+      {profile && !("error" in profile) && !("isBlocked" in profile) ? (
+        <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
+          <CustomTooltip title="More">
+            <Popover>
+              <PopoverTrigger>
+                <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center ">
+                  <MoreHorizontal className="size-5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="  bg-black text-white p-0 border-none shadow-md  shadow-red-600/80  ring-1 ring-red-500/80  ">
+                <div
+                  className=" h-full w-full p-2 py-3 hover:bg-white/10 active:bg-red-600/20 transition-colors cursor-pointer select-none font-semibold tracking-wide"
+                  onClick={() => Block()}
+                >
+                  Block
+                </div>
+              </PopoverContent>
+            </Popover>
+          </CustomTooltip>
+          <CustomTooltip title="Search">
+            <button className="size-8 border  border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">
+              <Search className="size-4 m-1 " />
+            </button>
+          </CustomTooltip>
+
+          {authUser._id === profile?._id ? (
+            <button
+              className="bg-transparent border rounded-full w-24 border-gray-200/90 hover:bg-white/10 h-8 text-sm font-bold"
+              onClick={() => setIsEditProfileDialog(true)}
+            >
+              Edit profile
+            </button>
+          ) : (
+            ""
+          )}
+          {profile && profile !== null ? (
+            <FollowButton personId={profile?._id} username={personUsername} />
+          ) : (
+            ""
+          )}
+        </div>
+      ) : (
+        ""
+      )}
 
       {isFetching || isLoading || isPending ? (
         <div className="bg-white/5 animate-pulse duration-600 size-28 relative bottom-20 rounded-md w-2/3 m-2 mx-5"></div>
@@ -207,21 +222,25 @@ const Profile = () => {
               <MapPin className="size-4" />
               {profile?.location || "unknown"}
               <LucideCalendarRange className="size-4" /> Joined{" "}
-              {profile ? format(profile?.createdAt, "MMMM yyyy") : ""}
+              {profile && profile.createdAt
+                ? format(profile?.createdAt, "MMMM yyyy")
+                : ""}
             </div>
             <div className=" px-1 mt-2 flex  gap-4 text-sm ">
               <div
                 className="flex gap-1 hover:border-b"
                 onClick={() => navigate(`/profile/${personUsername}/following`)}
               >
-                <span className="font-bold">{profile?.following.length}</span>
+                <span className="font-bold">
+                  {profile?.following.length || 0}
+                </span>
                 <span className="text-gray-400/70">Following</span>
               </div>
               <div
                 className="flex gap-1 hover:border-b"
                 onClick={() => navigate(`/profile/${personUsername}/followers`)}
               >
-                <span className="font-bold">{followers?.length}</span>
+                <span className="font-bold">{followers?.length || 0}</span>
                 <span className="text-gray-400/70">Followers</span>
               </div>
             </div>
@@ -271,7 +290,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {currentPath === "likedposts" && profile ? (
+      {currentPath === "likedposts" && profile && !("isBlocked" in profile) ? (
         <LikedPosts
           isAuthenticated={!!profile._id}
           authUserId={authUser._id}
@@ -280,7 +299,7 @@ const Profile = () => {
       ) : (
         ""
       )}
-      {currentPath === "media" && profile ? (
+      {currentPath === "media" && profile && !("isBlocked" in profile) ? (
         <Media
           isAuthenticated={!!profile._id}
           authUserId={authUser._id}
@@ -290,7 +309,7 @@ const Profile = () => {
         ""
       )}
 
-      {!currentPath && profile ? (
+      {!currentPath && profile && !("isBlocked" in profile) ? (
         <ProfilePost
           isAuthenticated={!!profile._id}
           authUserId={authUser._id}

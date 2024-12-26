@@ -113,7 +113,7 @@ const PostDisplayer = memo(
         const data = await res.json();
         if ("error" in data) return toast.error(data.error);
 
-        console.log(data);
+       
 
         return data;
       },

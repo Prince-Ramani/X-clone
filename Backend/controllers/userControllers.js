@@ -16,23 +16,33 @@ const validateEmail = (email) => {
 const getProfile = async (req, res) => {
   try {
     const { username: UserName } = req.params;
-    const user = await User.findById(req.user).select("blocked blockedBy");
     const profile = await User.findOne({
-      $and: [
-        { username: UserName },
-        {
-          _id: { $nin: user.blocked },
-        },
-        { _id: { $nin: user.blockedBy } },
-      ],
+      username: UserName,
     }).select("-password");
-    if (!profile) {
-      return res
-        .status(404)
-        .json({ error: "Account with this username doesn't exists!" });
+
+    if (!profile)
+      return res.json({ error: "Account with this username doesn't exists" });
+
+    if (
+      profile.blocked.includes(req.user) ||
+      profile.blockedBy.includes(req.user)
+    ) {
+      return res.status(200).json({
+        username: "X user",
+        location: "",
+        profilePic: process.env.defaultProfilePic,
+        banner: process.env.defaultBanner,
+        followers: [],
+        following: [],
+        bio: "",
+        createdAt: Date.now(),
+        isBlocked: true,
+      });
     }
+
     return res.status(200).json(profile);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -148,10 +158,7 @@ const updateProfile = async (req, res) => {
 
     if (banner && banner[0].path) {
       try {
-        if (
-          user.banner !==
-          "https://res.cloudinary.com/dwxzguawt/image/upload/v1732515390/jeremy-thomas-4dpAqfTbvKA-unsplash_xwdeqn.jpg"
-        ) {
+        if (user.banner !== process.env.defaultBanner) {
           const imgID = user.banner.split("/").slice(-1)[0].split(".")[0];
           const foldername = "X-clone/Banners";
           const picID = `${foldername}/${imgID}`;
@@ -176,10 +183,7 @@ const updateProfile = async (req, res) => {
 
     if (profilePic && profilePic[0].path) {
       try {
-        if (
-          user.profilePic !==
-          "https://res.cloudinary.com/dwxzguawt/image/upload/v1727403075/defaultXprofile_siuopn.jpg"
-        ) {
+        if (user.profilePic !== process.env.defaultProfilePic) {
           const imgID = user.profilePic.split("/").slice(-1)[0].split(".")[0];
           const foldername = "X-clone/Profile_pics";
           const picID = `${foldername}/${imgID}`;
@@ -305,10 +309,22 @@ const suggestUser = async (req, res) => {
     const user = await User.findById(req.user);
     const limit = parseInt(req.query.limit) || 3;
 
+    const excludedIds = [
+      user._id,
+      ...(user.following || []),
+      ...(user.blocked || []),
+      ...(user.blockedBy || []),
+    ];
+
     const suggest = await User.aggregate([
-      { $match: { _id: { $ne: user._id, $nin: user.following } } },
+      {
+        $match: {
+          _id: { $nin: excludedIds },
+        },
+      },
       { $sample: { size: limit } },
     ]);
+
     return res.status(200).json(suggest);
   } catch (err) {
     console.log(err);
@@ -339,14 +355,20 @@ const getFollowersListByUsername = async (req, res) => {
   try {
     const { username } = req.query;
 
-    const user = await User.findOne({ username }).select("followers").populate({
-      path: "followers",
-      select: "-password",
-    });
+    const user = await User.findOne({ username })
+      .select("followers blocked blockedBy")
+      .populate({
+        path: "followers",
+        select: "-password",
+      });
+
     if (!user) {
       return res.status(404).json({ error: "No such account exists!" });
     }
 
+    if (user.blocked.includes(req.user) || user.blockedBy.includes(req.user)) {
+      return res.status(200).json([]);
+    }
     return res.status(200).json(user.followers);
   } catch (err) {
     console.log(err);
@@ -358,12 +380,19 @@ const getFollowingListByUsername = async (req, res) => {
   try {
     const { username } = req.query;
 
-    const user = await User.findOne({ username }).select("following").populate({
-      path: "following",
-      select: "-password",
-    });
+    const user = await User.findOne({ username })
+      .select("following blocked blockedBy")
+      .populate({
+        path: "following",
+        select: "-password",
+      });
+
     if (!user) {
       return res.status(404).json({ error: "No such account exists!" });
+    }
+
+    if (user.blocked.includes(req.user) || user.blockedBy.includes(req.user)) {
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(user.following);
@@ -543,11 +572,10 @@ const getBookmarks = async (req, res) => {
 const blockUser = async (req, res) => {
   try {
     const pers = req.params.personID;
+
+    if (!pers) return res.json({ error: "Person id required!" }).status(400);
+
     const personToBlock = pers.toString();
-
-    if (!personToBlock)
-      return res.json({ error: "Person id required!" }).status(400);
-
     const person = await User.findById(personToBlock);
 
     if (!person) return res.json({ error: "No such user exists!" }).status(400);
@@ -556,14 +584,18 @@ const blockUser = async (req, res) => {
 
     if (us.blocked.includes(personToBlock)) {
       us.blocked.pull(personToBlock);
-      person.blockedBy.pull(personToBlock);
+      person.blockedBy.pull(req.user);
       await us.save();
       await person.save();
       return res.json({ message: "Unblocked successfully!" }).status(200);
     }
 
     us.blocked.push(personToBlock);
-    person.blockedBy.push(personToBlock);
+    us.following.pull(personToBlock);
+    us.followers.pull(personToBlock);
+    person.blockedBy.push(req.user);
+    person.followers.pull(req.user);
+    person.following.pull(req.user);
     await us.save();
     await person.save();
 
