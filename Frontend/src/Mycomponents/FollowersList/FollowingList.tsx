@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ListItem from "./ListItem";
 import { UploadedByType } from "../Home/ForYou";
 import { useAuthUser } from "@/context/userContext";
+import PrivateAccount from "./PrivateAccount";
 
 const FollowingList = () => {
   const { username } = useParams();
@@ -25,13 +26,14 @@ const FollowingList = () => {
   });
 
   const { data: followers } = useQuery({
-    queryKey: [username, "Followers"],
+    queryKey: [username, "Following"],
     queryFn: async () => {
       const res = await fetch(
         `/api/getfollowingbyusername?username=${username}`
       );
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
+      console.log(data);
       return data;
     },
     enabled: !!username && !!userExists,
@@ -81,21 +83,27 @@ const FollowingList = () => {
         </div>
       </div>
 
-      <div className="flex flex-col ">
-        {followers?.length ? (
-          followers.map((follower: UploadedByType) => (
-            <ListItem
-              key={follower._id}
-              follower={follower}
-              isUserAlreadyFollowing={follower.followers.includes(
-                authUser?._id
-              )}
-              isUserHimself={follower._id === authUser?._id}
-            />
-          ))
+      <div className="flex flex-col  ">
+        {followers?.length > 0 && !("message" in followers)
+          ? followers.map((follower: UploadedByType) => (
+              <ListItem
+                key={follower._id}
+                follower={follower}
+                isUserAlreadyFollowing={follower.followers.includes(
+                  authUser?._id
+                )}
+                isUserHimself={follower._id === authUser?._id}
+              />
+            ))
+          : ""}
+
+        {followers?.length === 0 && !("message" in followers) ? (
+          <div className="text-center text-gray-400">Not following anyone.</div>
         ) : (
-          <div className="text-center text-gray-400">No followers yet.</div>
+          ""
         )}
+
+        {followers && "message" in followers ? <PrivateAccount /> : ""}
       </div>
     </div>
   );

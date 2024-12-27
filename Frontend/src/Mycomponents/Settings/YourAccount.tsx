@@ -72,8 +72,8 @@ const YourAccount = memo(() => {
                     </div>
                     <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
                       {isPrivate
-                        ? "Are you sure you want to make your account PUBLIC?! Your posts will be visible to everyone!"
-                        : "Are you sure you want to make your account PRIVATE?! Your posts will only be visible to people who follows you!"}
+                        ? "Are you sure you want to make your account PUBLIC?! Your posts and followers, following will be visible to everyone!"
+                        : "Are you sure you want to make your account PRIVATE?! Your posts will be visible to everyone but no one can see your followers, following except people who follows you!"}
                     </div>
                     <div>
                       <div className="flex flex-col gap-2 mt-7">

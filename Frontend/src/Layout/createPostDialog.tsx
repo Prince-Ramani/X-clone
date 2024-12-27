@@ -72,6 +72,9 @@ const CreatePostDialog = () => {
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Media"],
         });
+        queryClient.invalidateQueries({
+          queryKey: [authUser?.username, "PostsCount"],
+        });
         return toast.success("Post created successfully!");
       }
     },

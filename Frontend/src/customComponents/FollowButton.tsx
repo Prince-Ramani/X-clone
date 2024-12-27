@@ -88,8 +88,8 @@ const FollowButton = memo(
                       <div className="">@{username}?</div>
                     </div>
                     <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      Their posts will no longer show up in your For You
-                      timeline. You can still view their profile, unless their
+                      Their posts will no longer show up in your Following
+                      section. You can still view their profile, unless their
                       posts are protected.
                     </div>
                     <div>

@@ -1,5 +1,5 @@
 import CustomTooltip from "@/customComponents/ToolTip";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
 
 const Profile = () => {
   const navigate = useNavigate();
+  const queryclient = useQueryClient();
   const { setIsEditProfileDialog } = useEditProfileContext();
 
   const [currentPath, setCurrentPath] = useState<string | null | undefined>(
@@ -54,7 +55,7 @@ const Profile = () => {
     queryFn: async () => {
       const res = await fetch(`/api/profile/${personUsername}`);
       const data = await res.json();
-    
+
       if ("error" in data) {
         toast.error(data.error);
         setTimeout(() => navigate(-1), 1000);
@@ -92,6 +93,7 @@ const Profile = () => {
 
       const res = await fetch(`/api/post/getpostscount`);
       const data = await res.json();
+
       return data;
     },
     enabled: !!profile,
@@ -100,6 +102,8 @@ const Profile = () => {
 
   const { mutate: Block } = useMutation({
     mutationFn: async () => {
+      if (authUser._id === profile._id)
+        return toast.error("You can't block yourself!");
       const res = await fetch(`/api/blockuser/${profile?._id}`, {
         method: "POST",
       });
@@ -107,6 +111,7 @@ const Profile = () => {
       if ("error" in data) return toast.error(data.error);
 
       toast.success(data.message);
+      queryclient.invalidateQueries({ queryKey: [personUsername, "Profile"] });
 
       return data;
     },
@@ -226,7 +231,7 @@ const Profile = () => {
                 ? format(profile?.createdAt, "MMMM yyyy")
                 : ""}
             </div>
-            <div className=" px-1 mt-2 flex  gap-4 text-sm ">
+            <div className=" px-1 mt-2 flex  gap-4 text-sm">
               <div
                 className="flex gap-1 hover:border-b"
                 onClick={() => navigate(`/profile/${personUsername}/following`)}

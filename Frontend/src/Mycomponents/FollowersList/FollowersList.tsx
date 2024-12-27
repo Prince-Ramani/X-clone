@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ListItem from "./ListItem";
 import { UploadedByType } from "../Home/ForYou";
 import { useAuthUser } from "@/context/userContext";
+import PrivateAccount from "./PrivateAccount";
 
 const FollowersList = () => {
   const { username } = useParams();
@@ -31,6 +32,7 @@ const FollowersList = () => {
         `/api/getfollowersbyusername?username=${username}`
       );
       const data = await res.json();
+      console.log(data);
 
       if ("error" in data) toast.error(data.error);
       return data;
@@ -83,21 +85,27 @@ const FollowersList = () => {
       </div>
 
       <div className="flex flex-col ">
-        {followers?.length ? (
-          followers.map((follower: UploadedByType) => (
-            <ListItem
-              key={follower._id}
-              follower={follower}
-              isUserAlreadyFollowing={follower.followers.includes(
-                authUser?._id
-              )}
-              isUserHimself={follower._id === authUser?._id}
-            />
-          ))
-        ) : (
-          <div className="text-center text-gray-400">No followers yet.</div>
-        )}
+        {followers?.length > 0 && !("message" in followers)
+          ? followers.map((follower: UploadedByType) => (
+              <ListItem
+                key={follower._id}
+                follower={follower}
+                isUserAlreadyFollowing={follower.followers.includes(
+                  authUser?._id
+                )}
+                isUserHimself={follower._id === authUser?._id}
+              />
+            ))
+          : ""}
       </div>
+
+      {followers?.length === 0 && !("message" in followers) ? (
+        <div className="text-center text-gray-400">No followers yet.</div>
+      ) : (
+        ""
+      )}
+
+      {followers && "message" in followers ? <PrivateAccount /> : ""}
     </div>
   );
 };

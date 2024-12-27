@@ -33,7 +33,9 @@ const ProfilePost = memo(
         const res = await fetch(
           `/api/post/profile/${profileId}?limit=30&offset=${offset.current}`
         );
+
         const data: [] = await res.json();
+        console.log(data);
 
         if (data.length < 30) setHasMore(false);
 

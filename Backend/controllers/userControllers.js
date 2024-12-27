@@ -356,10 +356,10 @@ const getFollowersListByUsername = async (req, res) => {
     const { username } = req.query;
 
     const user = await User.findOne({ username })
-      .select("followers blocked blockedBy")
+      .select("following followers blocked blockedBy accountType _id")
       .populate({
         path: "followers",
-        select: "-password",
+        select: "_id profilePic bio username followers following",
       });
 
     if (!user) {
@@ -369,6 +369,17 @@ const getFollowersListByUsername = async (req, res) => {
     if (user.blocked.includes(req.user) || user.blockedBy.includes(req.user)) {
       return res.status(200).json([]);
     }
+
+    const isFollowing = user.followers.filter(
+      (u) => u._id.toString() === req.user
+    );
+
+    if (
+      user.accountType === "private" &&
+      isFollowing.length === 0 &&
+      req.user !== user._id.toString()
+    )
+      return res.json({ message: "Account is private!" });
     return res.status(200).json(user.followers);
   } catch (err) {
     console.log(err);
@@ -381,10 +392,10 @@ const getFollowingListByUsername = async (req, res) => {
     const { username } = req.query;
 
     const user = await User.findOne({ username })
-      .select("following blocked blockedBy")
+      .select("following followers blocked blockedBy accountType _id")
       .populate({
         path: "following",
-        select: "-password",
+        select: "_id profilePic bio username followers following",
       });
 
     if (!user) {
@@ -394,6 +405,13 @@ const getFollowingListByUsername = async (req, res) => {
     if (user.blocked.includes(req.user) || user.blockedBy.includes(req.user)) {
       return res.status(200).json([]);
     }
+
+    if (
+      user.accountType === "private" &&
+      !user.followers.includes(req.user) &&
+      req.user !== user._id.toString()
+    )
+      return res.json({ message: "Account is private!" }).status(200);
 
     return res.status(200).json(user.following);
   } catch (err) {
@@ -576,6 +594,10 @@ const blockUser = async (req, res) => {
     if (!pers) return res.json({ error: "Person id required!" }).status(400);
 
     const personToBlock = pers.toString();
+
+    if (personToBlock === req.user)
+      return res.json({ error: "You can't block yourself!" }).status(400);
+
     const person = await User.findById(personToBlock);
 
     if (!person) return res.json({ error: "No such user exists!" }).status(400);

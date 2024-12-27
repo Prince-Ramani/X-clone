@@ -4,6 +4,7 @@ const Notification = require("../models/notification");
 const { unlink } = require("fs").promises;
 const { v2: cloudinary } = require("cloudinary");
 const { error } = require("console");
+const { default: mongoose } = require("mongoose");
 
 const createPost = async (req, res) => {
   try {
@@ -230,12 +231,17 @@ const getPosts = async (req, res) => {
 
 const getPostsCount = async (req, res) => {
   try {
-    const posts = await Post.countDocuments({ uploadedBy: { _id: req.user } });
+    const userID = new mongoose.Types.ObjectId(req.user);
+
+    const posts = await Post.countDocuments({
+      uploadedBy: userID,
+    });
+
     if (!posts) return res.json(0).status(200);
     return res.json(posts).status(200);
   } catch (err) {
     console.log(err);
-    return res.json({ error: "Internal sever error!" }.status(500));
+    return res.json({ error: "Internal sever error!" }).status(500);
   }
 };
 
