@@ -34,5 +34,5 @@ export interface NotificationsType {
     postContent: string;
     _id: string;
   };
-  topic: "like" | "follow";
+  topic: "like" | "follow" | "followRequest";
 }

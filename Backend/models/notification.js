@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema(
     },
     topic: {
       type: String,
-      enum: ["like", "follow"],
+      enum: ["like", "follow", "followRequest"],
       default: "like",
     },
     read: {

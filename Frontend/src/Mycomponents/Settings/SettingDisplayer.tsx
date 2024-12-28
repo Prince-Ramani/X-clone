@@ -13,7 +13,7 @@ const SettingDisplayer = memo(({ title, href }: SettingDisplayerProps) => {
   const [currentlyOn, setCurrentlyOn] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!location.pathname.split("/")[2]) return setCurrentlyOn("account");
+  if (!location.pathname.split("/")[2]) return setCurrentlyOn("account");
     setCurrentlyOn(
       location.pathname.split("/")[1] + "/" + location.pathname.split("/")[2]
     );

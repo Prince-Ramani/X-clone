@@ -62,8 +62,50 @@ const followPerson = async (req, res) => {
         .status(400)
         .json({ error: "You can't follow or unfollow youself" });
     }
-    const following = await me.following.includes(userToFollow.id);
-    if (!following) {
+    const following = me.following.includes(userToFollow.id);
+
+    const followRequestSent = await Notification.find({
+      to: userToFollow.id,
+      from: me.id,
+      topic: "followRequest",
+    });
+
+    if (
+      userToFollow.accountType === "private" &&
+      !following &&
+      followRequestSent.length === 0
+    ) {
+      const followRes = new Notification({
+        to: userToFollow.id,
+        from: me.id,
+        topic: "followRequest",
+        read: false,
+      });
+
+      await User.findByIdAndUpdate(userToFollow.id, {
+        $push: { pendingRequest: me.id },
+      });
+
+      await followRes.save();
+
+      return res.status(200).json({ message: "Follow request sent!" });
+    } else if (
+      userToFollow.accountType === "private" &&
+      !following &&
+      followRequestSent.length !== 0
+    ) {
+      await Notification.findOneAndDelete({
+        to: userToFollow.id,
+        from: me.id,
+        topic: "followRequest",
+      });
+
+      await User.findByIdAndUpdate(userToFollow.id, {
+        $pull: { pendingRequest: me.id },
+      });
+
+      return res.status(200).json({ message: "Follow request cancelled!" });
+    } else if (!following && userToFollow.accountType === "public") {
       //Follow
       await User.findByIdAndUpdate(me.id, {
         $push: { following: userToFollow.id },
@@ -121,6 +163,38 @@ const getUserNotifications = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const AcceptRequest = async (req, res) => {
+  try {
+    const NotificationID = req.query.persontofollow;
+
+    if (!NotificationID)
+      return res.json({ error: "Profile id required!" }).status(400);
+
+    const noti = await Notification.findById(NotificationID);
+
+    if (!noti || noti.to.toString() !== req.user)
+      return res.json({ error: "Unauthorized!" }).status(400);
+
+    await User.findByIdAndUpdate(noti.from, {
+      $push: { following: noti.to },
+    });
+    await User.findByIdAndUpdate(noti.to, {
+      $push: { followers: noti.from },
+      $pull: { pendingRequest: noti.from },
+    });
+
+    noti.topic = "follow";
+    await noti.save();
+
+    return res.json({ message: "Follow request accepted!" }).status(200);
+
+    return res.status(200).json({ message: "followed successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.json({ error: "Internal sever error" }).status(500);
   }
 };
 
@@ -681,4 +755,5 @@ module.exports = {
   blockUser,
   getBlockedPerson,
   setPrivate,
+  AcceptRequest,
 };

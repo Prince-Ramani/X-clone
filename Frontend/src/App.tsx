@@ -38,6 +38,7 @@ function App() {
         return data;
       }
       setAuthUser(data);
+      console.log(data);
 
       return data;
     },

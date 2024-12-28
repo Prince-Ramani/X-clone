@@ -97,6 +97,10 @@ const NotificationDisplayer = ({
             </p>
           </div>
         ) : (
+          ""
+        )}
+
+        {notification.topic === "follow" ? (
           <div className=" w-full flex items-center justify-between">
             <div className="text-xs sm:text-sm">
               <span
@@ -127,6 +131,8 @@ const NotificationDisplayer = ({
               </span>
             </button>
           </div>
+        ) : (
+          ""
         )}
       </div>
     </div>

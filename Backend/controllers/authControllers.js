@@ -143,6 +143,7 @@ const getMe = async (req, res) => {
       accountType: myself.accountType,
       blocked: myself.blocked,
       blockedBy: myself.blockedBy,
+      pendingRequest: myself.pendingRequest,
     });
   } catch (err) {
     return res

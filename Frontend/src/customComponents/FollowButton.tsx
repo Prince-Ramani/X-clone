@@ -21,6 +21,7 @@ const FollowButton = memo(
 
     const isHimself = authUser?._id === personId;
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
+    const [requestSent, setRequestSent] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const {} = useQuery({
@@ -31,6 +32,7 @@ const FollowButton = memo(
         );
         const data = await res.json();
         if ("error" in data) toast.error(data.error);
+
         setIsFollowing(data.includes(authUser?._id));
         return data;
       },
@@ -50,6 +52,10 @@ const FollowButton = memo(
       },
       onSuccess: (data) => {
         if ("error" in data) return;
+        if ("message" in data && data.message === "Follow request sent!")
+          setRequestSent(true);
+        if ("message" in data && data.message === "Follow request cancelled!!")
+          setRequestSent(true);
 
         queryClient.invalidateQueries({
           queryKey: [username, "followers"],
@@ -128,31 +134,54 @@ const FollowButton = memo(
         )}
 
         <button
-          className={`font-bold relative flex justify-center items-center z-10 group ${
+          className={`font-bold relative flex justify-center  items-center bg-white text-black z-10 group ${
             isHimself ? "hidden" : "flex"
-          }  ${
-            isFollowing
+          }  
+            
+          ${
+            isFollowing && !requestSent
               ? "bg-transparent  border w-24    xl:text-base text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
-              : "bg-white text-black"
-          } text-black w-16 sm:w-20     xl:w-24 h-8 ${className}    rounded-full`}
+              : "bg-blue-400"
+          } text-black w-16 sm:w-20      xl:w-24 h-8 ${className}    rounded-full`}
           disabled={pendingFollow}
           onClick={() => handleClick()}
         >
-          <span
-            className={`absolute opacity-100 group-hover:opacity-0 ${
-              isFollowing ? " text-xs md:text-sm" : ""
-            }`}
-          >
-            {isFollowing ? "Following" : "Follow"}
-          </span>
-          <span
-            className={`absolute opacity-0   group-hover:opacity-100  ${
-              isFollowing ? " text-base" : ""
-            }
+          {!requestSent ? (
+            <>
+              <span
+                className={`absolute opacity-100 group-hover:opacity-0 ${
+                  isFollowing ? " text-xs md:text-sm" : ""
+                }`}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </span>
+              <span
+                className={`absolute opacity-0   group-hover:opacity-100  ${
+                  isFollowing ? " text-base" : ""
+                }
               `}
-          >
-            {isFollowing ? "Unfollow" : "Follow"}
-          </span>
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </span>
+            </>
+          ) : (
+            ""
+          )}
+
+          {requestSent ? (
+            <>
+              <span
+                className={`absolute opacity-100 group-hover:opacity-0   text-xs md:text-sm `}
+              >
+                {isFollowing ? "Requested!" : "Follow"}
+              </span>
+              <span className={`absolute opacity-0   group-hover:opacity-100 `}>
+                {isFollowing ? "Cancel" : "Follow"}
+              </span>
+            </>
+          ) : (
+            ""
+          )}
         </button>
       </>
     );

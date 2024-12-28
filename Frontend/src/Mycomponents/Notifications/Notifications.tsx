@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import NotificationDisplayer from "./NotificationDisplayer";
 import { NotificationsType } from "@/lib/Types";
+import FollowRequest from "./FollowRequest";
 
 const Notifications = () => {
   const { data: notifcationsArray } = useQuery({
@@ -24,12 +25,16 @@ const Notifications = () => {
         <div className={`border-2 border-blue-400 w-16 rounded-full `} />
       </div>
 
-      {notifcationsArray?.map((notification: NotificationsType) => (
-        <NotificationDisplayer
-          notification={notification}
-          key={notification._id}
-        />
-      ))}
+      {notifcationsArray?.map((notification: NotificationsType) =>
+        notification.topic === "followRequest" ? (
+          <FollowRequest notification={notification} />
+        ) : (
+          <NotificationDisplayer
+            notification={notification}
+            key={notification._id}
+          />
+        )
+      )}
     </div>
   );
 };

@@ -75,6 +75,10 @@ const userSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
+    pendingRequest: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

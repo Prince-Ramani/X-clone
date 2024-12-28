@@ -46,7 +46,7 @@ const FollowersList = () => {
         <CustomTooltip title="Back">
           <div
             className="h-fit w-fit p-2 hover:bg-gray-500/20 rounded-full"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(`/profile/${username}`)}
           >
             <ArrowLeft className="size-5 " />
           </div>
