@@ -529,11 +529,18 @@ const getFollowersNumber = async (req, res) => {
   try {
     const { username } = req.query;
 
-    const user = await User.findOne({ username: username });
+    const user = await User.findOne({ username: username }).select(
+      "followers accountType pendingRequest"
+    );
 
     if (!user)
       return res.status(404).json({ error: "No such account exists!" });
 
+    if (user.accountType === "private" && user.pendingRequest.length > 0) {
+      return res
+        .json([...user.followers, { pendingRequest: [...user.pendingRequest] }])
+        .status(200);
+    }
     if (user && user.followers.length === 0) return res.json([]).status(200);
 
     return res.json([...user.followers]).status(200);

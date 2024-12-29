@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
   ArrowLeft,
+  Lock,
   LucideCalendarRange,
   MapPin,
   MoreHorizontal,
@@ -22,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import Count from "./Count";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -66,32 +68,15 @@ const Profile = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { data: followers } = useQuery({
-    queryKey: [personUsername, "followers"],
-    queryFn: async () => {
-      if ("error" in profile || "isBlocked" in profile) return null;
-      const res = await fetch(
-        `/api/getfollowersnumbers?username=${personUsername}`
-      );
-      const data = await res.json();
-
-      if ("error" in data) {
-        toast.error(data.error);
-        return null;
-      }
-      return data;
-    },
-    enabled: !!profile,
-    refetchOnWindowFocus: false,
-  });
-
   const { data: totalPosts } = useQuery({
     queryKey: [personUsername, "PostsCount"],
 
     queryFn: async () => {
       if ("error" in profile || "isBlocked" in profile) return null;
 
-      const res = await fetch(`/api/post/getpostscount`);
+      const res = await fetch(
+        `/api/post/getpostscount?personID=${profile._id}`
+      );
       const data = await res.json();
 
       return data;
@@ -217,7 +202,19 @@ const Profile = () => {
       ) : (
         <>
           <div className="p-2 px-5 relative bottom-20 md:bottom-20  ">
-            <div className="font-bold text-xl "> {profile?.username}</div>
+            <div className="font-bold text-xl flex gap-2 items-center ">
+              {" "}
+              <div>{profile?.username}</div>
+              {profile?.accountType === "private" ? (
+                <CustomTooltip title="Private account">
+                  <div>
+                    <Lock className="size-5" />
+                  </div>
+                </CustomTooltip>
+              ) : (
+                ""
+              )}
+            </div>
             <div className="text-gray-400/80">@{profile?.username}</div>
           </div>
 
@@ -231,24 +228,13 @@ const Profile = () => {
                 ? format(profile?.createdAt, "MMMM yyyy")
                 : ""}
             </div>
-            <div className=" px-1 mt-2 flex  gap-4 text-sm">
-              <div
-                className="flex gap-1 hover:border-b"
-                onClick={() => navigate(`/profile/${personUsername}/following`)}
-              >
-                <span className="font-bold">
-                  {profile?.following.length || 0}
-                </span>
-                <span className="text-gray-400/70">Following</span>
-              </div>
-              <div
-                className="flex gap-1 hover:border-b"
-                onClick={() => navigate(`/profile/${personUsername}/followers`)}
-              >
-                <span className="font-bold">{followers?.length || 0}</span>
-                <span className="text-gray-400/70">Followers</span>
-              </div>
-            </div>
+            <Count
+              personUsername={personUsername}
+              followingLength={profile.following.length}
+              isBlocked={!!profile.isBlocked}
+              hasError={!!profile.error}
+              profile={!!profile}
+            />
           </div>
         </>
       )}

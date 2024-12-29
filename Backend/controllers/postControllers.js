@@ -231,14 +231,14 @@ const getPosts = async (req, res) => {
 
 const getPostsCount = async (req, res) => {
   try {
-    const userID = new mongoose.Types.ObjectId(req.user);
+    const userID = new mongoose.Types.ObjectId(req.query.personID);
 
     const posts = await Post.countDocuments({
       uploadedBy: userID,
     });
 
-    if (!posts) return res.json(0).status(200);
-    return res.json(posts).status(200);
+    if (!posts) return res.status(200).json(0);
+    return res.status(200).json(posts);
   } catch (err) {
     console.log(err);
     return res.json({ error: "Internal sever error!" }).status(500);

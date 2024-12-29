@@ -3,7 +3,7 @@ import Loading from "@/components/ui/Loading";
 import { useAuthUser } from "@/context/userContext";
 import { Dialog, DialogDescription } from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const FollowButton = memo(
@@ -15,16 +15,17 @@ const FollowButton = memo(
     className?: string;
     personId: string;
     username: string;
+    isProfilePage?: boolean;
   }) => {
     const queryClient = useQueryClient();
     const { authUser } = useAuthUser();
 
     const isHimself = authUser?._id === personId;
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
-    const [requestSent, setRequestSent] = useState<boolean>(true);
+    const [requestSent, setRequestSent] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    const {} = useQuery({
+    const { data, isPending: pendingFetch } = useQuery({
       queryKey: [username, "followers"],
       queryFn: async () => {
         const res = await fetch(
@@ -33,12 +34,24 @@ const FollowButton = memo(
         const data = await res.json();
         if ("error" in data) toast.error(data.error);
 
-        setIsFollowing(data.includes(authUser?._id));
         return data;
       },
+      staleTime: 2000,
 
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
     });
+
+    useEffect(() => {
+      if (data && authUser) {
+        setIsFollowing(data.includes(authUser._id));
+
+        if (!!data[0] && !!data[0].pendingRequest) {
+          setRequestSent(data[0].pendingRequest.includes(authUser._id));
+        }
+      }
+    }, [data, authUser]);
 
     const { mutate: follow, isPending: pendingFollow } = useMutation({
       mutationFn: async () => {
@@ -50,14 +63,10 @@ const FollowButton = memo(
         if ("error" in data) toast.error(data.error);
         return data;
       },
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         if ("error" in data) return;
-        if ("message" in data && data.message === "Follow request sent!")
-          setRequestSent(true);
-        if ("message" in data && data.message === "Follow request cancelled!!")
-          setRequestSent(true);
 
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: [username, "followers"],
         });
 
@@ -68,7 +77,7 @@ const FollowButton = memo(
     });
 
     const handleClick = () => {
-      if (isFollowing) return setIsOpen(true);
+      if (isFollowing || requestSent) return setIsOpen(true);
 
       follow();
     };
@@ -90,13 +99,15 @@ const FollowButton = memo(
                 <DialogDescription>
                   <div className=" w-full  flex flex-col p-4 ">
                     <div className="font-bold">
-                      <div>Unfollow</div>
+                      <div>
+                        {requestSent ? "Cancle follow request?" : "Unfollow"}
+                      </div>
                       <div className="">@{username}?</div>
                     </div>
                     <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      Their posts will no longer show up in your Following
-                      section. You can still view their profile, unless their
-                      posts are protected.
+                      {requestSent
+                        ? `Are you sure you want to cancle follow request sent to ${username} `
+                        : "Their posts will no longer show up in your Following section. You can still view their profile, unless their posts are protected."}
                     </div>
                     <div>
                       <div className="flex flex-col gap-2 mt-7">
@@ -107,7 +118,7 @@ const FollowButton = memo(
                           disabled={pendingFollow}
                           onClick={() => follow()}
                         >
-                          Unfollow
+                          {requestSent ? "Cancle Request!" : "Unfollow"}
                         </button>
 
                         <button
@@ -115,7 +126,7 @@ const FollowButton = memo(
                             pendingFollow ? "opacity-75" : "hover:bg-white/10"
                           } 
                       `}
-                          disabled={pendingFollow}
+                          disabled={pendingFollow || pendingFetch}
                           onClick={() => {
                             setIsOpen(false);
                           }}
@@ -134,54 +145,38 @@ const FollowButton = memo(
         )}
 
         <button
-          className={`font-bold relative flex justify-center  items-center bg-white text-black z-10 group ${
+          className={`font-bold relative flex justify-center  items-center   text-black z-10 group ${
             isHimself ? "hidden" : "flex"
           }  
             
           ${
-            isFollowing && !requestSent
-              ? "bg-transparent  border w-24    xl:text-base text-white hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
-              : "bg-blue-400"
-          } text-black w-16 sm:w-20      xl:w-24 h-8 ${className}    rounded-full`}
+            isFollowing
+              ? "bg-transparent  border w-24 text-white    xl:text-base  hover:bg-red-500/30 hover:text-red-700 hover:border-red-800"
+              : requestSent
+              ? "bg-blue-600 text-white font-semibold  w-28   hover:font-bold hover:border hover:text-red-600 hover:bg-transparent"
+              : "bg-white text-black hover:opacity-90  "
+          } text-black w-16       xl:w-24 h-8 ${className}    rounded-full`}
           disabled={pendingFollow}
           onClick={() => handleClick()}
         >
-          {!requestSent ? (
-            <>
-              <span
-                className={`absolute opacity-100 group-hover:opacity-0 ${
-                  isFollowing ? " text-xs md:text-sm" : ""
-                }`}
-              >
-                {isFollowing ? "Following" : "Follow"}
-              </span>
-              <span
-                className={`absolute opacity-0   group-hover:opacity-100  ${
-                  isFollowing ? " text-base" : ""
-                }
-              `}
-              >
-                {isFollowing ? "Unfollow" : "Follow"}
-              </span>
-            </>
-          ) : (
-            ""
-          )}
+          <>
+            <span
+              className={`absolute opacity-100  group-hover:opacity-0 ${
+                isFollowing ? " text-xs md:text-sm" : ""
+              }`}
+            >
+              {isFollowing ? "Following" : requestSent ? "Requested" : "Follow"}
+            </span>
 
-          {requestSent ? (
-            <>
-              <span
-                className={`absolute opacity-100 group-hover:opacity-0   text-xs md:text-sm `}
-              >
-                {isFollowing ? "Requested!" : "Follow"}
-              </span>
-              <span className={`absolute opacity-0   group-hover:opacity-100 `}>
-                {isFollowing ? "Cancel" : "Follow"}
-              </span>
-            </>
-          ) : (
-            ""
-          )}
+            <span
+              className={`absolute opacity-0   group-hover:opacity-100  ${
+                isFollowing ? " text-base" : ""
+              }
+              `}
+            >
+              {isFollowing ? "Unfollow" : requestSent ? "Cancle" : "Follow"}
+            </span>
+          </>
         </button>
       </>
     );

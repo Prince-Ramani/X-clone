@@ -35,7 +35,6 @@ const ProfilePost = memo(
         );
 
         const data: [] = await res.json();
-        console.log(data);
 
         if (data.length < 30) setHasMore(false);
 
