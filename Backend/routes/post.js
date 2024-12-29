@@ -23,7 +23,7 @@ const {
 router.post(
   "/createpost",
   protectRoute,
-  upload.single("uploadedPhoto"),
+  upload.array("uploadedPhoto", 4),
   createPost
 );
 router.post(

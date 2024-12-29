@@ -31,8 +31,8 @@ const CreatePostDialog = () => {
 
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [type, setType] = useState<"poll" | "post">("post");
-  const [file, setFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File[]>([]);
+  const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [totalOptions, setTotalOptions] = useState<number>(2);
   const [optionValue, setOptionValue] = useState({
@@ -90,18 +90,19 @@ const CreatePostDialog = () => {
     setSelectedEmoji(emoji.native);
     setTextareaValue((prevText) => prevText + emoji.native);
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileExists = e.target.files?.[0];
-    if (fileExists) {
-      setFile(fileExists);
-      const reader = new FileReader();
+    const selectedFiles = Array.from(e.target.files || []);
 
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(fileExists);
+    console.log(selectedFiles);
+
+    if (selectedFiles.length + file.length > 4) {
+      return toast.error("You can upload a maximum of 4 images.");
     }
+
+    setFile((prev) => [...prev, ...selectedFiles]);
+
+    const previews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setImagesPreview((prev) => [...prev, ...previews]);
   };
 
   const { mutate: createPoll } = useMutation({
@@ -121,10 +122,10 @@ const CreatePostDialog = () => {
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
       else {
-        setFile(null);
+        setFile([]);
         setTextareaValue("");
         setIsEmojiOpen(false);
-        setImagePreview(null);
+        setImagesPreview([]);
 
         setCreateDialog(false);
 
@@ -143,7 +144,9 @@ const CreatePostDialog = () => {
       const formData = new FormData();
 
       formData.append("postContent", textareaValue);
-      if (file) formData.append("uploadedPhoto", file);
+      if (file && file.length > 0) {
+        file.forEach((f) => formData.append("uploadedPhoto", f));
+      }
 
       createPost(formData);
     }
@@ -175,6 +178,11 @@ const CreatePostDialog = () => {
     }
   };
 
+  const handleRemoveImage = (index: number) => {
+    setFile((prev) => prev.filter((_, i) => i !== index));
+    setImagesPreview((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialog}>
       <DialogContent className="fixed inset-0 p-3 pt-20 sm:pt-36 flex items-center md:p-0 md:pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
@@ -195,7 +203,7 @@ const CreatePostDialog = () => {
               disabled={isPending}
               onClick={() => {
                 setTextareaValue("");
-                setFile(null);
+                setFile([]);
               }}
             >
               <X />
@@ -380,30 +388,28 @@ const CreatePostDialog = () => {
                   {isPending ? "Posting..." : "Post"}
                 </button>
               </div>
-              {imagePreview ? (
-                <div className="text-xs ml-5  w-fit p-2 flex gap-3 items-center ">
-                  <img
-                    src={imagePreview}
-                    alt="Selected preview"
-                    className=" size-24 object-cover rounded-md"
-                  />
-                  <CustomTooltip title="Close">
-                    <button
-                      className={`  text-white  p-2 rounded-full ${
-                        isPending ? "" : "hover:bg-gray-800/50"
-                      }   `}
-                      onClick={() => {
-                        setFile(null);
-                        setImagePreview(null);
-                      }}
-                      disabled={isPending}
-                    >
-                      <X className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70" />
-                    </button>
-                  </CustomTooltip>
+              {imagesPreview.length > 0 && (
+                <div className="flex gap-3 mt-3 flex-wrap ">
+                  {imagesPreview.map((preview, index) => (
+                    <div className="flex flex-col justify-center items-center gap-1">
+                      <div key={index} className="relative w-24 h-24">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                      <div className=" h-fit w-fit rounded-full p-0.5 hover:bg-white/10">
+                        <CustomTooltip title="Remove">
+                          <X
+                            className=" text-red-600 transition-colors cursor-pointer flex justify-center items-center w-full bg-transparent"
+                            onClick={() => handleRemoveImage(index)}
+                          />
+                        </CustomTooltip>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                ""
               )}
             </div>
           </DialogDescription>

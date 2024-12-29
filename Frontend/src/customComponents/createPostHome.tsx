@@ -19,8 +19,8 @@ const CreatePostHome = memo(() => {
   const queryClient = useQueryClient();
   const { authUser } = useAuthUser();
   const [textareaValue, setTextareaValue] = useState<string | null>("");
-  const [file, setFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File[]>([]);
+  const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const [_, setSelectedEmoji] = useState();
   const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
   const [totalOptions, setTotalOptions] = useState<number>(2);
@@ -50,10 +50,10 @@ const CreatePostHome = memo(() => {
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
       else {
-        setFile(null);
+        setFile([]);
         setTextareaValue("");
         setIsEmojiOpen(false);
-        setImagePreview(null);
+        setImagesPreview([]);
 
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Posts"],
@@ -81,10 +81,10 @@ const CreatePostHome = memo(() => {
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
       else {
-        setFile(null);
+        setFile([]);
         setTextareaValue("");
         setIsEmojiOpen(false);
-        setImagePreview(null);
+        setImagesPreview([]);
 
         return toast.success(data.message);
       }
@@ -101,7 +101,9 @@ const CreatePostHome = memo(() => {
       const formData = new FormData();
 
       formData.append("postContent", textareaValue);
-      if (file) formData.append("uploadedPhoto", file);
+      if (file && file.length > 0) {
+        file.forEach((f) => formData.append("uploadedPhoto", f));
+      }
 
       createPost(formData);
     }
@@ -134,22 +136,28 @@ const CreatePostHome = memo(() => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileExists = e.target.files?.[0];
-    if (fileExists) {
-      setFile(fileExists);
-      const reader = new FileReader();
+    const selectedFiles = Array.from(e.target.files || []);
 
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
+    console.log(selectedFiles);
 
-      reader.readAsDataURL(fileExists);
+    if (selectedFiles.length + file.length > 4) {
+      return toast.error("You can upload a maximum of 4 images.");
     }
+
+    setFile((prev) => [...prev, ...selectedFiles]);
+
+    const previews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setImagesPreview((prev) => [...prev, ...previews]);
   };
 
   const handleEmojiSelect = (emoji: any) => {
     setSelectedEmoji(emoji.native);
     setTextareaValue((prevText) => prevText + emoji.native);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFile((prev) => prev.filter((_, i) => i !== index));
+    setImagesPreview((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -180,6 +188,8 @@ const CreatePostHome = memo(() => {
               className="hidden"
               onChange={handleFileChange}
               disabled={type === "poll"}
+              multiple
+              accept="image/*"
             />
 
             {type === "poll" ? (
@@ -335,23 +345,28 @@ const CreatePostHome = memo(() => {
               {isPending ? "Posting..." : "Post"}
             </button>
           </div>
-          {imagePreview ? (
-            <div className="text-xs  w-fit p-2 pt-0 flex gap-3 items-center ">
-              <img
-                src={imagePreview}
-                alt="Selected preview"
-                className="w-24 h-24 object-cover rounded-md"
-              />
-              <X
-                className="size-5  rounded-full  text-center cursor-pointer hover:opacity-70"
-                onClick={() => {
-                  setFile(null);
-                  setImagePreview(null);
-                }}
-              />
+          {imagesPreview.length > 0 && (
+            <div className="flex gap-3 mt-3 flex-wrap ">
+              {imagesPreview.map((preview, index) => (
+                <div className="flex flex-col justify-center items-center gap-1">
+                  <div key={index} className="relative w-24 h-24">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                  </div>
+                  <div className=" h-fit w-fit rounded-full p-0.5 hover:bg-white/10">
+                    <CustomTooltip title="Remove">
+                      <X
+                        className=" text-red-600 transition-colors cursor-pointer flex justify-center items-center w-full bg-transparent"
+                        onClick={() => handleRemoveImage(index)}
+                      />
+                    </CustomTooltip>
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : (
-            ""
           )}
         </div>
       </div>

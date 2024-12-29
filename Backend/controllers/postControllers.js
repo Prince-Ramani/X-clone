@@ -9,25 +9,31 @@ const { default: mongoose } = require("mongoose");
 const createPost = async (req, res) => {
   try {
     const { postContent } = req.body;
+    const uploadedImages = [];
     const uploadedBy = req.user;
     if (!postContent) {
       return res.status(400).json({ error: "A post must have some content!" });
     }
 
-    if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(req.file.path, {
-        folder: "X-clone/Posts",
-      });
+    if (req.files && req.files.length <= 4) {
+      await Promise.all(
+        req.files.map(async (file) => {
+          try {
+            const uploadRes = await cloudinary.uploader.upload(file.path, {
+              folder: "X-clone/Posts",
+            });
+            await unlink(file.path);
+            uploadedImages.push(uploadRes.secure_url);
+          } catch (err) {
+            console.error("Error uploading  the file:", err);
+            return res.status(400).json({ error: "Resource type invalid!" });
+          }
+        })
+      );
 
-      try {
-        await unlink(req.file.path);
-      } catch (err) {
-        console.error("Error deleting the file:", err);
-      }
-      const uploadedPhoto = uploadRes.secure_url;
       const post = new Post({
         postContent,
-        uploadedPhoto,
+        uploadedPhoto: uploadedImages,
         uploadedBy,
       });
       await post.save();
@@ -372,24 +378,30 @@ const deletePost = async (req, res) => {
     if (!postToDelete) {
       return res.status(404).json({ error: "No such post exists" });
     }
+
     if (postToDelete.uploadedBy != req.user) {
       return res.status(400).json({ error: "You can't delete others posts!" });
     }
-    if (postToDelete.uploadedPhoto) {
-      const imgID = postToDelete.uploadedPhoto
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
+
+    if (postToDelete.uploadedPhoto.length > 0) {
       const foldername = "X-clone/Posts";
-      const picID = `${foldername}/${imgID}`;
-      const result = await cloudinary.uploader.destroy(picID);
+      await Promise.all(
+        postToDelete.uploadedPhoto.map(async (photo) => {
+          try {
+            const imgID = photo.split("/").slice(-1)[0].split(".")[0];
+            const picID = `${foldername}/${imgID}`;
+            await cloudinary.uploader.destroy(picID);
+          } catch (error) {
+            console.error(`Error deleting photo: ${photo}`, error);
+          }
+        })
+      );
     }
-    const deleted = await Post.deleteOne(
-      { _id: postID },
-      { uploadedBy: req.user }
-    );
+    await Post.deleteOne({ _id: postID }, { uploadedBy: req.user });
+
     return res.status(200).json({ message: "Post deleted successfully" });
   } catch (err) {
+    console.log(err);
     return res.status(404).json({ error: "No such post exists!" });
   }
 };

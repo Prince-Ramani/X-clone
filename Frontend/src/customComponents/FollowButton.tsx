@@ -49,6 +49,8 @@ const FollowButton = memo(
 
         if (!!data[0] && !!data[0].pendingRequest) {
           setRequestSent(data[0].pendingRequest.includes(authUser._id));
+        } else {
+          setRequestSent(false);
         }
       }
     }, [data, authUser]);
@@ -66,7 +68,7 @@ const FollowButton = memo(
       onSuccess: async (data) => {
         if ("error" in data) return;
 
-        await queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: [username, "followers"],
         });
 

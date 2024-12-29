@@ -6,7 +6,8 @@ const postSchema = mongoose.Schema(
       type: String,
     },
     uploadedPhoto: {
-      type: String,
+      type: [String],
+      default: [],
     },
     likes: [
       {

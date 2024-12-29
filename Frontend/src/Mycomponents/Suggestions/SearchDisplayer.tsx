@@ -3,6 +3,7 @@ import { UploadedByType } from "../Home/ForYou";
 
 const SearchDisplayer = ({ person }: { person: UploadedByType }) => {
   const navigate = useNavigate();
+
   return (
     <div
       className="flex  gap-3 hover:bg-gray-500/20 p-3 cursor-pointer"

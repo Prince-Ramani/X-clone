@@ -113,8 +113,6 @@ const PostDisplayer = memo(
         const data = await res.json();
         if ("error" in data) return toast.error(data.error);
 
-       
-
         return data;
       },
       enabled: hasAnswered && post.type === "poll",
@@ -156,8 +154,8 @@ const PostDisplayer = memo(
           onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
         />
 
-        <div className=" w-full h-fit ml-2 flex-flex-col ">
-          <div className="flex gap-2 items-center  w-full ">
+        <div className=" w-full h-fit ml-2 flex flex-col ">
+          <div className="flex gap-2  items-center  w-full ">
             <span
               className="font-bold hover:underline decoration-white decoration-1"
               onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
@@ -180,19 +178,36 @@ const PostDisplayer = memo(
             )}
           </div>
 
-          <div className="leading-normal text-sm tracking-wide break-all break-words ">
+          <div className="leading-normal text-sm tracking-wide break-all break-words  ">
             {" "}
             {postContent}
           </div>
 
-          {uploadedPhoto ? (
-            <div className=" w-full  h-fit mt-2 flex justify-center items-center  ">
-              <a href={uploadedPhoto} target="_blank" className="w-full h-fit">
-                <img
-                  src={uploadedPhoto}
-                  className=" w-full h-fit rounded-2xl border-gray-400/20 border"
-                />
-              </a>
+          {uploadedPhoto.length > 0 ? (
+            <div
+              className={`  grid ${
+                uploadedPhoto.length === 1 ? "grid-cols-1" : "grid-cols-2"
+              }  gap-1 mt-2     `}
+            >
+              {uploadedPhoto.map((photo, index) => (
+                <div
+                  className={` w-full   ${
+                    uploadedPhoto.length === 1
+                      ? "h-fit"
+                      : index === 2 && uploadedPhoto.length === 3
+                      ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
+                      : "h-40 sm:h-44  lg:h-48"
+                  } overflow-hidden  flex justify-center `}
+                >
+                  <a href={photo} target="_blank" className="w-full  ">
+                    <img
+                      src={photo}
+                      className=" w-full h-full object-cover rounded-2xl border-gray-400/20 "
+                      alt="Post image"
+                    />
+                  </a>
+                </div>
+              ))}
             </div>
           ) : (
             ""

@@ -239,11 +239,31 @@ const ShowPost = () => {
           {post?.postContent}
         </div>
 
-        {post?.uploadedPhoto ? (
-          <div className="w-full h-fit mt-3 border border-gray-500/20 rounded-2xl">
-            <a target="_blank" href={post.uploadedPhoto}>
-              <img src={post.uploadedPhoto} className="rounded-2xl" />
-            </a>
+        {post?.uploadedPhoto.length > 0 ? (
+          <div
+            className={`  grid ${
+              post.uploadedPhoto.length === 1 ? "grid-cols-1" : "grid-cols-2"
+            }  gap-1 mt-2     `}
+          >
+            {post?.uploadedPhoto.map((photo: string, index: number) => (
+              <div
+                className={` w-full   ${
+                  post?.uploadedPhoto.length === 1
+                    ? "h-fit"
+                    : index === 2 && post?.uploadedPhoto.length === 3
+                    ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
+                    : "h-40 sm:h-44  lg:h-48"
+                } overflow-hidden  flex justify-center `}
+              >
+                <a href={photo} target="_blank" className="w-full  ">
+                  <img
+                    src={photo}
+                    className=" w-full h-full object-cover rounded-2xl border-gray-400/20 "
+                    alt="Post image"
+                  />
+                </a>
+              </div>
+            ))}
           </div>
         ) : (
           ""

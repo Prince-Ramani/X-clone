@@ -6,7 +6,7 @@ import Loading from "@/components/ui/Loading";
 export interface PostType {
   _id: string;
   postContent: string;
-  uploadedPhoto: string;
+  uploadedPhoto: string[];
   comments: any[] | number;
   likes: any[];
   uploadedBy: UploadedByType;
