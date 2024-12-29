@@ -269,6 +269,20 @@ const ShowPost = () => {
           ""
         )}
 
+        {post?.uploadedVideo ? (
+          <div className="mt-2 w-full">
+            <video
+              controls
+              className="border w-full border-white/10 rounded-md"
+            >
+              <source src={post?.uploadedVideo} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        ) : (
+          ""
+        )}
+
         {post?.type === "poll" ? (
           <div className="w-full rounded-xl mt-2 ">
             <div className="text-xs text-gray-400/70 pl-3">

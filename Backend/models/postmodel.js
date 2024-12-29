@@ -9,6 +9,9 @@ const postSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    uploadedVideo: {
+      type: String,
+    },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,

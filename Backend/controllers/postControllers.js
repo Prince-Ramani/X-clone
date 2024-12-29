@@ -15,12 +15,13 @@ const createPost = async (req, res) => {
       return res.status(400).json({ error: "A post must have some content!" });
     }
 
-    if (req.files && req.files.length <= 4) {
+    if (req.files.uploadedPhoto && req.files.uploadedPhoto.length <= 4) {
       await Promise.all(
-        req.files.map(async (file) => {
+        req.files.uploadedPhoto.map(async (file) => {
           try {
             const uploadRes = await cloudinary.uploader.upload(file.path, {
               folder: "X-clone/Posts",
+              resource_type: "image",
             });
             await unlink(file.path);
             uploadedImages.push(uploadRes.secure_url);
@@ -39,6 +40,31 @@ const createPost = async (req, res) => {
       await post.save();
       return res.status(201).json({ message: "Post created successfully!" });
     }
+
+    if (req.files.uploadedVideo && req.files.uploadedVideo.length > 0) {
+      var uploadedVid;
+      try {
+        const pather = req.files.uploadedVideo[0];
+        const uploadResult = await cloudinary.uploader.upload(pather.path, {
+          folder: "X-clone/Videos",
+          resource_type: "video",
+        });
+        await unlink(pather.path);
+        uploadedVid = uploadResult.secure_url;
+      } catch (err) {
+        console.error(err);
+        return res.status(400).json({ error: "Resource type invalid!" });
+      }
+
+      const post = new Post({
+        postContent,
+        uploadedVideo: uploadedVid,
+        uploadedBy,
+      });
+      await post.save();
+      return res.status(201).json({ message: "Post created successfully!" });
+    }
+
     const post = new Post({
       postContent,
       uploadedBy,
@@ -397,6 +423,21 @@ const deletePost = async (req, res) => {
         })
       );
     }
+
+    if (postToDelete.uploadedVideo) {
+      const foldername = "X-clone/Videos";
+      try {
+        const vidID = postToDelete.uploadedVideo
+          .split("/")
+          .slice(-1)[0]
+          .split(".")[0];
+        const videoID = `${foldername}/${vidID}`;
+        await cloudinary.uploader.destroy(videoID);
+      } catch (error) {
+        console.error(`Error deleting video`, error);
+      }
+    }
+
     await Post.deleteOne({ _id: postID }, { uploadedBy: req.user });
 
     return res.status(200).json({ message: "Post deleted successfully" });

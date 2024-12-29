@@ -26,6 +26,8 @@ const PostDisplayer = memo(
       postContent,
     } = post;
 
+    console.log(post.uploadedVideo);
+
     const { setIsReplyDialog, setPostContent } = useReplyDialogContext();
     const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>(
       post.bookmarkedBy?.includes(authUserId)
@@ -208,6 +210,20 @@ const PostDisplayer = memo(
                   </a>
                 </div>
               ))}
+            </div>
+          ) : (
+            ""
+          )}
+
+          {post.uploadedVideo ? (
+            <div className="mt-2 w-full">
+              <video
+                controls
+                className="border w-full border-white/10 rounded-md"
+              >
+                <source src={post.uploadedVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
           ) : (
             ""

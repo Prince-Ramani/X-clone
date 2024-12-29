@@ -23,7 +23,10 @@ const {
 router.post(
   "/createpost",
   protectRoute,
-  upload.array("uploadedPhoto", 4),
+  upload.fields([
+    { name: "uploadedPhoto", maxCount: 4 },
+    { name: "uploadedVideo", maxCount: 1 },
+  ]),
   createPost
 );
 router.post(

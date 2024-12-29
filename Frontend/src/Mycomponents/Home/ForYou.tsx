@@ -7,6 +7,7 @@ export interface PostType {
   _id: string;
   postContent: string;
   uploadedPhoto: string[];
+  uploadedVideo?: string;
   comments: any[] | number;
   likes: any[];
   uploadedBy: UploadedByType;

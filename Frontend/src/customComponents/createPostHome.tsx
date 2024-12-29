@@ -24,6 +24,8 @@ const CreatePostHome = memo(() => {
   const [_, setSelectedEmoji] = useState();
   const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
   const [totalOptions, setTotalOptions] = useState<number>(2);
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [optionValue, setOptionValue] = useState({
     option1: "",
     option2: "",
@@ -54,7 +56,8 @@ const CreatePostHome = memo(() => {
         setTextareaValue("");
         setIsEmojiOpen(false);
         setImagesPreview([]);
-
+        setVideo(null);
+        setVideoPreview(null);
         queryClient.invalidateQueries({
           queryKey: [authUser?.username, "Posts"],
         });
@@ -105,6 +108,8 @@ const CreatePostHome = memo(() => {
         file.forEach((f) => formData.append("uploadedPhoto", f));
       }
 
+      if (video) formData.append("uploadedVideo", video);
+
       createPost(formData);
     }
 
@@ -138,8 +143,6 @@ const CreatePostHome = memo(() => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
 
-    console.log(selectedFiles);
-
     if (selectedFiles.length + file.length > 4) {
       return toast.error("You can upload a maximum of 4 images.");
     }
@@ -148,6 +151,17 @@ const CreatePostHome = memo(() => {
 
     const previews = selectedFiles.map((file) => URL.createObjectURL(file));
     setImagesPreview((prev) => [...prev, ...previews]);
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //@ts-ignore
+    const v = e.target.files[0];
+    if (v) {
+      setVideo(v);
+      setImagesPreview([]);
+      setFile([]);
+      setVideoPreview(URL.createObjectURL(v));
+    }
   };
 
   const handleEmojiSelect = (emoji: any) => {
@@ -190,6 +204,15 @@ const CreatePostHome = memo(() => {
               disabled={type === "poll"}
               multiple
               accept="image/*"
+            />
+
+            <input
+              type="file"
+              id="upload-video"
+              className="hidden"
+              onChange={handleVideoChange}
+              disabled={type === "poll"}
+              accept="video/*"
             />
 
             {type === "poll" ? (
@@ -280,11 +303,18 @@ const CreatePostHome = memo(() => {
                 } `}
                 disabled={type === "poll"}
               >
-                <VideoIcon
-                  className={`size-5  ${
-                    type === "poll" ? "text-gray-400/70" : "text-blue-400"
-                  } `}
-                />
+                <label
+                  htmlFor="upload-video"
+                  className={`${
+                    type === "poll" ? " cursor-default" : " cursor-pointer"
+                  }`}
+                >
+                  <VideoIcon
+                    className={`size-5  ${
+                      type === "poll" ? "text-gray-400/70" : "text-blue-400"
+                    } `}
+                  />
+                </label>
               </button>
             </CustomTooltip>
             <CustomTooltip title="Poll">
@@ -367,6 +397,30 @@ const CreatePostHome = memo(() => {
                 </div>
               ))}
             </div>
+          )}
+
+          {videoPreview ? (
+            <div className=" flex flex-col gap-2 items-center  ">
+              <div>
+                <video controls>
+                  <source src={videoPreview} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className=" h-fit w-fit rounded-full  p-1 hover:bg-white/10">
+                <CustomTooltip title="Remove">
+                  <X
+                    className="   rounded-full  transition-colors cursor-pointer flex justify-center items-center w-full "
+                    onClick={() => {
+                      setVideo(null);
+                      setVideoPreview(null);
+                    }}
+                  />
+                </CustomTooltip>
+              </div>
+            </div>
+          ) : (
+            ""
           )}
         </div>
       </div>
