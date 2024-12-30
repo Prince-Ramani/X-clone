@@ -416,7 +416,9 @@ const deletePost = async (req, res) => {
           try {
             const imgID = photo.split("/").slice(-1)[0].split(".")[0];
             const picID = `${foldername}/${imgID}`;
-            await cloudinary.uploader.destroy(picID);
+            await cloudinary.uploader.destroy(picID, {
+              resource_type: "image",
+            });
           } catch (error) {
             console.error(`Error deleting photo: ${photo}`, error);
           }
@@ -424,7 +426,7 @@ const deletePost = async (req, res) => {
       );
     }
 
-    if (postToDelete.uploadedVideo) {
+    if (!!postToDelete.uploadedVideo) {
       const foldername = "X-clone/Videos";
       try {
         const vidID = postToDelete.uploadedVideo
@@ -432,7 +434,8 @@ const deletePost = async (req, res) => {
           .slice(-1)[0]
           .split(".")[0];
         const videoID = `${foldername}/${vidID}`;
-        await cloudinary.uploader.destroy(videoID);
+
+        await cloudinary.uploader.destroy(videoID, { resource_type: "video" });
       } catch (error) {
         console.error(`Error deleting video`, error);
       }
@@ -456,8 +459,15 @@ const getProfilePost = async (req, res) => {
     const user = await User.findById(req.user).select("blocked");
     const person = await User.findById(personID).select("blocked");
 
-    if (user.blocked.includes(personID) || person.blocked.includes(req.user)) {
-      return res.json([]).status(200);
+    console.log(user.blocked, person.blocked);
+
+    if (user.blocked && person.blocked) {
+      if (
+        user.blocked.includes(personID) ||
+        person.blocked.includes(req.user)
+      ) {
+        return res.json([]).status(200);
+      }
     }
 
     const postss = await Post.find({ uploadedBy: personID })

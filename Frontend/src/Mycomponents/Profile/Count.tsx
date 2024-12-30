@@ -34,7 +34,7 @@ const Count = memo(
         }
         return data;
       },
-      enabled: !!profile,
+
       refetchOnWindowFocus: false,
     });
 
@@ -51,7 +51,13 @@ const Count = memo(
           className="flex gap-1 hover:border-b"
           onClick={() => navigate(`/profile/${personUsername}/followers`)}
         >
-          <span className="font-bold">{followers?.length || 0}</span>
+          <span className="font-bold">
+            {followers && followers.pendingRequest
+              ? followers.length - 1
+              : followers
+              ? followers.length
+              : 0}
+          </span>
           <span className="text-gray-400/70">Followers</span>
         </div>
       </div>

@@ -236,10 +236,13 @@ const updateProfile = async (req, res) => {
           const imgID = user.banner.split("/").slice(-1)[0].split(".")[0];
           const foldername = "X-clone/Banners";
           const picID = `${foldername}/${imgID}`;
-          const result = await cloudinary.uploader.destroy(picID);
+          const result = await cloudinary.uploader.destroy(picID, {
+            resource_type: "image",
+          });
         }
         const uploadRes = await cloudinary.uploader.upload(banner[0].path, {
           folder: "X-clone/Banners",
+          resource_type: "image",
         });
 
         try {
@@ -261,10 +264,13 @@ const updateProfile = async (req, res) => {
           const imgID = user.profilePic.split("/").slice(-1)[0].split(".")[0];
           const foldername = "X-clone/Profile_pics";
           const picID = `${foldername}/${imgID}`;
-          const result = await cloudinary.uploader.destroy(picID);
+          const result = await cloudinary.uploader.destroy(picID, {
+            resource_type: "image",
+          });
         }
         const uploadRes = await cloudinary.uploader.upload(profilePic[0].path, {
           folder: "X-clone/Profile_pics",
+          resource_type: "image",
         });
         try {
           await fs.unlink(profilePic[0].path);
@@ -730,7 +736,25 @@ const setPrivate = async (req, res) => {
     const user = await User.findById(req.user);
 
     if (user.accountType === "public") user.accountType = "private";
-    else if (user.accountType === "private") user.accountType = "public";
+    else if (user.accountType === "private") {
+      user.accountType = "public";
+      if (user.pendingRequest && user.pendingRequest.length > 0) {
+        const requests = await Notification.find({
+          to: user._id,
+          topic: "followRequest",
+        });
+
+        await Promise.all(
+          requests.map(async (followReq) => {
+            await User.findByIdAndUpdate(followReq.from, {
+              $push: { following: user._id },
+            });
+
+            user.followers.push(followReq.from);
+          })
+        );
+      }
+    }
 
     await user.save();
     return res.json({ message: "Success" }).status(200);

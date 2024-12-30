@@ -19,6 +19,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { CommentType } from "@/lib/Types";
 import EmojiPicker from "@/customComponents/EmojiPicker";
+import VideoPlayer from "@/customComponents/VideoPlayer";
 
 const ShowPost = () => {
   const { username, postId } = useParams();
@@ -269,19 +270,7 @@ const ShowPost = () => {
           ""
         )}
 
-        {post?.uploadedVideo ? (
-          <div className="mt-2 w-full">
-            <video
-              controls
-              className="border w-full border-white/10 rounded-md"
-            >
-              <source src={post?.uploadedVideo} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        ) : (
-          ""
-        )}
+        {post?.uploadedVideo ? <VideoPlayer source={post.uploadedVideo} /> : ""}
 
         {post?.type === "poll" ? (
           <div className="w-full rounded-xl mt-2 ">

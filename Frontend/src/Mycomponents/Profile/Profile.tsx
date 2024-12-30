@@ -228,13 +228,17 @@ const Profile = () => {
                 ? format(profile?.createdAt, "MMMM yyyy")
                 : ""}
             </div>
-            <Count
-              personUsername={personUsername}
-              followingLength={profile.following.length}
-              isBlocked={!!profile.isBlocked}
-              hasError={!!profile.error}
-              profile={!!profile}
-            />
+            {!!profile ? (
+              <Count
+                personUsername={personUsername}
+                followingLength={profile.following.length}
+                isBlocked={!!profile.isBlocked}
+                hasError={!!profile.error}
+                profile={!!profile}
+              />
+            ) : (
+              ""
+            )}
           </div>
         </>
       )}

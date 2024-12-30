@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import CustomTooltip from "@/customComponents/ToolTip";
 import Loading from "@/components/ui/Loading";
 import EmojiPicker from "@/customComponents/EmojiPicker";
+import VideoPlayer from "@/customComponents/VideoPlayer";
 
 const CreatePostDialog = () => {
   const { isCreateDialogOpen, setCreateDialog } = useCreatePostContext();
@@ -35,6 +36,9 @@ const CreatePostDialog = () => {
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [totalOptions, setTotalOptions] = useState<number>(2);
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+
   const [optionValue, setOptionValue] = useState({
     option1: "",
     option2: "",
@@ -148,6 +152,8 @@ const CreatePostDialog = () => {
         file.forEach((f) => formData.append("uploadedPhoto", f));
       }
 
+      if (video) formData.append("uploadedVideo", video);
+
       createPost(formData);
     }
 
@@ -181,6 +187,17 @@ const CreatePostDialog = () => {
   const handleRemoveImage = (index: number) => {
     setFile((prev) => prev.filter((_, i) => i !== index));
     setImagesPreview((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //@ts-ignore
+    const v = e.target.files[0];
+    if (v) {
+      setVideo(v);
+      setImagesPreview([]);
+      setFile([]);
+      setVideoPreview(URL.createObjectURL(v));
+    }
   };
 
   return (
@@ -316,28 +333,40 @@ const CreatePostDialog = () => {
                     </label>
                   </button>
                 </CustomTooltip>
+                <input
+                  type="file"
+                  id="upload-video"
+                  className="hidden"
+                  onChange={handleVideoChange}
+                  disabled={type === "poll"}
+                  accept="video/*"
+                />
                 <CustomTooltip title="Video">
                   <button
-                    className={`rounded-full p-2 ${
+                    className={`rounded-full p-2  ${
                       type === "poll"
                         ? " cursor-default"
                         : "cursor-pointer hover:bg-gray-800/70"
                     } `}
                     disabled={type === "poll"}
                   >
-                    <VideoIcon
-                      className={`size-5  ${
-                        type === "poll" ? "text-gray-400/70" : "text-blue-400"
-                      } `}
-                    />
+                    <label htmlFor="upload-video">
+                      <VideoIcon
+                        className={`size-5  ${
+                          type === "poll"
+                            ? "text-gray-400/70"
+                            : "text-blue-400 cursor-pointer"
+                        } `}
+                      />
+                    </label>
                   </button>
                 </CustomTooltip>
                 <CustomTooltip title="Poll">
                   <button
                     className={`rounded-full p-2  ${
                       type === "poll"
-                        ? "hover:bg-gray-800/70 cursor-default"
-                        : " cursor-pointer"
+                        ? "cursor-default"
+                        : " cursor-pointer hover:bg-gray-800/70 "
                     }  `}
                     onClick={() => setType("poll")}
                     disabled={type === "poll"}
@@ -410,6 +439,27 @@ const CreatePostDialog = () => {
                     </div>
                   ))}
                 </div>
+              )}
+
+              {videoPreview ? (
+                <div className=" flex flex-col gap-2 items-center  ">
+                  <div className="w-full h-fit">
+                    <VideoPlayer source={videoPreview} />
+                  </div>
+                  <div className=" h-fit w-fit rounded-full  p-1 hover:bg-white/10">
+                    <CustomTooltip title="Remove">
+                      <X
+                        className="   rounded-full  transition-colors cursor-pointer flex justify-center items-center w-full "
+                        onClick={() => {
+                          setVideo(null);
+                          setVideoPreview(null);
+                        }}
+                      />
+                    </CustomTooltip>
+                  </div>
+                </div>
+              ) : (
+                ""
               )}
             </div>
           </DialogDescription>

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { memo, useState } from "react";
 import { useAuthUser } from "@/context/userContext";
+import VideoPlayer from "./VideoPlayer";
 
 const CreatePostHome = memo(() => {
   const queryClient = useQueryClient();
@@ -321,8 +322,8 @@ const CreatePostHome = memo(() => {
               <button
                 className={`rounded-full p-2  ${
                   type === "poll"
-                    ? "hover:bg-gray-800/70 cursor-default"
-                    : " cursor-pointer"
+                    ? "cursor-default"
+                    : " cursor-pointer hover:bg-gray-800/70 "
                 }  `}
                 onClick={() => setType("poll")}
                 disabled={type === "poll"}
@@ -401,11 +402,8 @@ const CreatePostHome = memo(() => {
 
           {videoPreview ? (
             <div className=" flex flex-col gap-2 items-center  ">
-              <div>
-                <video controls>
-                  <source src={videoPreview} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+              <div className="w-full h-fit">
+                <VideoPlayer source={videoPreview} />
               </div>
               <div className=" h-fit w-fit rounded-full  p-1 hover:bg-white/10">
                 <CustomTooltip title="Remove">

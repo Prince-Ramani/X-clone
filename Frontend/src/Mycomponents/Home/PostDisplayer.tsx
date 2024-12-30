@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { FormateDate } from "@/lib/Date";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import DeletPost from "@/customComponents/DeletePostsIcon";
+import VideoPlayer from "@/customComponents/VideoPlayer";
 
 const PostDisplayer = memo(
   ({
@@ -156,7 +157,7 @@ const PostDisplayer = memo(
           onClick={() => navigate(`/profile/${uploadedBy?.username}`)}
         />
 
-        <div className=" w-full h-fit ml-2 flex flex-col ">
+        <div className=" w-full h-fit   ml-2 flex flex-col ">
           <div className="flex gap-2  items-center  w-full ">
             <span
               className="font-bold hover:underline decoration-white decoration-1"
@@ -216,14 +217,11 @@ const PostDisplayer = memo(
           )}
 
           {post.uploadedVideo ? (
-            <div className="mt-2 w-full">
-              <video
-                controls
-                className="border w-full border-white/10 rounded-md"
-              >
-                <source src={post.uploadedVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+            <div className=" w-full h-full  ">
+              <VideoPlayer
+                source={post.uploadedVideo}
+                // className="border w-full border-white/10 rounded-md"
+              />
             </div>
           ) : (
             ""
