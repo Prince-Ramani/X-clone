@@ -13,7 +13,7 @@ const CustomTooltip = memo(
     delay,
   }: {
     children: React.ReactNode;
-    title: string;
+    title: string | undefined;
     delay?: number;
   }) => {
     return (
@@ -21,7 +21,7 @@ const CustomTooltip = memo(
         <Tooltip>
           <TooltipTrigger asChild>{children}</TooltipTrigger>
           <TooltipContent>
-            <p>{title}</p>
+            <span>{title}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

@@ -109,15 +109,15 @@ const DeleteComment = memo(
           ""
         )}
 
-        <button
-          className="p-1 rounded-full hover:bg-white/10"
-          onClick={() => setIsOpen(true)}
-          disabled={isPending}
-        >
-          <CustomTooltip title="Delete">
+        <CustomTooltip title="Delete">
+          <button
+            className="p-1 rounded-full hover:bg-white/10"
+            onClick={() => setIsOpen(true)}
+            disabled={isPending}
+          >
             <Trash className={`size-4 text-red-600 ${className}`} />
-          </CustomTooltip>
-        </button>
+          </button>
+        </CustomTooltip>
       </>
     );
   }

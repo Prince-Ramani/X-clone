@@ -255,6 +255,7 @@ const ShowPost = () => {
                     ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
                     : "h-40 sm:h-44  lg:h-48"
                 } overflow-hidden  flex justify-center `}
+                key={index + 1}
               >
                 <a href={photo} target="_blank" className="w-full  ">
                   <img
@@ -285,6 +286,7 @@ const ShowPost = () => {
                       hasAnswered ? "" : "hover:bg-white/20"
                     }  `}
                     onClick={() => submitPollAnswer(index)}
+                    key={index + 1}
                   >
                     <span
                       className={`h-10 rounded-lg    ${
@@ -343,7 +345,13 @@ const ShowPost = () => {
               {post?.comments.length || 0}
             </span>
           </div>
-          <CustomTooltip title={1 ? "Unlike" : "Like"}>
+          <CustomTooltip
+            title={
+              authUser?._id && totalLikes?.includes(authUser?._id)
+                ? "Unlike"
+                : "Like"
+            }
+          >
             <span
               className="flex gap-1 items-center text-sm hover:text-pink-600 group "
               onClick={() => likePost()}

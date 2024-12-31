@@ -9,7 +9,6 @@ import { Toaster } from "react-hot-toast";
 import UserContextProvider from "./context/userContext";
 import CreatePostContextProvider from "./context/createPostContext";
 import ReplyDialogContextProvider from "./context/ReplyPostContext";
-import EditProfileContextProvider from "./context/EditProfileContext";
 import DeletePostContextProvider from "./context/DeletePostContext";
 
 const queryClient = new QueryClient({
@@ -28,15 +27,13 @@ if (rootElement) {
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
-          <EditProfileContextProvider>
-            <ReplyDialogContextProvider>
-              <CreatePostContextProvider>
-                <DeletePostContextProvider>
-                  <App />
-                </DeletePostContextProvider>
-              </CreatePostContextProvider>
-            </ReplyDialogContextProvider>
-          </EditProfileContextProvider>
+          <ReplyDialogContextProvider>
+            <CreatePostContextProvider>
+              <DeletePostContextProvider>
+                <App />
+              </DeletePostContextProvider>
+            </CreatePostContextProvider>
+          </ReplyDialogContextProvider>
         </UserContextProvider>
       </QueryClientProvider>
     </>

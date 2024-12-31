@@ -19,8 +19,6 @@ function Signup() {
     password: "",
   });
 
-  console.log(userInfo);
-
   const { mutate, isPending, data } = useMutation({
     mutationFn: async (Info: signupRequirements) => {
       try {

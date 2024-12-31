@@ -34,9 +34,9 @@ const Bar = memo(({ title, href, hideSettings = false }: BarProps) => {
         ""
       ) : (
         <CustomTooltip title="Settings">
-          <div className="ml-auto h-fit w-fit  rounded-full p-2 hover:bg-white/10">
+          <button className="ml-auto h-fit w-fit  rounded-full p-2 hover:bg-white/10">
             <Settings className="size-5" />
-          </div>
+          </button>
         </CustomTooltip>
       )}
     </div>

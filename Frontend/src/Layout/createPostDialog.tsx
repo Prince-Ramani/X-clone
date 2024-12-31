@@ -24,6 +24,7 @@ import CustomTooltip from "@/customComponents/ToolTip";
 import Loading from "@/components/ui/Loading";
 import EmojiPicker from "@/customComponents/EmojiPicker";
 import VideoPlayer from "@/customComponents/VideoPlayer";
+import { DialogHeader } from "@/components/ui/dialog";
 
 const CreatePostDialog = () => {
   const { isCreateDialogOpen, setCreateDialog } = useCreatePostContext();
@@ -97,10 +98,13 @@ const CreatePostDialog = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
 
-    console.log(selectedFiles);
-
     if (selectedFiles.length + file.length > 4) {
       return toast.error("You can upload a maximum of 4 images.");
+    }
+
+    if (video || videoPreview) {
+      setVideo(null);
+      setVideoPreview(null);
     }
 
     setFile((prev) => [...prev, ...selectedFiles]);
@@ -203,7 +207,10 @@ const CreatePostDialog = () => {
   return (
     <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialog}>
       <DialogContent className="fixed inset-0 p-3 pt-20 sm:pt-36 flex items-center md:p-0 md:pt-9 z-50 flex-col bg-blue-200/20 bg-opacity-50 ">
-        <DialogTitle />
+        <DialogHeader>
+          <DialogTitle></DialogTitle>
+        </DialogHeader>
+        <DialogDescription />
         <div className="bg-black p-3 relative rounded-3xl max-w-xl w-full ">
           {isPending ? (
             <div className=" absolute inset-0 z-[51] flex justify-center items-center rounded-3xl bg-blue-50/20 cursor-not-allowed">
@@ -226,243 +233,242 @@ const CreatePostDialog = () => {
               <X />
             </button>
           </DialogClose>
-          <DialogDescription>
-            <div className=" w-full  flex flex-col ">
-              <div className="w-full flex gap-3 p-1">
-                <img
-                  src={authUser?.profilePic}
-                  className="size-10 object-cover rounded-full "
-                />
-                <TextareaAutosize
-                  className="bg-transparent w-full  text-lg resize-none focus:outline-none mt-2 scro"
-                  minRows={3}
-                  maxRows={14}
-                  value={textareaValue}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setTextareaValue(e.target.value)
-                  }
-                  ref={textareaRef}
-                  placeholder={` ${
-                    type === "post" ? "What is happening?!" : "Ask a question"
-                  }`}
-                />
-              </div>
 
-              {type === "poll" ? (
-                <div className="border m-2 rounded-xl border-white/50 mb-5  ">
-                  <div className="p-2 flex ">
-                    <div className="flex w-full h-full pb-3   ">
-                      <div className="w-full flex flex-col gap-2 ">
-                        {Array(totalOptions)
-                          .fill(0)
-                          .map((_, index) => (
-                            <input
-                              key={index}
-                              type="text"
-                              className="bg-transparent border-[1px] border-gray-500 rounded-md focus:outline-none focus:border-blue-400 w-full p-2"
-                              placeholder={`Option ${index + 1} ${
-                                index + 1 > 2 ? "(optional)" : ""
-                              } `}
-                              onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                              ) =>
-                                setOptionValue((prev) => ({
-                                  ...prev,
-                                  [`option${index + 1}`]: e.target.value,
-                                }))
-                              }
-                            />
-                          ))}
-                      </div>
+          <div className=" w-full  flex flex-col ">
+            <div className="w-full flex gap-3 p-1">
+              <img
+                src={authUser?.profilePic}
+                className="size-10 object-cover rounded-full "
+              />
+              <TextareaAutosize
+                className="bg-transparent w-full  text-lg resize-none focus:outline-none mt-2 scro"
+                minRows={3}
+                maxRows={14}
+                value={textareaValue}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setTextareaValue(e.target.value)
+                }
+                ref={textareaRef}
+                placeholder={` ${
+                  type === "post" ? "What is happening?!" : "Ask a question"
+                }`}
+              />
+            </div>
+
+            {type === "poll" ? (
+              <div className="border m-2 rounded-xl border-white/50 mb-5  ">
+                <div className="p-2 flex ">
+                  <div className="flex w-full h-full pb-3   ">
+                    <div className="w-full flex flex-col gap-2 ">
+                      {Array(totalOptions)
+                        .fill(0)
+                        .map((_, index) => (
+                          <input
+                            key={index}
+                            type="text"
+                            className="bg-transparent border-[1px] border-gray-500 rounded-md focus:outline-none focus:border-blue-400 w-full p-2"
+                            placeholder={`Option ${index + 1} ${
+                              index + 1 > 2 ? "(optional)" : ""
+                            } `}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) =>
+                              setOptionValue((prev) => ({
+                                ...prev,
+                                [`option${index + 1}`]: e.target.value,
+                              }))
+                            }
+                          />
+                        ))}
                     </div>
-                    {totalOptions < 7 ? (
-                      <div className="flex min-h-full  items-end pl-1  pb-3  ">
-                        <CustomTooltip title="Add">
-                          <div
-                            className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors cursor-pointer"
-                            onClick={() => setTotalOptions((prev) => prev + 1)}
-                          >
-                            <Plus className="text-blue-400" />
-                          </div>
-                        </CustomTooltip>
-                      </div>
-                    ) : (
-                      ""
-                    )}
                   </div>
-
-                  <div
-                    className="border-t border-gray-500 cursor-pointer  text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
-                    onClick={() => setType("post")}
-                  >
-                    Remove poll
-                  </div>
+                  {totalOptions < 7 ? (
+                    <div className="flex min-h-full  items-end pl-1  pb-3  ">
+                      <CustomTooltip title="Add">
+                        <div
+                          className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors cursor-pointer"
+                          onClick={() => setTotalOptions((prev) => prev + 1)}
+                        >
+                          <Plus className="text-blue-400" />
+                        </div>
+                      </CustomTooltip>
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </div>
-              ) : (
-                ""
-              )}
 
-              <div className="flex gap-1 p-2 items-center h-full  pb-0 border-t-2 border-gray-800/50 ">
-                <input
-                  type="file"
-                  id="file-upload"
-                  className="hidden"
-                  onChange={handleFileChange}
+                <div
+                  className="border-t border-gray-500 cursor-pointer  text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
+                  onClick={() => setType("post")}
+                >
+                  Remove poll
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
+
+            <div className="flex gap-1 p-2 items-center h-full  pb-0 border-t-2 border-gray-800/50 ">
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={type === "poll"}
+              />
+              <CustomTooltip title="Media">
+                <button
+                  className={`rounded-full    ${
+                    type === "poll"
+                      ? " cursor-default"
+                      : "hover:bg-gray-800 cursor-pointer"
+                  } `}
                   disabled={type === "poll"}
-                />
-                <CustomTooltip title="Media">
-                  <button
-                    className={`rounded-full    ${
-                      type === "poll"
-                        ? " cursor-default"
-                        : "hover:bg-gray-800 cursor-pointer"
-                    } `}
-                    disabled={type === "poll"}
+                >
+                  <label
+                    htmlFor="file-upload"
+                    className={`${
+                      type === "poll" ? " cursor-default" : " cursor-pointer"
+                    }`}
                   >
-                    <label
-                      htmlFor="file-upload"
-                      className={`${
-                        type === "poll" ? " cursor-default" : " cursor-pointer"
-                      }`}
-                    >
-                      <ImageIcon
-                        className={`size-5  m-2 ${
-                          type === "poll" ? "text-gray-400/70" : "text-blue-400"
-                        }`}
-                      />
-                    </label>
-                  </button>
-                </CustomTooltip>
-                <input
-                  type="file"
-                  id="upload-video"
-                  className="hidden"
-                  onChange={handleVideoChange}
-                  disabled={type === "poll"}
-                  accept="video/*"
-                />
-                <CustomTooltip title="Video">
-                  <button
-                    className={`rounded-full p-2  ${
-                      type === "poll"
-                        ? " cursor-default"
-                        : "cursor-pointer hover:bg-gray-800/70"
-                    } `}
-                    disabled={type === "poll"}
-                  >
-                    <label htmlFor="upload-video">
-                      <VideoIcon
-                        className={`size-5  ${
-                          type === "poll"
-                            ? "text-gray-400/70"
-                            : "text-blue-400 cursor-pointer"
-                        } `}
-                      />
-                    </label>
-                  </button>
-                </CustomTooltip>
-                <CustomTooltip title="Poll">
-                  <button
-                    className={`rounded-full p-2  ${
-                      type === "poll"
-                        ? "cursor-default"
-                        : " cursor-pointer hover:bg-gray-800/70 "
-                    }  `}
-                    onClick={() => setType("poll")}
-                    disabled={type === "poll"}
-                  >
-                    <ArrowUpDown
-                      className={`size-5  ${
+                    <ImageIcon
+                      className={`size-5  m-2 ${
                         type === "poll" ? "text-gray-400/70" : "text-blue-400"
+                      }`}
+                    />
+                  </label>
+                </button>
+              </CustomTooltip>
+              <input
+                type="file"
+                id="upload-video"
+                className="hidden"
+                onChange={handleVideoChange}
+                disabled={type === "poll"}
+                accept="video/*"
+              />
+              <CustomTooltip title="Video">
+                <button
+                  className={`rounded-full p-2  ${
+                    type === "poll"
+                      ? " cursor-default"
+                      : "cursor-pointer hover:bg-gray-800/70"
+                  } `}
+                  disabled={type === "poll"}
+                >
+                  <label htmlFor="upload-video">
+                    <VideoIcon
+                      className={`size-5  ${
+                        type === "poll"
+                          ? "text-gray-400/70"
+                          : "text-blue-400 cursor-pointer"
                       } `}
                     />
-                  </button>
-                </CustomTooltip>
-                <CustomTooltip title="Emoji">
-                  <button
-                    className=" relative rounded-full p-2 hover:bg-gray-800/70 cursor-pointer"
-                    onClick={() => setIsEmojiOpen((prev) => !prev)}
-                  >
-                    <Smile className="size-5 text-blue-400" />
-                    {isEmojiOpen ? (
-                      <EmojiPicker
-                        onSelect={handleEmojiSelect}
-                        isOpen={isEmojiOpen}
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </button>
-                </CustomTooltip>
-                <div
-                  className={`ml-auto lg:size-8 size-5 md:size-6 text-sm flex justify-center items-center bg-green-600 rounded-full ${
-                    !textareaValue ? "hidden" : "flex"
-                  } ${
-                    textareaValue && textareaValue.length >= 280
-                      ? "bg-red-600"
-                      : "bg-green-600"
-                  }`}
-                >
-                  {textareaValue?.length}
-                </div>
-                <button
-                  className={`bg-blue-400 rounded-full  w-2/12 p-2 ml-auto  ${
-                    isPending
-                      ? "opactiy-75"
-                      : "hover:opacity-90 active:bg-green-500 "
-                  }`}
-                  onClick={() => handlePostSubmit()}
-                  disabled={isPending}
-                >
-                  {isPending ? "Posting..." : "Post"}
+                  </label>
                 </button>
+              </CustomTooltip>
+              <CustomTooltip title="Poll">
+                <button
+                  className={`rounded-full p-2  ${
+                    type === "poll"
+                      ? "cursor-default"
+                      : " cursor-pointer hover:bg-gray-800/70 "
+                  }  `}
+                  onClick={() => setType("poll")}
+                  disabled={type === "poll"}
+                >
+                  <ArrowUpDown
+                    className={`size-5  ${
+                      type === "poll" ? "text-gray-400/70" : "text-blue-400"
+                    } `}
+                  />
+                </button>
+              </CustomTooltip>
+              <CustomTooltip title="Emoji">
+                <div
+                  className=" relative rounded-full p-2 hover:bg-gray-800/70 cursor-pointer"
+                  onClick={() => setIsEmojiOpen((prev) => !prev)}
+                >
+                  <Smile className="size-5 text-blue-400" />
+                  {isEmojiOpen ? (
+                    <EmojiPicker
+                      onSelect={handleEmojiSelect}
+                      isOpen={isEmojiOpen}
+                    />
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </CustomTooltip>
+              <div
+                className={`ml-auto lg:size-8 size-5 md:size-6 text-sm flex justify-center items-center bg-green-600 rounded-full ${
+                  !textareaValue ? "hidden" : "flex"
+                } ${
+                  textareaValue && textareaValue.length >= 280
+                    ? "bg-red-600"
+                    : "bg-green-600"
+                }`}
+              >
+                {textareaValue?.length}
               </div>
-              {imagesPreview.length > 0 && (
-                <div className="flex gap-3 mt-3 flex-wrap ">
-                  {imagesPreview.map((preview, index) => (
-                    <div className="flex flex-col justify-center items-center gap-1">
-                      <div key={index} className="relative w-24 h-24">
-                        <img
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      </div>
-                      <div className=" h-fit w-fit rounded-full p-0.5 hover:bg-white/10">
-                        <CustomTooltip title="Remove">
-                          <X
-                            className=" text-red-600 transition-colors cursor-pointer flex justify-center items-center w-full bg-transparent"
-                            onClick={() => handleRemoveImage(index)}
-                          />
-                        </CustomTooltip>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {videoPreview ? (
-                <div className=" flex flex-col gap-2 items-center  ">
-                  <div className="w-full h-fit">
-                    <VideoPlayer source={videoPreview} />
-                  </div>
-                  <div className=" h-fit w-fit rounded-full  p-1 hover:bg-white/10">
-                    <CustomTooltip title="Remove">
-                      <X
-                        className="   rounded-full  transition-colors cursor-pointer flex justify-center items-center w-full "
-                        onClick={() => {
-                          setVideo(null);
-                          setVideoPreview(null);
-                        }}
-                      />
-                    </CustomTooltip>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
+              <button
+                className={`bg-blue-400 rounded-full  w-2/12 p-2 ml-auto  ${
+                  isPending
+                    ? "opactiy-75"
+                    : "hover:opacity-90 active:bg-green-500 "
+                }`}
+                onClick={() => handlePostSubmit()}
+                disabled={isPending}
+              >
+                {isPending ? "Posting..." : "Post"}
+              </button>
             </div>
-          </DialogDescription>
+            {imagesPreview.length > 0 && (
+              <div className="flex gap-3 mt-3 flex-wrap ">
+                {imagesPreview.map((preview, index) => (
+                  <div className="flex flex-col justify-center items-center gap-1">
+                    <div key={index} className="relative w-24 h-24">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                    <div className=" h-fit w-fit rounded-full p-0.5 hover:bg-white/10">
+                      <CustomTooltip title="Remove">
+                        <X
+                          className=" text-red-600 transition-colors cursor-pointer flex justify-center items-center w-full bg-transparent"
+                          onClick={() => handleRemoveImage(index)}
+                        />
+                      </CustomTooltip>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {videoPreview ? (
+              <div className=" flex flex-col gap-2 items-center  ">
+                <div className="w-full h-fit">
+                  <VideoPlayer source={videoPreview} />
+                </div>
+                <div className=" h-fit w-fit rounded-full  p-1 hover:bg-white/10">
+                  <CustomTooltip title="Remove">
+                    <X
+                      className="   rounded-full  transition-colors cursor-pointer flex justify-center items-center w-full "
+                      onClick={() => {
+                        setVideo(null);
+                        setVideoPreview(null);
+                      }}
+                    />
+                  </CustomTooltip>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -148,6 +148,11 @@ const CreatePostHome = memo(() => {
       return toast.error("You can upload a maximum of 4 images.");
     }
 
+    if (video || videoPreview) {
+      setVideo(null);
+      setVideoPreview(null);
+    }
+
     setFile((prev) => [...prev, ...selectedFiles]);
 
     const previews = selectedFiles.map((file) => URL.createObjectURL(file));
@@ -336,7 +341,7 @@ const CreatePostHome = memo(() => {
               </button>
             </CustomTooltip>
             <CustomTooltip title="Emoji">
-              <button
+              <div
                 className=" relative rounded-full p-2 hover:bg-gray-800/70 cursor-pointer"
                 onClick={() => setIsEmojiOpen((prev) => !prev)}
               >
@@ -349,7 +354,7 @@ const CreatePostHome = memo(() => {
                 ) : (
                   ""
                 )}
-              </button>
+              </div>
             </CustomTooltip>
 
             {textareaValue ? (

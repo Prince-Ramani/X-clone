@@ -575,9 +575,18 @@ const getMediaOfUser = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset);
-    const personID = req.params.personID;
+    const personID = new mongoose.Types.ObjectId(req.params.personID);
+
     const postss = await Post.find({
-      $and: [{ uploadedPhoto: { $ne: null } }, { uploadedBy: personID }],
+      $and: [
+        {
+          $or: [
+            { $expr: { $gt: [{ $size: "$uploadedPhoto" }, 0] } },
+            { uploadedVideo: { $exists: true, $ne: null } },
+          ],
+        },
+        { uploadedBy: personID },
+      ],
     })
       .sort({ createdAt: -1 })
       .skip(offset)

@@ -459,8 +459,6 @@ const getProfilePost = async (req, res) => {
     const user = await User.findById(req.user).select("blocked");
     const person = await User.findById(personID).select("blocked");
 
-    console.log(user.blocked, person.blocked);
-
     if (user.blocked && person.blocked) {
       if (
         user.blocked.includes(personID) ||

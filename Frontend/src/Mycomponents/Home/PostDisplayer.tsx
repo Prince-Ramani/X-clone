@@ -27,8 +27,6 @@ const PostDisplayer = memo(
       postContent,
     } = post;
 
-    console.log(post.uploadedVideo);
-
     const { setIsReplyDialog, setPostContent } = useReplyDialogContext();
     const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>(
       post.bookmarkedBy?.includes(authUserId)
@@ -201,6 +199,7 @@ const PostDisplayer = memo(
                       ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
                       : "h-40 sm:h-44  lg:h-48"
                   } overflow-hidden  flex justify-center `}
+                  key={index + 1}
                 >
                   <a href={photo} target="_blank" className="w-full  ">
                     <img
@@ -218,10 +217,7 @@ const PostDisplayer = memo(
 
           {post.uploadedVideo ? (
             <div className=" w-full h-full  ">
-              <VideoPlayer
-                source={post.uploadedVideo}
-                // className="border w-full border-white/10 rounded-md"
-              />
+              <VideoPlayer source={post.uploadedVideo} />
             </div>
           ) : (
             ""
@@ -244,6 +240,7 @@ const PostDisplayer = memo(
                         hasAnswered ? "" : "hover:bg-white/20"
                       }  `}
                       onClick={() => submitPollAnswer(index)}
+                      key={index + 1}
                     >
                       <span
                         className={`h-10 rounded-lg    ${
@@ -285,7 +282,7 @@ const PostDisplayer = memo(
 
           <div className=" p-1 mt-1 flex items-center justify-between gap-4  text-gray-500/90">
             <CustomTooltip title="Reply">
-              <span
+              <button
                 className="flex gap-1 items-end text-sm hover:text-blue-500 "
                 onClick={() => {
                   setIsReplyDialog(true);
@@ -294,10 +291,10 @@ const PostDisplayer = memo(
               >
                 <MessageCircle className="size-6 p-1  rounded-full  hover:bg-blue-400/20" />
                 {comments || 0}
-              </span>
+              </button>
             </CustomTooltip>
             <CustomTooltip title={hasUserLiked ? "Unlike" : "Like"}>
-              <span
+              <button
                 className="flex gap-2 items-end text-sm hover:text-pink-600 group "
                 onClick={() => mutate()}
               >
@@ -307,12 +304,12 @@ const PostDisplayer = memo(
                   }`}
                 />
                 {totalLikes.length}
-              </span>
+              </button>
             </CustomTooltip>
 
             <div className="flex items-center gap-1">
               <CustomTooltip title="Save">
-                <span
+                <button
                   className="flex gap-2 items-end text-sm group"
                   onClick={() => addToBookmark()}
                 >
@@ -321,11 +318,11 @@ const PostDisplayer = memo(
                       hasBookmarked ? "fill-white text-white " : ""
                     }`}
                   />
-                </span>
+                </button>
               </CustomTooltip>
 
               <CustomTooltip title="Copy url">
-                <span
+                <button
                   className="flex gap-2 items-end text-sm group"
                   onClick={() =>
                     navigator.clipboard
@@ -339,7 +336,7 @@ const PostDisplayer = memo(
                   }
                 >
                   <Share className="size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white" />
-                </span>
+                </button>
               </CustomTooltip>
             </div>
           </div>

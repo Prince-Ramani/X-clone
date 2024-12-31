@@ -32,7 +32,6 @@ const FollowersList = () => {
         `/api/getfollowersbyusername?username=${username}`
       );
       const data = await res.json();
-      console.log(data);
 
       if ("error" in data) toast.error(data.error);
       return data;

@@ -48,7 +48,7 @@ const CommentDisplayer = memo(
       },
     });
 
-    const isFollowing = totalLikes.includes(authUserId);
+    const isLiked = totalLikes.includes(authUserId);
 
     return (
       <div className="w-full border-b border-gray-400/20 break-all">
@@ -85,14 +85,14 @@ const CommentDisplayer = memo(
             </div>
             <div className="text-sm tracking-wide ">{comment?.text}</div>
             <div className=" mt-2 w-full flex justify-center items-center  text-gray-4se00/90">
-              <CustomTooltip title="Like">
+              <CustomTooltip title={isLiked ? "Unlike" : "Like"}>
                 <span
                   className="flex gap-2 items-end text-sm hover:text-pink-600 group"
                   onClick={() => LikeComment()}
                 >
                   <Heart
                     className={`size-6 p-1  rounded-full   group-hover:bg-pink-600/20  ${
-                      isFollowing ? "fill-pink-600 text-transparent" : ""
+                      isLiked ? "fill-pink-600 text-transparent" : ""
                     }`}
                   />
                   {totalLikes.length}

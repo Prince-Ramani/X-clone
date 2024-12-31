@@ -15,7 +15,7 @@ const BlockPage = () => {
       const res = await fetch("/api/totalblocks");
       const data = await res.json();
       if ("error" in data) return toast.error(data.error);
-     
+
       return data;
     },
   });
@@ -28,7 +28,7 @@ const BlockPage = () => {
       </div>
 
       {blockedUsers?.blocked.map((user: blockUserType) => (
-        <BlockUserDisplayer user={user} />
+        <BlockUserDisplayer key={user._id} user={user} />
       ))}
     </div>
   );

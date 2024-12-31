@@ -66,7 +66,7 @@ const OOP = () => {
           {searchValue && data ? (
             <div className="">
               {data.map((s: UploadedByType) => (
-                <SearchDisplayer person={s} />
+                <SearchDisplayer person={s} key={s._id} />
               ))}
             </div>
           ) : (

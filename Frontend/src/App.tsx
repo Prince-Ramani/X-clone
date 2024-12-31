@@ -22,7 +22,6 @@ import Connect from "./Mycomponents/Connect/Connect";
 import NotFoundPage from "./Mycomponents/NotFound.tsx/NotFoundPage";
 import Loading from "./components/ui/Loading";
 import Bookmark from "./Mycomponents/Bookmarks/Bookmark";
-
 import YourAccount from "./Mycomponents/Settings/YourAccount";
 import BlockPage from "./Mycomponents/Settings/BlockPage";
 
@@ -38,7 +37,6 @@ function App() {
         return data;
       }
       setAuthUser(data);
-      console.log(data);
 
       return data;
     },

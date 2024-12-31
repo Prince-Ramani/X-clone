@@ -33,7 +33,7 @@ const FollowingList = () => {
       );
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
-      console.log(data);
+
       return data;
     },
     enabled: !!username && !!userExists,

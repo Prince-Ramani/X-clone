@@ -58,57 +58,56 @@ const DeletPost = memo(
                 ) : (
                   ""
                 )}
-                <DialogDescription>
-                  <div className=" w-full  flex flex-col p-4 gap-2 ">
-                    <div className="font-bold tracking-tight text-red-600 flex gap-2  items-center ">
-                      <div>
-                        <AlertOctagon className="size-6" />
-                      </div>
-                      <div className="text-xl">Delete Post</div>
-                    </div>
-                    <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      When you delete a post, it will be permanently removed
-                      from your profile and cannot be retrieved. Deleted posts
-                      will no longer appear in your feed or be visible to
-                      others.
-                    </div>
+                <DialogDescription />
 
+                <div className=" w-full  flex flex-col p-4 gap-2 ">
+                  <div className="font-bold tracking-tight text-red-600 flex gap-2  items-center ">
                     <div>
-                      <div className="flex flex-col gap-2 mt-7">
-                        <button
-                          className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
-                            pendingDelete ? "opacity-75" : "hover:opacity-90"
-                          }  `}
-                          disabled={pendingDelete}
-                          onClick={() => Delete()}
-                        >
-                          Delete post
-                        </button>
+                      <AlertOctagon className="size-6" />
+                    </div>
+                    <div className="text-xl">Delete Post</div>
+                  </div>
+                  <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
+                    When you delete a post, it will be permanently removed from
+                    your profile and cannot be retrieved. Deleted posts will no
+                    longer appear in your feed or be visible to others.
+                  </div>
 
-                        <button
-                          className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
-                            pendingDelete ? "opacity-75" : "hover:bg-white/10"
-                          } 
+                  <div>
+                    <div className="flex flex-col gap-2 mt-7">
+                      <button
+                        className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
+                          pendingDelete ? "opacity-75" : "hover:opacity-90"
+                        }  `}
+                        disabled={pendingDelete}
+                        onClick={() => Delete()}
+                      >
+                        Delete post
+                      </button>
+
+                      <button
+                        className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
+                          pendingDelete ? "opacity-75" : "hover:bg-white/10"
+                        } 
                       `}
-                          disabled={pendingDelete}
-                          onClick={() => {
-                            setIsOpen(false);
-                          }}
-                        >
-                          Cancle
-                        </button>
-                      </div>
+                        disabled={pendingDelete}
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        Cancle
+                      </button>
                     </div>
                   </div>
-                </DialogDescription>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
         ) : (
           ""
         )}
-        <p
-          className="p-2 rounded-full hover:bg-white/10"
+        <button
+          className="p-2 rounded-full hover:bg-white/10 "
           onClick={() => {
             setIsOpen(true);
           }}
@@ -116,7 +115,7 @@ const DeletPost = memo(
           <CustomTooltip title="Delete">
             <Trash className={`size-4 text-red-600 ${className}`} />
           </CustomTooltip>
-        </p>
+        </button>
       </>
     );
   }

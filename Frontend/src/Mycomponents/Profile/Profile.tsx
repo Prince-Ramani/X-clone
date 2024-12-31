@@ -15,7 +15,7 @@ import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
 import Media from "./Media";
 import LikedPosts from "./LikedPosts";
-import { useEditProfileContext } from "@/context/EditProfileContext";
+
 import ProfilePost from "./profilePosts";
 import FollowButton from "@/customComponents/FollowButton";
 import {
@@ -24,11 +24,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Count from "./Count";
+import EditProfileDialog from "@/Layout/EditProfileDialog";
 
 const Profile = () => {
   const navigate = useNavigate();
   const queryclient = useQueryClient();
-  const { setIsEditProfileDialog } = useEditProfileContext();
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const [currentPath, setCurrentPath] = useState<string | null | undefined>(
     null
@@ -103,7 +105,16 @@ const Profile = () => {
   });
 
   return (
-    <div className="border border-b-0 border-gray-800 min-h-full  cursor-pointer">
+    <div
+      className={`border border-b-0 border-gray-800 min-h-full    cursor-pointer ${
+        isOpen ? "overflow-y-hidden" : ""
+      }`}
+    >
+      {isOpen ? (
+        <EditProfileDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      ) : (
+        ""
+      )}
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-10 ">
         <CustomTooltip title="Back">
           <div
@@ -153,13 +164,13 @@ const Profile = () => {
       </div>
 
       {profile && !("error" in profile) && !("isBlocked" in profile) ? (
-        <div className=" relative bottom-20  sm:bottom-24 md:bottom-32  flex items-center justify-end gap-3 md:gap-4 px-4  ">
-          <CustomTooltip title="More">
+        <div className=" relative bottom-20  sm:bottom-24 md:bottom-32   flex items-center justify-end gap-3 md:gap-4 px-4  ">
+          {profile._id !== authUser._id ? (
             <Popover>
               <PopoverTrigger>
-                <button className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center ">
+                <div className="size-8 border border-white/70 hover:bg-white/20 rounded-full active:bg-white/40 flex justify-center items-center ">
                   <MoreHorizontal className="size-5" />
-                </button>
+                </div>
               </PopoverTrigger>
               <PopoverContent className="  bg-black text-white p-0 border-none shadow-md  shadow-red-600/80  ring-1 ring-red-500/80  ">
                 <div
@@ -170,7 +181,10 @@ const Profile = () => {
                 </div>
               </PopoverContent>
             </Popover>
-          </CustomTooltip>
+          ) : (
+            ""
+          )}
+
           <CustomTooltip title="Search">
             <button className="size-8 border  border-white/70 hover:bg-white/20 active:bg-white/40  rounded-full  flex justify-center items-center">
               <Search className="size-4 m-1 " />
@@ -180,7 +194,7 @@ const Profile = () => {
           {authUser._id === profile?._id ? (
             <button
               className="bg-transparent border rounded-full w-24 border-gray-200/90 hover:bg-white/10 h-8 text-sm font-bold"
-              onClick={() => setIsEditProfileDialog(true)}
+              onClick={() => setIsOpen(true)}
             >
               Edit profile
             </button>
@@ -218,8 +232,8 @@ const Profile = () => {
             <div className="text-gray-400/80">@{profile?.username}</div>
           </div>
 
-          <div className="  relative bottom-16 md:bottom-20  px-2 md:px-4 flex flex-col gap-2">
-            {profile?.bio}
+          <div className="  relative bottom-16 md:bottom-20  mb  px-2 md:px-5 flex flex-col gap-2">
+            <div className="text-sm mb-1">{profile?.bio}</div>
             <div className="flex  items-center gap-2 text-gray-400/70 text-xs 2xl:text-sm ">
               <MapPin className="size-4" />
               {profile?.location || "unknown"}
@@ -228,16 +242,13 @@ const Profile = () => {
                 ? format(profile?.createdAt, "MMMM yyyy")
                 : ""}
             </div>
-            {!!profile ? (
+            {!!profile && "isBlocked" in profile ? (
+              ""
+            ) : (
               <Count
                 personUsername={personUsername}
                 followingLength={profile.following.length}
-                isBlocked={!!profile.isBlocked}
-                hasError={!!profile.error}
-                profile={!!profile}
               />
-            ) : (
-              ""
             )}
           </div>
         </>

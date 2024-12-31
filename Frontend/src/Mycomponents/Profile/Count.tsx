@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -7,22 +7,16 @@ const Count = memo(
   ({
     personUsername,
     followingLength,
-    isBlocked,
-    hasError,
-    profile,
   }: {
     personUsername: string;
     followingLength: number;
-    isBlocked: boolean;
-    hasError: boolean;
-    profile: boolean;
   }) => {
     const navigate = useNavigate();
+    const [hasPendingRequest, setHasPendingRequest] = useState<boolean>(false);
 
     const { data: followers } = useQuery({
       queryKey: [personUsername, "followers"],
       queryFn: async () => {
-        if (hasError || isBlocked) return null;
         const res = await fetch(
           `/api/getfollowersnumbers?username=${personUsername}`
         );
@@ -34,9 +28,24 @@ const Count = memo(
         }
         return data;
       },
-
       refetchOnWindowFocus: false,
     });
+
+    useEffect(() => {
+      if (followers) {
+        const hasObj = followers.some(
+          (item: string | object) =>
+            typeof item === "object" &&
+            item !== null &&
+            "pendingRequest" in item
+        );
+        if (hasObj) {
+          setHasPendingRequest(true);
+        } else {
+          if (setHasPendingRequest) setHasPendingRequest(false);
+        }
+      }
+    }, [followers]);
 
     return (
       <div className=" px-1 mt-2 flex  gap-4 text-sm">
@@ -52,7 +61,7 @@ const Count = memo(
           onClick={() => navigate(`/profile/${personUsername}/followers`)}
         >
           <span className="font-bold">
-            {followers && followers.pendingRequest
+            {followers && hasPendingRequest
               ? followers.length - 1
               : followers
               ? followers.length
