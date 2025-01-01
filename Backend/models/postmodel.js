@@ -83,10 +83,6 @@ const postSchema = mongoose.Schema(
         votes: { type: Number, default: 0 },
       },
     ],
-    answer: {
-      type: String,
-      required: false,
-    },
     explanation: {
       type: String,
       required: false,

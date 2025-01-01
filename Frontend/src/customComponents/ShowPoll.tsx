@@ -119,8 +119,8 @@ const ShowPoll = memo(
             ))}
           </div>
         </div>
-        {hasAnswered && !!post.explanation ? (
-          <div className="  rounded-md mt-4  p-2 bg-slate-800 text-slate-300 flex flex-col gap-2 animate-in animate-out transition-all  duration-1000 ">
+        {hasAnswered && (!!post.explanation || !!post.explanationImage) ? (
+          <div className="  rounded-md mt-4  p-2   bg-slate-800 text-slate-300 flex flex-col gap-2   ">
             <div className=" flex items-center">
               <div className="font-bold tracking-wide underline underline-offset-2 ">
                 Explanation:
@@ -138,7 +138,11 @@ const ShowPoll = memo(
                 </div>
               </CustomTooltip>
             </div>
-            {isCollpased ? "" : <p className="text-sm  ">{post.explanation}</p>}
+            {post.explanation && isCollpased ? (
+              ""
+            ) : (
+              <p className="text-sm  ">{post.explanation}</p>
+            )}
             {post.explanationImage && !isCollpased ? (
               <a
                 className="w-full rounded-md  "
@@ -147,7 +151,8 @@ const ShowPoll = memo(
               >
                 <img
                   src={post.explanationImage}
-                  className=" border border-gray-400/20 rounded-md max-h-96 w-full "
+                  className=" border border-gray-400/20 rounded-md max-h-[500px] w-full object-cover"
+                  loading="lazy"
                 />
               </a>
             ) : (

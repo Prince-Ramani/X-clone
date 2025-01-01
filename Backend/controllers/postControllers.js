@@ -89,7 +89,6 @@ const createPoll = async (req, res) => {
       return res
         .json({ error: "A poll must have minimum 2 options!" })
         .status(400);
-    // if(!answer) return res.json({error : "A poll must have an answer!"}).status(400)
 
     if (req.file) {
       const uploadRes = await cloudinary.uploader.upload(req.file.path, {
@@ -106,9 +105,8 @@ const createPoll = async (req, res) => {
       const post = new Post({
         type: "poll",
         postContent,
-        explanationImage,
+        explanationImage: explanationImage,
         options,
-        answer: answer || "",
         explanation: explanation || "",
         uploadedBy: req.user,
       });
@@ -129,7 +127,7 @@ const createPoll = async (req, res) => {
     return res.json({ message: "Poll created successfully!" }).status(200);
   } catch (err) {
     console.log(err);
-    return res.json({ error: "Internal server error!" }).status(5000);
+    return res.json({ error: "Make sure internet is ON!" }).status(5000);
   }
 };
 

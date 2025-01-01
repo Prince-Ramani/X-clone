@@ -368,24 +368,45 @@ const CreatePostHome = memo(() => {
                     multiple
                     accept="image/*"
                   />
-                  <label
-                    htmlFor="explanation-upload"
-                    className="cursor-pointer"
-                  >
-                    <div className="flex justify-center items-center  p-5 group transition-colors duration-200 hover:bg-white/20">
-                      <ImageIcon className="size-10 group group-hover:text-blue-500 transition-all" />
-                    </div>
-                  </label>
+
                   {explanationImagePreview ? (
-                    <img src={explanationImagePreview}></img>
+                    <div className=" w-full p-2 relative ">
+                      <img
+                        src={explanationImagePreview}
+                        className="h-full max-h-96 w-full rounded-sm border-gray-400/20 border"
+                      />
+                      <CustomTooltip title="Remove">
+                        <div
+                          className=" flex justify-center items-center font-bold pt-2  "
+                          onClick={() => {
+                            setExpanationImagePreview("");
+                            setExpanationImage(null);
+                          }}
+                        >
+                          <X className="hover:bg-white/20 p-2 size-10 rounded-full " />
+                        </div>
+                      </CustomTooltip>
+                    </div>
                   ) : (
-                    ""
+                    <label
+                      htmlFor="explanation-upload"
+                      className="cursor-pointer"
+                    >
+                      <div className="flex justify-center items-center  p-5 group transition-colors duration-200 hover:bg-white/20">
+                        <ImageIcon className="size-10 group group-hover:text-blue-500 transition-all" />
+                      </div>
+                    </label>
                   )}
                 </div>
 
                 <div
                   className="border-t border-gray-500  cursor-pointer text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
-                  onClick={() => setType("post")}
+                  onClick={() => {
+                    setType("post");
+                    setExpanationImage(null);
+                    setExpanation("");
+                    setExpanationImagePreview("");
+                  }}
                 >
                   Remove poll
                 </div>
