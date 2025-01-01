@@ -439,8 +439,12 @@ const getFollowersListByUsername = async (req, res) => {
       .select("following followers blocked blockedBy accountType _id")
       .populate({
         path: "followers",
-        select: "_id profilePic bio username followers following",
+        select: "_id profilePic bio username followers following ",
       });
+
+    const me = await User.findOne({ _id: req.user }).select(
+      "blocked blockedBy"
+    );
 
     if (!user) {
       return res.status(404).json({ error: "No such account exists!" });
@@ -458,8 +462,16 @@ const getFollowersListByUsername = async (req, res) => {
       user.accountType === "private" &&
       isFollowing.length === 0 &&
       req.user !== user._id.toString()
-    )
+    ) {
       return res.json({ message: "Account is private!" });
+    }
+
+    user.followers = user.followers.filter((follower) => {
+      return (
+        !me.blocked.includes(follower._id) &&
+        !me.blockedBy.includes(follower._id)
+      );
+    });
     return res.status(200).json(user.followers);
   } catch (err) {
     console.log(err);
@@ -478,6 +490,10 @@ const getFollowingListByUsername = async (req, res) => {
         select: "_id profilePic bio username followers following",
       });
 
+    const me = await User.findOne({ _id: req.user }).select(
+      "blocked blockedBy"
+    );
+
     if (!user) {
       return res.status(404).json({ error: "No such account exists!" });
     }
@@ -492,6 +508,13 @@ const getFollowingListByUsername = async (req, res) => {
       req.user !== user._id.toString()
     )
       return res.json({ message: "Account is private!" }).status(200);
+
+    user.following = user.following.filter((following) => {
+      return (
+        !me.blocked.includes(following._id) &&
+        !me.blockedBy.includes(following._id)
+      );
+    });
 
     return res.status(200).json(user.following);
   } catch (err) {
@@ -534,7 +557,6 @@ const userNameAvailable = async (req, res) => {
 const getFollowersNumber = async (req, res) => {
   try {
     const { username } = req.query;
-
     const user = await User.findOne({ username: username }).select(
       "followers accountType pendingRequest"
     );

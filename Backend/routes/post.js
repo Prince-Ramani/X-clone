@@ -17,6 +17,7 @@ const {
   createPoll,
   submitPollAnswer,
   getPollResult,
+  getPolls,
   getPostsCount,
 } = require("../controllers/postControllers");
 
@@ -45,6 +46,7 @@ router.post("/likepost/:postid", protectRoute, likePost);
 router.get("/likedposts/:personid", protectRoute, getLikedPosts);
 router.post("/deletepost/:postid", protectRoute, deletePost);
 router.get("/profile/:personID", protectRoute, getProfilePost);
+router.get("/polls/:personID", protectRoute, getPolls);
 router.get("/getPost/:postID", protectRoute, getPost);
 router.post("/:postID/likecomment/:commentID", protectRoute, likeComment);
 router.post("/:postID/deletecomment/:commentID", protectRoute, deleteComment);

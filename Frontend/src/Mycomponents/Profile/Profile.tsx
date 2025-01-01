@@ -15,7 +15,6 @@ import { useAuthUser } from "@/context/userContext";
 import { useEffect, useState } from "react";
 import Media from "./Media";
 import LikedPosts from "./LikedPosts";
-
 import ProfilePost from "./profilePosts";
 import FollowButton from "@/customComponents/FollowButton";
 import {
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import Count from "./Count";
 import EditProfileDialog from "@/Layout/EditProfileDialog";
+import Polls from "./Polls";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -253,8 +253,8 @@ const Profile = () => {
           </div>
         </>
       )}
-
-      <div className="font-semibold relative bottom-12  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
+      {/* dcdc */}
+      <div className="font-semibold relative bottom-12  text-sm  sm:text-base  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
         <div
           className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 ${
             !currentPath ? "text-white font-bold" : ""
@@ -294,6 +294,19 @@ const Profile = () => {
             }`}
           />
         </div>
+        <div
+          className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
+            currentPath === "polls" ? "text-white font-bold" : ""
+          }  `}
+          onClick={() => navigate(`/profile/${personUsername}/polls`)}
+        >
+          <div className="p-1 pt-2">Polls</div>
+          <div
+            className={`border-2 border-blue-400 w-20 rounded-full ${
+              currentPath === "polls" ? "block" : "hidden"
+            }`}
+          />
+        </div>
       </div>
 
       {currentPath === "likedposts" && profile && !("isBlocked" in profile) ? (
@@ -307,6 +320,16 @@ const Profile = () => {
       )}
       {currentPath === "media" && profile && !("isBlocked" in profile) ? (
         <Media
+          isAuthenticated={!!profile._id}
+          authUserId={authUser._id}
+          profileId={profile._id}
+        />
+      ) : (
+        ""
+      )}
+
+      {currentPath === "polls" && profile && !("isBlocked" in profile) ? (
+        <Polls
           isAuthenticated={!!profile._id}
           authUserId={authUser._id}
           profileId={profile._id}

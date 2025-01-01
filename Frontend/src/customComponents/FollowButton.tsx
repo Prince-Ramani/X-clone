@@ -47,10 +47,16 @@ const FollowButton = memo(
       if (data && authUser) {
         setIsFollowing(data.includes(authUser._id));
 
-        if (!!data[0] && !!data[0].pendingRequest) {
-          setRequestSent(data[0].pendingRequest.includes(authUser._id));
+        const includesPendingRequest = data.filter((d: any) => {
+          return typeof d === "object";
+        });
+
+        if (includesPendingRequest.length > 0) {
+          setRequestSent(
+            includesPendingRequest[0].pendingRequest.includes(authUser._id)
+          );
         } else {
-          setRequestSent(false);
+          if (requestSent === true) setRequestSent(false);
         }
       }
     }, [data, authUser]);
@@ -98,47 +104,46 @@ const FollowButton = memo(
                 ) : (
                   ""
                 )}
-                <DialogDescription>
-                  <div className=" w-full  flex flex-col p-4 ">
-                    <div className="font-bold">
-                      <div>
-                        {requestSent ? "Cancle follow request?" : "Unfollow"}
-                      </div>
-                      <div className="">@{username}?</div>
-                    </div>
-                    <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      {requestSent
-                        ? `Are you sure you want to cancle follow request sent to ${username} `
-                        : "Their posts will no longer show up in your Following section. You can still view their profile, unless their posts are protected."}
-                    </div>
+                <DialogDescription />
+                <div className=" w-full  flex flex-col p-4 ">
+                  <div className="font-bold">
                     <div>
-                      <div className="flex flex-col gap-2 mt-7">
-                        <button
-                          className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
-                            pendingFollow ? "opacity-75" : "hover:opacity-90"
-                          }  `}
-                          disabled={pendingFollow}
-                          onClick={() => follow()}
-                        >
-                          {requestSent ? "Cancle Request!" : "Unfollow"}
-                        </button>
+                      {requestSent ? "Cancle follow request?" : "Unfollow"}
+                    </div>
+                    <div className="">@{username}?</div>
+                  </div>
+                  <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
+                    {requestSent
+                      ? `Are you sure you want to cancle follow request sent to ${username} `
+                      : "Their posts will no longer show up in your Following section. You can still view their profile, unless their posts are protected."}
+                  </div>
+                  <div>
+                    <div className="flex flex-col gap-2 mt-7">
+                      <button
+                        className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
+                          pendingFollow ? "opacity-75" : "hover:opacity-90"
+                        }  `}
+                        disabled={pendingFollow}
+                        onClick={() => follow()}
+                      >
+                        {requestSent ? "Cancle Request!" : "Unfollow"}
+                      </button>
 
-                        <button
-                          className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
-                            pendingFollow ? "opacity-75" : "hover:bg-white/10"
-                          } 
+                      <button
+                        className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
+                          pendingFollow ? "opacity-75" : "hover:bg-white/10"
+                        } 
                       `}
-                          disabled={pendingFollow || pendingFetch}
-                          onClick={() => {
-                            setIsOpen(false);
-                          }}
-                        >
-                          Cancle
-                        </button>
-                      </div>
+                        disabled={pendingFollow || pendingFetch}
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        Cancle
+                      </button>
                     </div>
                   </div>
-                </DialogDescription>
+                </div>
               </div>
             </DialogContent>
           </Dialog>

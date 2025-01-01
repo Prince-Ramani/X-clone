@@ -14,7 +14,7 @@ export interface User {
   blocked: string[];
   blockedBy: string[];
   accountType: "public" | "private";
-  pendingRequest: string[];
+pendingRequest: string[];
 }
 
 interface UserContextType {

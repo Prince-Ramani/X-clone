@@ -492,6 +492,50 @@ const getProfilePost = async (req, res) => {
   }
 };
 
+const getPolls = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = parseInt(req.query.offset);
+    const personID = req.params.personID;
+
+    const user = await User.findById(req.user).select("blocked");
+    const person = await User.findById(personID).select("blocked");
+
+    if (user.blocked && person.blocked) {
+      if (
+        user.blocked.includes(personID) ||
+        person.blocked.includes(req.user)
+      ) {
+        return res.json([]).status(200);
+      }
+    }
+
+    const postss = await Post.find({
+      $and: [{ uploadedBy: personID }, { type: "poll" }],
+    })
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .populate({
+        path: "uploadedBy",
+        select: "-password",
+      })
+      .lean();
+
+    if (!postss || postss.length === 0) return res.status(200).json([]);
+
+    const posts = postss.map((post) => ({
+      ...post,
+      comments: post.comments.length,
+    }));
+
+    return res.status(200).json(posts);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal servere error" });
+  }
+};
+
 const getPost = async (req, res) => {
   try {
     const user = await User.findById(req.user);
@@ -595,4 +639,5 @@ module.exports = {
   submitPollAnswer,
   getPollResult,
   getPostsCount,
+  getPolls,
 };

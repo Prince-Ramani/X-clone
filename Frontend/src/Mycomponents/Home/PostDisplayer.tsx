@@ -243,10 +243,10 @@ const PostDisplayer = memo(
                       key={index + 1}
                     >
                       <span
-                        className={`h-10 rounded-lg    ${
+                        className={`h-10 rounded-lg animate-in transition-all animate-out  duration-700    ${
                           selectedOption === index
-                            ? "bg-blue-500 "
-                            : "bg-red-500"
+                            ? "bg-blue-500  "
+                            : "bg-red-500 "
                         }`}
                         style={{
                           width: `${pollResultCount?.arr[index] || 0}%`,

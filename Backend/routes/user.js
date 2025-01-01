@@ -58,6 +58,7 @@ router.get("/getfollowings", protectRoute, getFOllowingList);
 router.post("/usernameavailable/:username", protectRoute, userNameAvailable);
 router.get("/userexists/:username", protectRoute, userExists);
 router.get("/profile/media/:personID", protectRoute, getMediaOfUser);
+
 router.post("/add/bookmark/:postID", protectRoute, addToBookmarks);
 router.get("/getbookmarks", protectRoute, getBookmarks);
 router.get("/totalblocks", protectRoute, getBlockedPerson);

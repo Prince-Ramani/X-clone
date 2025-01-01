@@ -11,6 +11,7 @@ import { useCreatePostContext } from "@/context/createPostContext";
 import {
   ArrowUpDown,
   ImageIcon,
+  Minus,
   Plus,
   Smile,
   VideoIcon,
@@ -129,16 +130,11 @@ const CreatePostDialog = () => {
     },
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
-      else {
-        setFile([]);
-        setTextareaValue("");
-        setIsEmojiOpen(false);
-        setImagesPreview([]);
 
-        setCreateDialog(false);
+      setIsEmojiOpen(false);
+      setCreateDialog(false);
 
-        return toast.success(data.message);
-      }
+      return toast.success(data.message);
     },
   });
 
@@ -202,6 +198,20 @@ const CreatePostDialog = () => {
       setFile([]);
       setVideoPreview(URL.createObjectURL(v));
     }
+  };
+
+  const switchToPoll = () => {
+    if (imagesPreview || file) {
+      setFile([]);
+      setImagesPreview([]);
+    }
+
+    if (video || videoPreview) {
+      setVideo(null);
+      setVideoPreview(null);
+    }
+
+    setType("poll");
   };
 
   return (
@@ -282,16 +292,32 @@ const CreatePostDialog = () => {
                         ))}
                     </div>
                   </div>
-                  {totalOptions < 7 ? (
-                    <div className="flex min-h-full  items-end pl-1  pb-3  ">
-                      <CustomTooltip title="Add">
-                        <div
-                          className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors cursor-pointer"
-                          onClick={() => setTotalOptions((prev) => prev + 1)}
-                        >
-                          <Plus className="text-blue-400" />
-                        </div>
-                      </CustomTooltip>
+                  {totalOptions > 1 ? (
+                    <div className="flex flex-col min-h-full cursor-pointer  justify-end items-center gap-4 pl-1  pb-4   ">
+                      {totalOptions > 2 ? (
+                        <CustomTooltip title="Remove">
+                          <div
+                            className=" rounded-full hover:bg-blue-600/20  p-1  transition-colors"
+                            onClick={() => setTotalOptions((prev) => prev - 1)}
+                          >
+                            <Minus className="text-red-600" />
+                          </div>
+                        </CustomTooltip>
+                      ) : (
+                        ""
+                      )}
+                      {totalOptions < 7 ? (
+                        <CustomTooltip title="Add">
+                          <div
+                            className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors"
+                            onClick={() => setTotalOptions((prev) => prev + 1)}
+                          >
+                            <Plus className="text-blue-400" />
+                          </div>
+                        </CustomTooltip>
+                      ) : (
+                        ""
+                      )}
                     </div>
                   ) : (
                     ""
@@ -375,7 +401,7 @@ const CreatePostDialog = () => {
                       ? "cursor-default"
                       : " cursor-pointer hover:bg-gray-800/70 "
                   }  `}
-                  onClick={() => setType("poll")}
+                  onClick={() => switchToPoll()}
                   disabled={type === "poll"}
                 >
                   <ArrowUpDown

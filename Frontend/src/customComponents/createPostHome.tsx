@@ -7,6 +7,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import {
   ArrowUpDown,
   ImageIcon,
+  Minus,
   Plus,
   Smile,
   VideoIcon,
@@ -27,6 +28,8 @@ const CreatePostHome = memo(() => {
   const [totalOptions, setTotalOptions] = useState<number>(2);
   const [video, setVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [explanation, setExpanation] = useState<string>("");
+
   const [optionValue, setOptionValue] = useState({
     option1: "",
     option2: "",
@@ -52,24 +55,29 @@ const CreatePostHome = memo(() => {
     },
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
-      else {
-        setFile([]);
-        setTextareaValue("");
-        setIsEmojiOpen(false);
-        setImagesPreview([]);
-        setVideo(null);
-        setVideoPreview(null);
-        queryClient.invalidateQueries({
-          queryKey: [authUser?.username, "Posts"],
-        });
 
-        return toast.success("Post created successfully!");
-      }
+      resetStates();
+      queryClient.invalidateQueries({
+        queryKey: [authUser?.username, "Posts"],
+      });
+
+      return toast.success("Post created successfully!");
     },
   });
 
+  const resetStates = () => {
+    setType("post");
+    setFile([]);
+    setTextareaValue("");
+    setIsEmojiOpen(false);
+    setImagesPreview([]);
+    setVideo(null);
+    setVideoPreview(null);
+    setTotalOptions(0);
+  };
+
   const { mutate: createPoll } = useMutation({
-    mutationFn: async (send) => {
+    mutationFn: async (send: any) => {
       const res = await fetch("/api/post/createPoll", {
         method: "POST",
         headers: {
@@ -84,14 +92,9 @@ const CreatePostHome = memo(() => {
     },
     onSuccess: (data) => {
       if ("error" in data) return toast.error(data.error);
-      else {
-        setFile([]);
-        setTextareaValue("");
-        setIsEmojiOpen(false);
-        setImagesPreview([]);
 
-        return toast.success(data.message);
-      }
+      resetStates();
+      return toast.success(data.message);
     },
   });
 
@@ -119,8 +122,9 @@ const CreatePostHome = memo(() => {
         return toast.error(
           "Poll content length must be less than 280 characters!"
         );
+      const formData = new FormData();
 
-      const optionsArray = Object.values(optionValue).filter(
+      const optionsArray: string[] = Object.values(optionValue).filter(
         (option) => option.trim() !== ""
       );
 
@@ -135,7 +139,20 @@ const CreatePostHome = memo(() => {
       if (optionsArray.length < 2)
         return toast.error("A poll must have minimum 2 options!");
 
+      if (explanation) {
+        if (explanation.length > 100) {
+          return toast.error(
+            "Explanation length must not exceed 100 characters!"
+          );
+        }
+        formData.append("explanation", explanation);
+      }
+
       //@ts-ignore
+
+      formData.append("postContent", textareaValue);
+      const optionArraySerialized = JSON.stringify(optionsArray);
+      formData.append("options", optionArraySerialized);
 
       createPoll({ postContent: textareaValue, options: optionsArray });
     }
@@ -178,6 +195,22 @@ const CreatePostHome = memo(() => {
   const handleRemoveImage = (index: number) => {
     setFile((prev) => prev.filter((_, i) => i !== index));
     setImagesPreview((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const switchToPoll = () => {
+    if (imagesPreview || file) {
+      setFile([]);
+      setImagesPreview([]);
+    }
+
+    if (video || videoPreview) {
+      setVideo(null);
+      setVideoPreview(null);
+    }
+
+    setTotalOptions(2);
+
+    setType("poll");
   };
 
   return (
@@ -248,20 +281,57 @@ const CreatePostHome = memo(() => {
                         ))}
                     </div>
                   </div>
-                  {totalOptions < 7 ? (
-                    <div className="flex min-h-full  items-end pl-1  pb-3  ">
-                      <CustomTooltip title="Add">
-                        <div
-                          className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors"
-                          onClick={() => setTotalOptions((prev) => prev + 1)}
-                        >
-                          <Plus className="text-blue-400" />
-                        </div>
-                      </CustomTooltip>
+                  {totalOptions > 1 ? (
+                    <div className="flex flex-col min-h-full  justify-end items-center gap-4 pl-1  pb-4   ">
+                      {totalOptions > 2 ? (
+                        <CustomTooltip title="Remove">
+                          <div
+                            className=" rounded-full hover:bg-blue-600/20  p-1  transition-colors"
+                            onClick={() => setTotalOptions((prev) => prev - 1)}
+                          >
+                            <Minus className="text-red-600" />
+                          </div>
+                        </CustomTooltip>
+                      ) : (
+                        ""
+                      )}
+                      {totalOptions < 7 ? (
+                        <CustomTooltip title="Add">
+                          <div
+                            className=" rounded-full hover:bg-blue-600/20 p-1 transition-colors"
+                            onClick={() => setTotalOptions((prev) => prev + 1)}
+                          >
+                            <Plus className="text-blue-400" />
+                          </div>
+                        </CustomTooltip>
+                      ) : (
+                        ""
+                      )}
                     </div>
                   ) : (
                     ""
                   )}
+                </div>
+
+                <div className="border-t border-gray-500 ">
+                  <div className="p-2 flex flex-col gap-2 pb-5">
+                    <div className="font-semibold text-gray-300">
+                      Explanation{" "}
+                      <span className="text-gray-400 font-normal ">
+                        (optional)
+                      </span>
+                    </div>
+                    <TextareaAutosize
+                      placeholder="Explanation if needed!"
+                      className="bg-transparent text-sm border-gray-400 border rounded-md  focus:border-blue-500 p-2  h-auto block focus:outline-none w-full resize-none  "
+                      minRows={3}
+                      maxRows={7}
+                      value={explanation}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setExpanation(e.target.value)
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div
@@ -330,7 +400,7 @@ const CreatePostHome = memo(() => {
                     ? "cursor-default"
                     : " cursor-pointer hover:bg-gray-800/70 "
                 }  `}
-                onClick={() => setType("poll")}
+                onClick={() => switchToPoll()}
                 disabled={type === "poll"}
               >
                 <ArrowUpDown
