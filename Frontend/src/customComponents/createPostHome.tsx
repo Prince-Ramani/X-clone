@@ -29,6 +29,9 @@ const CreatePostHome = memo(() => {
   const [video, setVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [explanation, setExpanation] = useState<string>("");
+  const [explanationImage, setExpanationImage] = useState<File | null>(null);
+  const [explanationImagePreview, setExpanationImagePreview] =
+    useState<string>("");
 
   const [optionValue, setOptionValue] = useState({
     option1: "",
@@ -73,17 +76,13 @@ const CreatePostHome = memo(() => {
     setImagesPreview([]);
     setVideo(null);
     setVideoPreview(null);
-    setTotalOptions(0);
   };
 
-  const { mutate: createPoll } = useMutation({
-    mutationFn: async (send: any) => {
+  const { mutate: createPoll, isPending: pendingPoll } = useMutation({
+    mutationFn: async (formData: FormData) => {
       const res = await fetch("/api/post/createPoll", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(send),
+        body: formData,
       });
 
       const data = await res.json();
@@ -148,13 +147,14 @@ const CreatePostHome = memo(() => {
         formData.append("explanation", explanation);
       }
 
-      //@ts-ignore
+      if (explanationImage)
+        formData.append("explanationImage", explanationImage);
 
       formData.append("postContent", textareaValue);
       const optionArraySerialized = JSON.stringify(optionsArray);
       formData.append("options", optionArraySerialized);
 
-      createPoll({ postContent: textareaValue, options: optionsArray });
+      createPoll(formData);
     }
   };
 
@@ -184,6 +184,25 @@ const CreatePostHome = memo(() => {
       setImagesPreview([]);
       setFile([]);
       setVideoPreview(URL.createObjectURL(v));
+    }
+  };
+
+  const handleExplanationImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (file) {
+      setFile([]);
+      setImagesPreview([]);
+    }
+
+    if (video) {
+      setVideo(null);
+      setVideoPreview(null);
+    }
+    if (e.target.files !== null && e.target.files[0]) {
+      const fi = e.target.files[0];
+      setExpanationImage(fi);
+      setExpanationImagePreview(URL.createObjectURL(fi));
     }
   };
 
@@ -334,6 +353,36 @@ const CreatePostHome = memo(() => {
                   </div>
                 </div>
 
+                <div className="border-t border-gray-500 ">
+                  <div className="font-semibold p-2">
+                    Image for better explanation!{" "}
+                    <span className="text-gray-400 font-normal ">
+                      (optional)
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    id="explanation-upload"
+                    className="hidden"
+                    onChange={handleExplanationImageChange}
+                    multiple
+                    accept="image/*"
+                  />
+                  <label
+                    htmlFor="explanation-upload"
+                    className="cursor-pointer"
+                  >
+                    <div className="flex justify-center items-center  p-5 group transition-colors duration-200 hover:bg-white/20">
+                      <ImageIcon className="size-10 group group-hover:text-blue-500 transition-all" />
+                    </div>
+                  </label>
+                  {explanationImagePreview ? (
+                    <img src={explanationImagePreview}></img>
+                  ) : (
+                    ""
+                  )}
+                </div>
+
                 <div
                   className="border-t border-gray-500  cursor-pointer text-center text-lg p-3 text-red-500 hover:bg-white/5 transition-colors active:bg-red-500/20  "
                   onClick={() => setType("post")}
@@ -443,12 +492,12 @@ const CreatePostHome = memo(() => {
 
             <button
               className={`rounded-full p-2 px-4 text-semibold bg-blue-400 hover:opacity-90 ml-auto ${
-                isPending ? "bg-gray-500" : ""
+                isPending || pendingPoll ? "bg-gray-500" : ""
               }`}
-              disabled={isPending}
+              disabled={isPending || pendingPoll}
               onClick={handlePostSubmit}
             >
-              {isPending ? "Posting..." : "Post"}
+              {isPending || pendingPoll ? "Posting..." : "Post"}
             </button>
           </div>
           {imagesPreview.length > 0 && (

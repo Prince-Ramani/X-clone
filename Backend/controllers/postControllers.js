@@ -79,9 +79,12 @@ const createPost = async (req, res) => {
 
 const createPoll = async (req, res) => {
   try {
-    const { postContent, options, answer, explanation } = req.body;
+    const { postContent, answer, explanation } = req.body;
+    var { options } = req.body;
+    options = JSON.parse(options);
     if (!postContent)
       return res.json({ error: "Poll must have some content!" }).status(400);
+
     if (!options || options.length < 2)
       return res
         .json({ error: "A poll must have minimum 2 options!" })
@@ -91,6 +94,7 @@ const createPoll = async (req, res) => {
     if (req.file) {
       const uploadRes = await cloudinary.uploader.upload(req.file.path, {
         folder: "X-clone/Posts",
+        resource_type: "image",
       });
 
       try {
@@ -426,6 +430,22 @@ const deletePost = async (req, res) => {
       );
     }
 
+    if (!!postToDelete.explanationImage) {
+      try {
+        const foldername = "X-clone/Posts";
+        const imgID = postToDelete.explanationImage
+          .split("/")
+          .slice(-1)[0]
+          .split(".")[0];
+        const picID = `${foldername}/${imgID}`;
+        await cloudinary.uploader.destroy(picID, {
+          resource_type: "image",
+        });
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: "Internal server error!" });
+      }
+    }
     if (!!postToDelete.uploadedVideo) {
       const foldername = "X-clone/Videos";
       try {
@@ -435,7 +455,9 @@ const deletePost = async (req, res) => {
           .split(".")[0];
         const videoID = `${foldername}/${vidID}`;
 
-        await cloudinary.uploader.destroy(videoID, { resource_type: "video" });
+        await cloudinary.uploader.destroy(videoID, {
+          resource_type: "video",
+        });
       } catch (error) {
         console.error(`Error deleting video`, error);
       }

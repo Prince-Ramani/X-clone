@@ -14,8 +14,10 @@ export interface PostType {
   bookmarkedBy?: any[];
   createdAt: string;
   updatedAt: string;
+  explanation?: string;
   type: "poll" | "post";
   options?: string[];
+  explanationImage?: string;
   answeredBy?: [
     {
       userAnswered: string;

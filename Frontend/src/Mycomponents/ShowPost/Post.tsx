@@ -13,13 +13,14 @@ import {
   Share,
   Smile,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { CommentType } from "@/lib/Types";
 import EmojiPicker from "@/customComponents/EmojiPicker";
 import VideoPlayer from "@/customComponents/VideoPlayer";
+import ShowPoll from "@/customComponents/ShowPoll";
 
 const ShowPost = () => {
   const { username, postId } = useParams();
@@ -30,8 +31,6 @@ const ShowPost = () => {
   const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>();
   const [_, setSelectedEmoji] = useState();
   const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
-  const [hasAnswered, setHasAnswered] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<number | undefined>();
 
   const { data: userExists } = useQuery({
     queryKey: [username, "sync"],
@@ -133,39 +132,6 @@ const ShowPost = () => {
     },
   });
 
-  const { mutate: answerPoll } = useMutation({
-    mutationFn: async (answerNumber: number) => {
-      const res = await fetch(`/api/post/answerpoll/${postId}`, {
-        method: "Post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ answerNumber }),
-      });
-      const data = await res.json();
-      if ("error" in data) return toast.error(data.error);
-      setSelectedOption(answerNumber);
-      setHasAnswered(true);
-      return data;
-    },
-    onSuccess: (data) => {
-      if ("error" in data) return;
-      toast.success(data.message);
-    },
-  });
-
-  const { data: pollResultCount } = useQuery({
-    queryKey: [postId, "PollResult"],
-    queryFn: async () => {
-      const res = await fetch(`/api/post/getpollresult/${postId}`);
-      const data = await res.json();
-      if ("error" in data) return toast.error(data.error);
-
-      return data;
-    },
-    enabled: hasAnswered && post?.type === "poll",
-  });
-
   const handleEmojiSelect = (emoji: any) => {
     setSelectedEmoji(emoji.native);
     setTextareaValue((prevText) => prevText + emoji.native);
@@ -180,25 +146,6 @@ const ShowPost = () => {
     } else {
       toast.error("Reply should have some content!");
     }
-  };
-
-  useEffect(() => {
-    if (post?.answeredBy && authUser?._id) {
-      const userHasAnswered = post.answeredBy.filter(
-        (entry: any) => entry.userAnswered === authUser._id
-      );
-
-      if (userHasAnswered.length > 0) {
-        setHasAnswered(true);
-        setSelectedOption(userHasAnswered[0].optionSelected);
-      }
-    }
-  }, [post, authUser?._id]);
-
-  const submitPollAnswer = (answerNumber: number) => {
-    if (hasAnswered) return toast.error("Aleardy answered!");
-
-    answerPoll(answerNumber);
   };
 
   return (
@@ -274,51 +221,8 @@ const ShowPost = () => {
         {post?.uploadedVideo ? <VideoPlayer source={post.uploadedVideo} /> : ""}
 
         {post?.type === "poll" ? (
-          <div className="w-full rounded-xl mt-2 ">
-            <div className="text-xs text-gray-400/70 pl-3">
-              Total votes : {pollResultCount?.totalVotes || 0}
-            </div>
-            <div className="p-2 flex rounded-xl ">
-              <div className="flex flex-col gap-2 w-full">
-                {post.options?.map((option: any, index: number) => (
-                  <span
-                    className={`relative rounded-lg    flex bg-slate-100/10 ${
-                      hasAnswered ? "" : "hover:bg-white/20"
-                    }  `}
-                    onClick={() => submitPollAnswer(index)}
-                    key={index + 1}
-                  >
-                    <span
-                      className={`h-10 rounded-lg    ${
-                        selectedOption === index ? "bg-blue-500 " : "bg-red-500"
-                      }`}
-                      style={{
-                        width: `${pollResultCount?.arr[index] || 0}%`,
-                      }}
-                    ></span>
-
-                    <span
-                      className={`absolute left-2  top-2 text-sm md:text-base tracking-tight    bg-transparent  text-white ${
-                        hasAnswered &&
-                        selectedOption &&
-                        selectedOption === index
-                          ? "font-semibold break-all"
-                          : ""
-                      }`}
-                    >
-                      {pollResultCount?.arr ? (
-                        <span className=" font-semibold lg:font-bold pr-3 ">
-                          {Math.round(pollResultCount?.arr[index])}%
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                      {option}
-                    </span>
-                  </span>
-                ))}
-              </div>
-            </div>
+          <div className="my-3">
+            <ShowPoll post={post} authUserId={authUser?._id} />
           </div>
         ) : (
           ""
