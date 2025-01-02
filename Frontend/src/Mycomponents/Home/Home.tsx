@@ -11,10 +11,10 @@ const Home = () => {
   const [isActive, setIsActive] = useState<"For you" | "Following">("For you");
 
   return (
-    <div className="min-h-full w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0 ">
+    <div className="min-h-full  w-full cursor-pointer  border border-gray-800 border-b-0 border-t-0 ">
       {/* Top */}
 
-      <div className="border-b border-gray-800 h-12  flex justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0 z-10  ">
+      <div className="border-b border-gray-800 h-12  flex  justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0 z-10  ">
         <div
           className="h-full w-1/2 text-center hover:bg-gray-700/30    "
           onClick={() => setIsActive("For you")}

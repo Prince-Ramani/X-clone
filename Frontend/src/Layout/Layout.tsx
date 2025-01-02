@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import CreatePostDialog from "./createPostDialog";
 import { useReplyDialogContext } from "@/context/ReplyPostContext";
 import ReplyDialog from "./CommentDialog";
+import MdSidebar from "@/Mycomponents/Sidebar/SmSidebar";
 
 const Layout = () => {
   const { isCreateDialogOpen } = useCreatePostContext();
@@ -16,8 +17,9 @@ const Layout = () => {
       {isReplyDialogOpen ? <ReplyDialog /> : ""}
 
       <Sidebar />
+      <MdSidebar />
       <main
-        className={` lg:w-5/12 min-h-screen    no-scrollbar  w-full  md:w-3/5  `}
+        className={` lg:w-5/12 min-h-screen pb-14 sm:pb-0    no-scrollbar  w-full  md:w-3/5  `}
       >
         <Outlet />
       </main>

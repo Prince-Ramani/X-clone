@@ -24,6 +24,8 @@ import Loading from "./components/ui/Loading";
 import Bookmark from "./Mycomponents/Bookmarks/Bookmark";
 import YourAccount from "./Mycomponents/Settings/YourAccount";
 import BlockPage from "./Mycomponents/Settings/BlockPage";
+import Settings from "./Mycomponents/Settings/Setting";
+import DeleteAccount from "./Mycomponents/Settings/DeleteAccount";
 
 function App() {
   const { setAuthUser } = useAuthUser();
@@ -113,7 +115,7 @@ function App() {
           />
           <Route
             path="settings"
-            element={isLoggedIn ? <YourAccount /> : <Navigate to="/sign-up" />}
+            element={isLoggedIn ? <Settings /> : <Navigate to="/sign-up" />}
           />
           <Route
             path="settings/blocked"
@@ -122,6 +124,12 @@ function App() {
           <Route
             path="settings/account"
             element={isLoggedIn ? <YourAccount /> : <Navigate to="/sign-up" />}
+          />
+          <Route
+            path="settings/deleteaccount"
+            element={
+              isLoggedIn ? <DeleteAccount /> : <Navigate to="/sign-up" />
+            }
           />
         </Route>
         <Route path="*" element={isLoggedIn ? <NotFoundPage /> : ""} />

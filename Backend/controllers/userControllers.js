@@ -7,6 +7,7 @@ const { cloudinary } = require("../Cloudinary/cloudinary");
 const fs = require("fs").promises;
 const { default: mongoose } = require("mongoose");
 const Post = require("../models/postmodel");
+const { post } = require("../routes/auth");
 
 const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -795,6 +796,100 @@ const setPrivate = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+
+    if (!user) return res.status(400).json("No such account exists!");
+
+    const posts = await Post.find({ uploadedBy: user._id });
+
+    await Promise.all([
+      ...posts.map(async (post) => {
+        if (post.uploadedPhoto.length > 0) {
+          const foldername = "X-clone/Posts";
+          await Promise.all(
+            post.uploadedPhoto.map(async (photo) => {
+              try {
+                const imgID = photo.split("/").slice(-1)[0].split(".")[0];
+                const picID = `${foldername}/${imgID}`;
+                await cloudinary.uploader.destroy(picID, {
+                  resource_type: "image",
+                });
+              } catch (error) {
+                console.error(`Error deleting photo: ${photo}`, error);
+              }
+            })
+          );
+        }
+        if (post.explanationImage) {
+          try {
+            const foldername = "X-clone/Posts";
+            const imgID = post.explanationImage
+              .split("/")
+              .slice(-1)[0]
+              .split(".")[0];
+            const picID = `${foldername}/${imgID}`;
+            await cloudinary.uploader.destroy(picID, {
+              resource_type: "image",
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        }
+        if (post.uploadedVideo) {
+          const foldername = "X-clone/Videos";
+          try {
+            const vidID = post.uploadedVideo
+              .split("/")
+              .slice(-1)[0]
+              .split(".")[0];
+            const videoID = `${foldername}/${vidID}`;
+
+            await cloudinary.uploader.destroy(videoID, {
+              resource_type: "video",
+            });
+          } catch (error) {
+            console.error(`Error deleting video`, error);
+          }
+        }
+      }),
+      User.updateMany(
+        { followers: { $in: user._id } },
+        { $pull: { followers: user._id } }
+      ),
+      User.updateMany(
+        { following: { $in: user._id } },
+        { $pull: { following: user._id } }
+      ),
+      User.updateMany(
+        { blocked: { $in: req.user } },
+        { $pull: { blocked: user._id } }
+      ),
+      User.updateMany(
+        { blockedBy: { $in: req.user } },
+        { $pull: { blockedBy: user._id } }
+      ),
+      Post.deleteMany({ uploadedBy: user._id }),
+
+      Notification.deleteMany({
+        $or: [{ to: user._id }, { from: user._id }],
+      }),
+
+      User.findByIdAndDelete(user._id),
+    ]);
+
+    await res.clearCookie("user");
+
+    return res
+      .status(200)
+      .json({ message: "Account and related data deleted successfully!" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json("Internal server error!");
+  }
+};
+
 module.exports = {
   getProfile,
   followPerson,
@@ -818,4 +913,5 @@ module.exports = {
   getBlockedPerson,
   setPrivate,
   AcceptRequest,
+  deleteAccount,
 };

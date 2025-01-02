@@ -23,6 +23,7 @@ const {
   getBlockedPerson,
   setPrivate,
   AcceptRequest,
+  deleteAccount,
 } = require("../controllers/userControllers");
 const { upload } = require("../Cloudinary/cloudinary");
 const router = express.Router();
@@ -65,5 +66,6 @@ router.get("/totalblocks", protectRoute, getBlockedPerson);
 router.post("/blockuser/:personID", protectRoute, blockUser);
 router.patch("/setprivate", protectRoute, setPrivate);
 router.post("/acceptrequest", protectRoute, AcceptRequest);
+router.post("/deleteaccount", protectRoute, deleteAccount);
 
 module.exports = router;

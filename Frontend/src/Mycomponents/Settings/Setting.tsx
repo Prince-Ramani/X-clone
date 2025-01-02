@@ -5,19 +5,19 @@ const Settings = () => {
   const settingArr = [
     {
       title: "Your account",
-      href: "settings/account",
+      href: "/settings/account",
     },
     {
       title: "Delete account",
-      href: "settings/deleteaccount",
+      href: "/settings/deleteaccount",
     },
     {
       title: "Blocked users",
-      href: "settings/blocked",
+      href: "/settings/blocked",
     },
   ];
   return (
-    <div className="min-h-full w-full cursor-pointer   border-gray-800 border-r  relative right-6 ">
+    <div className="min-h-full w-full cursor-pointer   border-gray-800 border-r  lg:relative right-6 ">
       <Bar title="Settings" hideSettings={true} />
       <div className=" flex flex-col  mt-4">
         {settingArr.map((setting) => (

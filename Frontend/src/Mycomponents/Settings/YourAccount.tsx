@@ -62,47 +62,46 @@ const YourAccount = memo(() => {
                 ) : (
                   ""
                 )}
-                <DialogDescription>
-                  <div className=" w-full  flex flex-col p-4 ">
-                    <div className="font-bold ">
-                      <div className="text-red-700 tracking-wide text-lg  font-extrabold">
-                        Hey
-                      </div>
-                      <div className="">@{authUser?.username}?</div>
+                <DialogDescription />
+                <div className=" w-full  flex flex-col p-4 ">
+                  <div className="font-bold ">
+                    <div className="text-red-700 tracking-wide text-lg  font-extrabold">
+                      Hey
                     </div>
-                    <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      {isPrivate
-                        ? "Are you sure you want to make your account PUBLIC?! Your posts and followers, following will be visible to everyone!"
-                        : "Are you sure you want to make your account PRIVATE?! Your posts will be visible to everyone but no one can see your followers, following except people who follows you!"}
-                    </div>
-                    <div>
-                      <div className="flex flex-col gap-2 mt-7">
-                        <button
-                          className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
-                            isPending ? "opacity-75" : "hover:opacity-90"
-                          }  `}
-                          disabled={isPending}
-                          onClick={() => mutate()}
-                        >
-                          {isPrivate ? "Public" : "Private"}
-                        </button>
+                    <div className="">@{authUser?.username}?</div>
+                  </div>
+                  <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
+                    {isPrivate
+                      ? "Are you sure you want to make your account PUBLIC?! Your posts and followers, following will be visible to everyone!"
+                      : "Are you sure you want to make your account PRIVATE?! Your posts will be visible to everyone but no one can see your followers, following except people who follows you!"}
+                  </div>
+                  <div>
+                    <div className="flex flex-col gap-2 mt-7">
+                      <button
+                        className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
+                          isPending ? "opacity-75" : "hover:opacity-90"
+                        }  `}
+                        disabled={isPending}
+                        onClick={() => mutate()}
+                      >
+                        {isPrivate ? "Public" : "Private"}
+                      </button>
 
-                        <button
-                          className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
-                            isPending ? "opacity-75" : "hover:bg-white/10"
-                          } 
+                      <button
+                        className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
+                          isPending ? "opacity-75" : "hover:bg-white/10"
+                        } 
                   `}
-                          disabled={isPending}
-                          onClick={() => {
-                            setIsOpen(false);
-                          }}
-                        >
-                          Cancle
-                        </button>
-                      </div>
+                        disabled={isPending}
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        Cancle
+                      </button>
                     </div>
                   </div>
-                </DialogDescription>
+                </div>
               </div>
             </DialogContent>
           </Dialog>

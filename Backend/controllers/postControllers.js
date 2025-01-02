@@ -15,7 +15,11 @@ const createPost = async (req, res) => {
       return res.status(400).json({ error: "A post must have some content!" });
     }
 
-    if (req.files.uploadedPhoto && req.files.uploadedPhoto.length <= 4) {
+    if (
+      !!req.files.uploadedPhoto &&
+      req.files.uploadedPhoto.length > 0 &&
+      req.files.uploadedPhoto.length <= 4
+    ) {
       await Promise.all(
         req.files.uploadedPhoto.map(async (file) => {
           try {

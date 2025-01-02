@@ -92,7 +92,7 @@ const ShowPoll = memo(
               >
                 <span
                   className={`h-10 rounded-lg animate-in transition-all animate-out  duration-700    ${
-                    selectedOption === index ? "bg-blue-500  " : "bg-red-500 "
+                    selectedOption === index ? "bg-blue-500  " : "bg-red-500"
                   }`}
                   style={{
                     width: `${pollResultCount?.arr[index] || 0}%`,
@@ -100,14 +100,14 @@ const ShowPoll = memo(
                 ></span>
 
                 <span
-                  className={`absolute left-2  top-2     bg-transparent  text-white ${
+                  className={`absolute left-2  top-2.5 sm:top-3  text-sm sm:text-base   bg-transparent  text-white ${
                     hasAnswered && selectedOption && selectedOption === index
                       ? "font-semibold break-all"
                       : ""
                   }`}
                 >
                   {pollResultCount?.arr ? (
-                    <span className="font-bold pr-3 ">
+                    <span className="font-bold pr-3  ">
                       {Math.round(pollResultCount?.arr[index])}%
                     </span>
                   ) : (
@@ -120,9 +120,9 @@ const ShowPoll = memo(
           </div>
         </div>
         {hasAnswered && (!!post.explanation || !!post.explanationImage) ? (
-          <div className="  rounded-md mt-4  p-2   bg-slate-800 text-slate-300 flex flex-col gap-2   ">
+          <div className="  rounded-md mt-4  p-2 ease-in-out transition-all duration-700 animate-in animate-out   bg-slate-800 text-slate-300 flex flex-col gap-2   ">
             <div className=" flex items-center">
-              <div className="font-bold tracking-wide underline underline-offset-2 ">
+              <div className="font-bold sm:tracking-wide underline underline-offset-2 ">
                 Explanation:
               </div>
               <CustomTooltip title={isCollpased ? "Expland" : "Collapse"}>
@@ -141,7 +141,9 @@ const ShowPoll = memo(
             {post.explanation && isCollpased ? (
               ""
             ) : (
-              <p className="text-sm  ">{post.explanation}</p>
+              <p className="text-xs sm:text-sm tracking-wide  ">
+                {post.explanation}
+              </p>
             )}
             {post.explanationImage && !isCollpased ? (
               <a
