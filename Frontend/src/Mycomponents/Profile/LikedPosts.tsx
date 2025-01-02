@@ -28,7 +28,7 @@ const ProfilePost = memo(
       setDeletePostId,
     } = useDeletePostContext();
 
-    const { isPending, isLoading, isFetching, refetch } = useQuery({
+    const { isPending, isLoading, isFetching, refetch, data } = useQuery({
       queryKey: [personUsername, "LikedPosts"],
       queryFn: async () => {
         const res = await fetch(
@@ -40,14 +40,19 @@ const ProfilePost = memo(
 
         if (data.length < 30) setHasMore(false);
 
-        setTotalPosts((prev) => [...prev, ...data]);
-        offset.current = offset.current + data?.length;
-
         return data;
       },
       enabled: isAuthenticated && !!profileId,
       refetchOnWindowFocus: false,
     });
+
+    useEffect(() => {
+      if (data && "error" in data) return;
+      if (data) {
+        setTotalPosts((prev) => [...prev, ...data]);
+        offset.current = offset.current + data?.length;
+      }
+    }, [data]);
 
     const handleScroll = () => {
       if (

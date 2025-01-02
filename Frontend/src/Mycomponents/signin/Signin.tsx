@@ -59,7 +59,7 @@ function Signin() {
           <h1 className="md:text-4xl  text-3xl font-bold lg:p-3">
             Welcome back.
           </h1>
-          <div className="w-full  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-[75%] select-none hover:border-blue-500">
+          <div className="w-full  flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl lg:max-w-[75%] select-none hover:border-blue-500">
             <Mail className="relative top-3 ml-2 size-5 " />
             <input
               type="email"
@@ -72,7 +72,7 @@ function Signin() {
             />
           </div>
 
-          <div className="w-full flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-[75%] select-none hover:border-blue-500  ">
+          <div className="w-full flex  border-2 border-white opacity-75 rounded-xl mt-4 max-w-xl lg:max-w-[75%]  select-none hover:border-blue-500  ">
             <Lock className="relative top-3 ml-2 size-5" />
             <input
               type="password"
@@ -91,7 +91,7 @@ function Signin() {
           )}
 
           <button
-            className={`bg-blue-600 max-w-xl lg:w-9/12 p-3 mt-3 rounded-3xl hover:bg-blue-300 w-full ${
+            className={`bg-blue-600 max-w-xl  lg:w-9/12 p-3 mt-3 rounded-3xl hover:bg-blue-300 w-full  ${
               isPending ? "bg-gray-500" : "bg-blue-600"
             }`}
             onClick={(e) => {

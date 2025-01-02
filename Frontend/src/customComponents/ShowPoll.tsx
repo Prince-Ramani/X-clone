@@ -1,5 +1,5 @@
 import { PostType } from "@/Mycomponents/Home/ForYou";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { memo, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import CustomTooltip from "./ToolTip";
@@ -19,7 +19,7 @@ const ShowPoll = memo(
     );
     const [isCollpased, setIsCollapsed] = useState<boolean>(false);
 
-    const { mutate: answerPoll } = useMutation({
+    const { mutate: answerPoll, data: pollResult } = useMutation({
       mutationFn: async (answerNumber: number) => {
         const res = await fetch(`/api/post/answerpoll/${post._id}`, {
           method: "Post",
@@ -32,53 +32,41 @@ const ShowPoll = memo(
         if ("error" in data) return toast.error(data.error);
         setSelectedOption(answerNumber);
         setHasAnswered(true);
-
         return data;
       },
       onSuccess: (data) => {
         if ("error" in data) return;
-        toast.success(data.message);
+        toast.success("Answer submitted successfully!");
       },
-    });
-
-    const { data: pollResultCount } = useQuery({
-      queryKey: [post._id, "PollResult"],
-      queryFn: async () => {
-        const res = await fetch(`/api/post/getpollresult/${post._id}`);
-        const data = await res.json();
-        if ("error" in data) return toast.error(data.error);
-        return data;
-      },
-      enabled: hasAnswered && post.type === "poll",
     });
 
     const submitPollAnswer = (answerNumber: number) => {
       if (hasAnswered) return toast.error("Aleardy answered!");
-
       answerPoll(answerNumber);
     };
 
     useEffect(() => {
-      if (post?.answeredBy && authUserId) {
-        const userHasAnswered = post.answeredBy.filter(
-          (entry) => entry.userAnswered === authUserId
-        );
-
-        if (userHasAnswered.length > 0) {
-          setHasAnswered(true);
-          setSelectedOption(userHasAnswered[0].optionSelected);
-        }
+      if (
+        post.answeredBy !== null &&
+        post.answeredBy !== undefined &&
+        typeof post.answeredBy === "object" &&
+        "optionSelected" in post.answeredBy &&
+        authUserId
+      ) {
+        setHasAnswered(true);
+        setSelectedOption(post.answeredBy.optionSelected);
       }
     }, [post, authUserId]);
 
     return (
       <div className="w-full   rounded-xl mt-2 ">
-        <div
-          className={`text-xs  text-gray-400/70 pl-3 ${
-            pollResultCount ? "block" : "hidden"
-          } `}
-        >
-          Total votes : {pollResultCount?.totalVotes || 0}
+        <div className={`text-xs  text-gray-400/70 pl-3 `}>
+          Total votes :{" "}
+          {pollResult
+            ? pollResult.totalVotes
+            : post.totalVotes
+            ? post.totalVotes
+            : 0}
         </div>
         <div className="p-2 flex rounded-xl  ">
           <div className="flex flex-col gap-2 w-full">
@@ -91,11 +79,17 @@ const ShowPoll = memo(
                 key={index + 1}
               >
                 <span
-                  className={`h-10 rounded-lg animate-in transition-all animate-out  duration-700    ${
-                    selectedOption === index ? "bg-blue-500  " : "bg-red-500"
+                  className={`h-10 rounded-lg animate-in transition-all animate-out   duration-1000    ${
+                    selectedOption === index && hasAnswered
+                      ? "bg-blue-500  "
+                      : "bg-red-500"
                   }`}
                   style={{
-                    width: `${pollResultCount?.arr[index] || 0}%`,
+                    width: `${
+                      !!post.arr && hasAnswered
+                        ? post.arr[index]
+                        : pollResult?.arr[index] || 0
+                    }%`,
                   }}
                 ></span>
 
@@ -106,9 +100,23 @@ const ShowPoll = memo(
                       : ""
                   }`}
                 >
-                  {pollResultCount?.arr ? (
+                  {post?.arr && hasAnswered ? (
                     <span className="font-bold pr-3  ">
-                      {Math.round(pollResultCount?.arr[index])}%
+                      {selectedOption === index
+                        ? Math.round(post?.arr[index])
+                        : Math.round(post?.arr[index])}
+                      %
+                    </span>
+                  ) : (
+                    ""
+                  )}
+
+                  {pollResult && hasAnswered ? (
+                    <span className="font-bold pr-3  ">
+                      {selectedOption === index
+                        ? Math.round(pollResult.arr[index])
+                        : Math.round(pollResult.arr[index])}
+                      %
                     </span>
                   ) : (
                     ""

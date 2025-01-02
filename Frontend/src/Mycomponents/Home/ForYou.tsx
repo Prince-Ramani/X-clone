@@ -18,12 +18,12 @@ export interface PostType {
   type: "poll" | "post";
   options?: string[];
   explanationImage?: string;
-  answeredBy?: [
-    {
-      userAnswered: string;
-      optionSelected: number;
-    }
-  ];
+  answeredBy?: {
+    userAnswered: string;
+    optionSelected: number;
+  } | null;
+  totalVotes?: number;
+  arr?: number[];
 }
 
 export interface UploadedByType {
@@ -45,18 +45,24 @@ const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [totalPosts, setTotalPosts] = useState([]);
   const [offset, setOffset] = useState<number>(0);
-  const { isPending, isLoading, isFetching, refetch } = useQuery({
+  const { isPending, isLoading, isFetching, refetch, data } = useQuery({
     queryKey: ["ForYouPosts"],
     queryFn: async () => {
       const res = await fetch(`/api/post/getallpost?limit=30&offset=${offset}`);
       const data: [] = await res.json();
       if (data.length < 30) setHasMore(false);
-      setTotalPosts((prev) => [...prev, ...data]);
-      setOffset((prev) => prev + data.length);
       return data;
     },
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (data) {
+      setTotalPosts((prev) => [...prev, ...data]);
+      setOffset((prev) => prev + data.length);
+    }
+  }, [data]);
+  console.log(totalPosts);
 
   const handleScroll = () => {
     if (

@@ -64,7 +64,7 @@ function Signup() {
             <X className="h-20 w-20  lg:hidden " />
             <h1 className="text-5xl font-bold lg:p-3">Join us.</h1>
 
-            <div className="w-full flex  border-2 border-white rounded-xl mt-4 max-w-[75%] hover:border-blue-500  ">
+            <div className="w-full flex  border-2 border-white rounded-xl mt-4 max-w-xl lg:max-w-[75%] hover:border-blue-500  ">
               <User className="relative top-3 ml-2 size-5" />
               <input
                 type="text"
@@ -78,7 +78,7 @@ function Signup() {
               />
             </div>
 
-            <div className="w-full  flex  border-2 border-white  rounded-xl mt-4 max-w-[75%] hover:border-blue-500">
+            <div className="w-full  flex  border-2 border-white  rounded-xl mt-4 max-w-xl  lg:max-w-[75%] hover:border-blue-500">
               <Mail className="relative top-3 ml-2 size-5 " />
               <input
                 type="email"
@@ -92,7 +92,7 @@ function Signup() {
               />
             </div>
 
-            <div className="w-full flex  border-2 border-white  rounded-xl mt-4 max-w-[75%]  hover:border-blue-500  ">
+            <div className="w-full flex  border-2 border-white  rounded-xl mt-4 max-w-xl  lg:max-w-[75%]  hover:border-blue-500  ">
               <Lock className="relative top-3 ml-2 size-5" />
               <input
                 type="password"

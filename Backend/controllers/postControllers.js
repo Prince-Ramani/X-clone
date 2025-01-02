@@ -4,7 +4,7 @@ const Notification = require("../models/notification");
 const { unlink } = require("fs").promises;
 const { v2: cloudinary } = require("cloudinary");
 const { error } = require("console");
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, set } = require("mongoose");
 
 const createPost = async (req, res) => {
   try {
@@ -169,7 +169,23 @@ const submitPollAnswer = async (req, res) => {
 
     await post.save();
 
-    return res.json({ message: "Answer submitted succesfully!" }).status(200);
+    let arr = [];
+    let totalVotes = post.answeredBy.length;
+
+    for (let i = 0; i < post.options.length; i++) {
+      const matchingOptions = post.optionsCount.filter(
+        (o) => o.optionText === post.options[i]
+      );
+
+      arr.push((matchingOptions.length * 100) / totalVotes);
+    }
+
+    return res
+      .json({
+        arr,
+        totalVotes,
+      })
+      .status(200);
   } catch (err) {
     console.log(err);
     return res.json({ error: "Internal server error!" }).status(500);
@@ -255,10 +271,47 @@ const getPosts = async (req, res) => {
       })
       .lean();
 
-    const postss = posts.map((post) => ({
-      ...post,
-      comments: post.comments.length,
-    }));
+    const postss = posts.map((post) => {
+      if (post.type === "poll") {
+        const totalVotes = post.optionsCount.length;
+
+        let hasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered.toString() === req.user
+        );
+
+        if (hasAnswered.length > 0) {
+          let arr = [];
+
+          for (let i = 0; i < post.options.length; i++) {
+            const matchingOptions = post.optionsCount.filter(
+              (o) => o.optionText === post.options[i]
+            );
+
+            arr.push((matchingOptions.length * 100) / totalVotes);
+          }
+
+          return {
+            ...post,
+            totalVotes,
+            arr,
+            comments: post.comments.length,
+            answeredBy: hasAnswered[0] || null,
+          };
+        }
+
+        return {
+          ...post,
+          totalVotes,
+          comments: post.comments.length,
+          answeredBy: hasAnswered[0] || null,
+        };
+      }
+
+      return {
+        ...post,
+        comments: post.comments.length,
+      };
+    });
 
     return res.status(200).json(postss);
   } catch (err) {
@@ -391,10 +444,48 @@ const getLikedPosts = async (req, res) => {
       .lean();
 
     if (!postss) return res.status(200).json([]);
-    const posts = postss.map((post) => ({
-      ...post,
-      comments: post.comments.length,
-    }));
+
+    const posts = postss.map((post) => {
+      if (post.type === "poll") {
+        const totalVotes = post.optionsCount.length;
+
+        let hasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered.toString() === req.user
+        );
+
+        if (hasAnswered.length > 0) {
+          let arr = [];
+
+          for (let i = 0; i < post.options.length; i++) {
+            const matchingOptions = post.optionsCount.filter(
+              (o) => o.optionText === post.options[i]
+            );
+
+            arr.push((matchingOptions.length * 100) / totalVotes);
+          }
+
+          return {
+            ...post,
+            totalVotes,
+            arr,
+            comments: post.comments.length,
+            answeredBy: hasAnswered[0] || null,
+          };
+        }
+
+        return {
+          ...post,
+          totalVotes,
+          comments: post.comments.length,
+          answeredBy: hasAnswered[0] || null,
+        };
+      }
+
+      return {
+        ...post,
+        comments: post.comments.length,
+      };
+    });
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -504,10 +595,47 @@ const getProfilePost = async (req, res) => {
 
     if (!postss) return res.status(200).json([]);
 
-    const posts = postss.map((post) => ({
-      ...post,
-      comments: post.comments.length,
-    }));
+    const posts = postss.map((post) => {
+      if (post.type === "poll") {
+        const totalVotes = post.optionsCount.length;
+
+        let hasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered.toString() === req.user
+        );
+
+        if (hasAnswered.length > 0) {
+          let arr = [];
+
+          for (let i = 0; i < post.options.length; i++) {
+            const matchingOptions = post.optionsCount.filter(
+              (o) => o.optionText === post.options[i]
+            );
+
+            arr.push((matchingOptions.length * 100) / totalVotes);
+          }
+
+          return {
+            ...post,
+            totalVotes,
+            arr,
+            comments: post.comments.length,
+            answeredBy: hasAnswered[0] || null,
+          };
+        }
+
+        return {
+          ...post,
+          totalVotes,
+          comments: post.comments.length,
+          answeredBy: hasAnswered[0] || null,
+        };
+      }
+
+      return {
+        ...post,
+        comments: post.comments.length,
+      };
+    });
 
     return res.status(200).json(posts);
   } catch (err) {
@@ -548,10 +676,47 @@ const getPolls = async (req, res) => {
 
     if (!postss || postss.length === 0) return res.status(200).json([]);
 
-    const posts = postss.map((post) => ({
-      ...post,
-      comments: post.comments.length,
-    }));
+    const posts = postss.map((post) => {
+      if (post.type === "poll") {
+        const totalVotes = post.optionsCount.length;
+
+        let hasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered.toString() === req.user
+        );
+
+        if (hasAnswered.length > 0) {
+          let arr = [];
+
+          for (let i = 0; i < post.options.length; i++) {
+            const matchingOptions = post.optionsCount.filter(
+              (o) => o.optionText === post.options[i]
+            );
+
+            arr.push((matchingOptions.length * 100) / totalVotes);
+          }
+
+          return {
+            ...post,
+            totalVotes,
+            arr,
+            comments: post.comments.length,
+            answeredBy: hasAnswered[0] || null,
+          };
+        }
+
+        return {
+          ...post,
+          totalVotes,
+          comments: post.comments.length,
+          answeredBy: hasAnswered[0] || null,
+        };
+      }
+
+      return {
+        ...post,
+        comments: post.comments.length,
+      };
+    });
 
     return res.status(200).json(posts);
   } catch (err) {
