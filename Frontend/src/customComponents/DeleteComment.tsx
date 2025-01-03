@@ -15,12 +15,14 @@ const DeleteComment = memo(
     commentID,
     postID,
     isCreator,
+    authUsername,
   }: {
     isCreator: boolean;
     className?: string;
     commentID: string;
     postID: string;
     username: string;
+    authUsername: string | undefined;
   }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const querClient = useQueryClient();
@@ -66,12 +68,12 @@ const DeleteComment = memo(
                       <div className="text-red-700 font-extrabold">
                         Delete Comment
                       </div>
-                      <div className="">@{username}?</div>
+                      <div className="">@{authUsername}?</div>
                     </div>
                     <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
                       {isCreator
                         ? "Are you sure you want to delete this comment from your post!?"
-                        : "Their comment will no longer show up in this post . You can still comment on their posts, unless their posts are protected."}
+                        : "This comment will no longer show up in this post . You can still comment on their posts, unless their posts are protected."}
                     </div>
                     <div>
                       <div className="flex flex-col gap-2 mt-7">

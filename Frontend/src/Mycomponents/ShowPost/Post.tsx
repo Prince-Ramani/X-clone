@@ -381,6 +381,8 @@ const ShowPost = () => {
             key={comment?._id}
             postUploaderId={post.uploadedBy?._id}
             username={post?.uploadedBy.username}
+            authUsername={authUser?.username}
+            authProfilePic={authUser?.profilePic}
           />
         ))}
       </div>

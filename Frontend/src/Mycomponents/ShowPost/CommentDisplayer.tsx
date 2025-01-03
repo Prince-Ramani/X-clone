@@ -15,12 +15,16 @@ const CommentDisplayer = memo(
     postId,
     postUploaderId,
     username,
+    authUsername,
+    authProfilePic,
   }: {
     comment: CommentType;
     authUserId?: string | undefined;
     postId: string;
     postUploaderId?: string;
     username: string;
+    authUsername: string | undefined;
+    authProfilePic: string | undefined;
   }) => {
     const [totalLikes, setTotalLikes] = useState([...comment.likes]);
 
@@ -69,14 +73,15 @@ const CommentDisplayer = memo(
               <span className="text-xs text-gray-400/90 ">
                 {FormateDate(comment.createdAt)}
               </span>
-              {comment.commenter._id === authUserId ||
-              comment.commenter._id === postUploaderId ? (
+              {postUploaderId === authUserId ||
+              comment.commenter._id === authUserId ? (
                 <div className=" ml-auto">
                   <DeleteComment
                     commentID={comment._id}
                     postID={postId}
                     username={username}
                     isCreator={postUploaderId === authUserId}
+                    authUsername={authUsername}
                   />
                 </div>
               ) : (
@@ -84,20 +89,35 @@ const CommentDisplayer = memo(
               )}
             </div>
             <div className="text-sm tracking-wide ">{comment?.text}</div>
-            <div className=" mt-2 w-full flex justify-center items-center  text-gray-4se00/90">
+            <div className=" mt-2  w-full  flex justify-center items-center  text-gray-400/90 ">
               <CustomTooltip title={isLiked ? "Unlike" : "Like"}>
                 <span
-                  className="flex gap-2 items-end text-sm hover:text-pink-600 group"
+                  className="flex gap-2 items-end text-sm text-gray-400/80 hover:text-pink-600 group"
                   onClick={() => LikeComment()}
                 >
                   <Heart
-                    className={`size-6 p-1  rounded-full   group-hover:bg-pink-600/20  ${
+                    className={`size-6 p-1  rounded-full    group-hover:bg-pink-600/20  ${
                       isLiked ? "fill-pink-600 text-transparent" : ""
                     }`}
                   />
                   {totalLikes.length}
                 </span>
               </CustomTooltip>
+              {totalLikes.includes(postUploaderId) ? (
+                <CustomTooltip title={`Like by ${username}`}>
+                  <div className="flex  relative left-14 sm:left-20    ">
+                    <img
+                      src={authProfilePic}
+                      className="size-6 sm:size-7   object-cover rounded-full "
+                    />
+                    <div>
+                      <Heart className="size-3 sm:size-4 fill-pink-700  absolute -right-2 -bottom-0.5   text-white/10  sm:-right-2.5 sm:-bottom-0.5  " />
+                    </div>
+                  </div>
+                </CustomTooltip>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
