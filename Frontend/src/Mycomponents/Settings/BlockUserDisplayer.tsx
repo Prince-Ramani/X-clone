@@ -52,43 +52,42 @@ const BlockUserDisplayer = memo(({ user }: { user: blockUserType }) => {
                 ) : (
                   ""
                 )}
-                <DialogDescription>
-                  <div className=" w-full  flex flex-col p-4 ">
-                    <div className="font-bold ">
-                      <div className="text-red-700 font-extrabold">Unblock</div>
-                      <div className="text-white">@{user.username}?</div>
-                    </div>
-                    <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
-                      Are you sure you want to unblock {user.username}?!
-                    </div>
-                    <div>
-                      <div className="flex flex-col gap-2 mt-7">
-                        <button
-                          className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
-                            isPending ? "opacity-75" : "hover:opacity-90"
-                          }  `}
-                          disabled={isPending}
-                          onClick={() => blockMutation()}
-                        >
-                          Unblock
-                        </button>
+                <DialogDescription />
+                <div className=" w-full  flex flex-col p-4 ">
+                  <div className="font-bold ">
+                    <div className="text-red-700 font-extrabold">Unblock</div>
+                    <div className="text-white">@{user.username}?</div>
+                  </div>
+                  <div className="text-gray-500  leading-tight text-sm tracking-wide pt-2">
+                    Are you sure you want to unblock {user.username}?!
+                  </div>
+                  <div>
+                    <div className="flex flex-col gap-2 mt-7">
+                      <button
+                        className={`bg-white text-black font-semibold rounded-full p-2 text-sm ${
+                          isPending ? "opacity-75" : "hover:opacity-90"
+                        }  `}
+                        disabled={isPending}
+                        onClick={() => blockMutation()}
+                      >
+                        Unblock
+                      </button>
 
-                        <button
-                          className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
-                            isPending ? "opacity-75" : "hover:bg-white/10"
-                          } 
+                      <button
+                        className={`bg-transparent  ring-1 ring-white/50 font-semibold rounded-full p-2 text-sm ${
+                          isPending ? "opacity-75" : "hover:bg-white/10"
+                        } 
                       `}
-                          disabled={isPending}
-                          onClick={() => {
-                            setIsOpen(false);
-                          }}
-                        >
-                          Cancle
-                        </button>
-                      </div>
+                        disabled={isPending}
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                      >
+                        Cancle
+                      </button>
                     </div>
                   </div>
-                </DialogDescription>
+                </div>
               </div>
             </DialogContent>
           </Dialog>

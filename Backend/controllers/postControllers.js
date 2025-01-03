@@ -83,7 +83,7 @@ const createPost = async (req, res) => {
 
 const createPoll = async (req, res) => {
   try {
-    const { postContent, answer, explanation } = req.body;
+    const { postContent, explanation } = req.body;
     var { options } = req.body;
     options = JSON.parse(options);
     if (!postContent)
@@ -122,7 +122,6 @@ const createPoll = async (req, res) => {
       type: "poll",
       postContent,
       options,
-      answer: answer || "",
       explanation: explanation || "",
       uploadedBy: req.user,
     });

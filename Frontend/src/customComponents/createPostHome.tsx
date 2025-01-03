@@ -1,6 +1,6 @@
 import CustomTooltip from "@/customComponents/ToolTip";
 import EmojiPicker from "@/customComponents/EmojiPicker";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import TextareaAutosize from "react-textarea-autosize";
@@ -18,7 +18,6 @@ import { useAuthUser } from "@/context/userContext";
 import VideoPlayer from "./VideoPlayer";
 
 const CreatePostHome = memo(() => {
-  const queryClient = useQueryClient();
   const { authUser } = useAuthUser();
   const [textareaValue, setTextareaValue] = useState<string | null>("");
   const [file, setFile] = useState<File[]>([]);
@@ -60,9 +59,6 @@ const CreatePostHome = memo(() => {
       if ("error" in data) return toast.error(data.error);
 
       resetStates();
-      queryClient.invalidateQueries({
-        queryKey: [authUser?.username, "Posts"],
-      });
 
       return toast.success("Post created successfully!");
     },

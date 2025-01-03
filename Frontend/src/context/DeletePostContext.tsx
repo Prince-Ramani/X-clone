@@ -37,7 +37,7 @@ export const useDeletePostContext = () => {
 
   if (context === undefined) {
     throw new Error(
-      "useDeletePostContext  must be used within a UserContextProvider"
+      "useDeletePostContext must be used within a UserContextProvider"
     );
   }
 

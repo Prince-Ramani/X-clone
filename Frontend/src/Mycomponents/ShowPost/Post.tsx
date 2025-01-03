@@ -168,10 +168,16 @@ const ShowPost = () => {
           <img
             src={post?.uploadedBy.profilePic}
             className="size-10 rounded-full object-cover "
+            onClick={() => navigate(`/profile/${post.uploadedBy.username}`)}
           />
 
-          <div className="flex flex-col text-sm ">
-            <span className="font-bold">{post?.uploadedBy.username}</span>
+          <div
+            className="flex flex-col text-sm "
+            onClick={() => navigate(`/profile/${post.uploadedBy.username}`)}
+          >
+            <span className="font-bold hover:underline underline-offset-4">
+              {post?.uploadedBy.username}
+            </span>
             <span className="tracking-wide text-gray-400/70">
               @{post?.uploadedBy.username}
             </span>
