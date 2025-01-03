@@ -112,7 +112,7 @@ const CommentDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="fixed w-full flex items-center  pb-40   z-50 flex-col     bg-transparent  ">
+      <DialogContent className="  flex items-center justify-center pb-28 lg:pb-52 min-w-full h-full    z-50 flex-col bg-blue-200/10 bg-opacity-50 ">
         <DialogTitle />
         <div className="relative bg-black p-3 rounded-3xl max-w-xl  focus:outline-none focus-visible:outline-none focus-visible:border-none w-full border shadow-sm shadow-slate-50/30 border-gray-400/20">
           {isPending ? (

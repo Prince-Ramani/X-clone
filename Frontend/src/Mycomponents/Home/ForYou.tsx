@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import PostDisplayer from "./PostDisplayer";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import Loading from "@/components/ui/Loading";
 
 export interface PostType {
@@ -41,61 +41,89 @@ export interface UploadedByType {
   location?: string;
 }
 
-const ForYou = ({ authUserId }: { authUserId: string | null | undefined }) => {
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [totalPosts, setTotalPosts] = useState([]);
-  const [offset, setOffset] = useState<number>(0);
-  const { isPending, isLoading, isFetching, refetch, data } = useQuery({
-    queryKey: ["ForYouPosts"],
-    queryFn: async () => {
-      const res = await fetch(`/api/post/getallpost?limit=30&offset=${offset}`);
-      const data: [] = await res.json();
-      if (data.length < 30) setHasMore(false);
-      return data;
-    },
-    refetchOnWindowFocus: false,
-  });
+const ForYou = memo(
+  ({ authUserId }: { authUserId: string | null | undefined }) => {
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [totalPosts, setTotalPosts] = useState([]);
+    const [offset, setOffset] = useState<number>(0);
+    const { isPending, isLoading, isFetching, refetch, data } = useQuery({
+      queryKey: ["ForYouPosts"],
+      queryFn: async () => {
+        const res = await fetch(
+          `/api/post/getallpost?limit=30&offset=${offset}`
+        );
+        const data: [] = await res.json();
+        if (data.length < 30) setHasMore(false);
 
-  useEffect(() => {
-    if (data) {
-      setTotalPosts((prev) => [...prev, ...data]);
-      setOffset((prev) => prev + data.length);
-    }
-  }, [data]);
-  console.log(totalPosts);
+        return data;
+      },
+      refetchOnWindowFocus: false,
+      enabled: hasMore,
+    });
 
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop + 1 >=
-        document.documentElement.scrollHeight &&
-      hasMore &&
-      (!isPending || !isLoading || !isFetching)
-    ) {
-      refetch();
-    }
-  };
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 1 >=
+          document.documentElement.scrollHeight &&
+        hasMore &&
+        (!isPending || !isLoading || !isFetching)
+      ) {
+        refetch();
+      }
+    };
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
+    useEffect(() => {
+      if (data) {
+        const totalPostsID = new Set(totalPosts.map((p: PostType) => p._id));
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, isFetching]);
+        const FilteredPosts = data.filter((post: PostType) => {
+          return !totalPostsID.has(post._id);
+        });
 
-  return (
-    <div>
-      {totalPosts?.map((post: PostType) => (
-        <PostDisplayer key={post._id} post={post} authUserId={authUserId} />
-      ))}
+        for (let i = FilteredPosts.length - 1; i > 0; i--) {
+          const randomIndex = Math.floor(Math.random() * (i + 1));
 
-      {isPending || isLoading || isFetching ? (
-        <div className="flex justify-center items-center p-2 h-full">
-          <Loading />
-        </div>
-      ) : (
-        ""
-      )}
-    </div>
-  );
-};
+          [FilteredPosts[i], FilteredPosts[randomIndex]] = [
+            FilteredPosts[randomIndex],
+            FilteredPosts[i],
+          ];
+        }
+
+        setTotalPosts((prev) => [...prev, ...FilteredPosts]);
+        setOffset((prev) => prev + data.length);
+      }
+    }, [data]);
+
+    useEffect(() => {
+      window.addEventListener("scroll", handleScroll);
+
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, [hasMore, isFetching]);
+
+    useEffect(() => {
+      return () => {
+        setTotalPosts(() => []);
+        setOffset(() => 0);
+        setHasMore(() => true);
+      };
+    }, []);
+
+    return (
+      <div>
+        {totalPosts?.map((post: PostType) => (
+          <PostDisplayer key={post._id} post={post} authUserId={authUserId} />
+        ))}
+
+        {isPending || isLoading || isFetching ? (
+          <div className="flex justify-center items-center p-2 h-full">
+            <Loading />
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+    );
+  }
+);
 
 export default ForYou;

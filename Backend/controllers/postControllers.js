@@ -743,7 +743,8 @@ const getPost = async (req, res) => {
       .populate({
         path: "comments.commenter",
         select: "username _id profilePic",
-      });
+      })
+      .lean();
 
     if (posts.length === 0) {
       return res.status(404).json({ error: "Invalid post Id" });
@@ -751,6 +752,41 @@ const getPost = async (req, res) => {
 
     if (posts && posts.length > 0) {
       posts[0].comments.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    if (posts.length > 0 && posts[0].type === "poll") {
+      const totalVotes = posts[0].optionsCount.length;
+
+      let hasAnswered = posts[0].answeredBy.filter(
+        (entry) => entry.userAnswered.toString() === req.user
+      );
+
+      if (hasAnswered.length > 0) {
+        let arr = [];
+
+        for (let i = 0; i < posts[0].options.length; i++) {
+          const matchingOptions = posts[0].optionsCount.filter(
+            (o) => o.optionText === posts[0].options[i]
+          );
+
+          arr.push((matchingOptions.length * 100) / totalVotes);
+        }
+
+        return res
+          .json({
+            ...posts[0],
+            totalVotes,
+            arr,
+            answeredBy: hasAnswered[0] || null,
+          })
+          .status(200);
+      }
+
+      return res.status(200).json({
+        ...posts[0],
+        totalVotes,
+        answeredBy: hasAnswered[0] || null,
+      });
     }
 
     return res.status(200).json(...posts);

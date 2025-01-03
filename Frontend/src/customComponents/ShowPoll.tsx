@@ -32,6 +32,8 @@ const ShowPoll = memo(
         if ("error" in data) return toast.error(data.error);
         setSelectedOption(answerNumber);
         setHasAnswered(true);
+        post.arr = data.arr;
+        console.log(post.arr);
         return data;
       },
       onSuccess: (data) => {
@@ -100,22 +102,18 @@ const ShowPoll = memo(
                       : ""
                   }`}
                 >
-                  {post?.arr && hasAnswered ? (
-                    <span className="font-bold pr-3  ">
-                      {selectedOption === index
-                        ? Math.round(post?.arr[index])
-                        : Math.round(post?.arr[index])}
-                      %
-                    </span>
-                  ) : (
-                    ""
-                  )}
-
                   {pollResult && hasAnswered ? (
                     <span className="font-bold pr-3  ">
                       {selectedOption === index
                         ? Math.round(pollResult.arr[index])
                         : Math.round(pollResult.arr[index])}
+                      %
+                    </span>
+                  ) : post?.arr && hasAnswered ? (
+                    <span className="font-bold pr-3  ">
+                      {selectedOption === index
+                        ? Math.round(post?.arr[index])
+                        : Math.round(post?.arr[index])}
                       %
                     </span>
                   ) : (
