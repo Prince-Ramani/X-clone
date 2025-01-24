@@ -202,7 +202,7 @@ const Sidebar = () => {
               currentlyOn === "settings" ? "font-semibold" : ""
             }  flex justify-start cursor-pointer   gap-4 group-hover:bg-gray-800/50  w-fit p-3 pr-6 rounded-full transition-colors `}
             onClick={() => {
-              navigate("/settings");
+              navigate("/settings/account");
             }}
           >
             <Settings className="size-7 ml-2 shrink-0" />

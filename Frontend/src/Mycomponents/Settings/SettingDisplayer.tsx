@@ -28,8 +28,8 @@ const SettingDisplayer = memo(({ title, href }: SettingDisplayerProps) => {
     >
       <div className="flex">
         <div
-          className={`border rounded-full border-blue-500 h-12  ${
-            currentlyOn === href ? "visible" : "invisible"
+          className={`border rounded-full border-blue-500 h-12   ${
+            "/" + currentlyOn === href ? "visible" : "invisible"
           }`}
         ></div>
         <div className="  p-3">{title}</div>

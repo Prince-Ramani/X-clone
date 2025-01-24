@@ -48,10 +48,7 @@ const ShowUser = ({
           />
         </div>
         {showBio ? (
-          <div className=" text-sm ">
-            {suggestion.bio} Host of Lex Fridman Podcast. Interested in robots
-            and humans.
-          </div>
+          <div className=" text-sm  min-h-1">{suggestion.bio}</div>
         ) : (
           ""
         )}

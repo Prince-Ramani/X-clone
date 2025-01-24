@@ -18,7 +18,7 @@ const Settings = () => {
   ];
   return (
     <div className="min-h-full w-full cursor-pointer   border-gray-800 border-r  lg:relative right-6 ">
-      <Bar title="Settings" hideSettings={true} />
+      <Bar title="Settings" hideSettings={true} href="/" />
       <div className=" flex flex-col  mt-4">
         {settingArr.map((setting) => (
           <SettingDisplayer

@@ -29,7 +29,7 @@ const createAccount = async (req, res) => {
       });
     }
 
-    const emailExists = await User.findOne({ email });
+    const emailExists = await User.findOne({ email: email });
     if (emailExists) {
       return res.status(409).json({
         error: "Account with this email already exists try logging in !",

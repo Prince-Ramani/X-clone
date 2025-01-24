@@ -222,23 +222,25 @@ const PostDisplayer = memo(
                 </button>
               </CustomTooltip>
 
-              <div className="flex items-center gap-1">
-                <CustomTooltip title="Save">
+              <div className="flex items-center gap-4">
+                <CustomTooltip title={hasBookmarked ? "Unsave" : "Save"}>
                   <button
-                    className="flex gap-2 items-end text-sm group"
+                    className={`flex gap-2 items-end text-sm group  rounded-full p-1 hover:bg-blue-400/20 active:bg-green-500 active:text-white ${
+                      hasBookmarked ? "fill-white text-white " : ""
+                    } `}
                     onClick={() => addToBookmark()}
                   >
                     <BookmarkPlus
-                      className={`size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white ${
+                      className={`size-5 ${
                         hasBookmarked ? "fill-white text-white " : ""
-                      }`}
+                      } `}
                     />
                   </button>
                 </CustomTooltip>
 
                 <CustomTooltip title="Copy url">
                   <button
-                    className="flex gap-2 items-end text-sm group"
+                    className="flex gap-2  items-end text-sm group p-1 rounded-full hover:bg-blue-400/20 active:bg-green-500 active:text-white"
                     onClick={() =>
                       navigator.clipboard
                         .writeText(
@@ -250,7 +252,7 @@ const PostDisplayer = memo(
                         .then(() => toast.success("URL copied!"))
                     }
                   >
-                    <Share className="size-6 p-1 rounded-full hover:bg-blue-400/20 group-active:bg-green-500 group-active:text-white" />
+                    <Share className="size-5" />
                   </button>
                 </CustomTooltip>
               </div>

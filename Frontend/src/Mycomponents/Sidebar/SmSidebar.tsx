@@ -21,7 +21,7 @@ const MdSidebar = () => {
   }, [location, navigate]);
 
   return (
-    <div className="border-t border-gray-400/50 p-2 md:hidden  fixed bottom-0 w-full bg-black z-[100] ">
+    <div className="border-t border-gray-400/50 p-2 md:hidden  fixed bottom-0 w-full bg-black z-[50] ">
       <div className={` flex justify-around items-center `}>
         <div
           className=" hover:bg-white/20 rounded-full p-1 cursor-pointer "
