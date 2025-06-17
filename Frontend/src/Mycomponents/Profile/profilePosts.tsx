@@ -31,12 +31,15 @@ const ProfilePost = memo(
       queryKey: [personUsername, "Posts"],
       queryFn: async () => {
         const res = await fetch(
-          `/api/post/profile/${profileId}?limit=30&offset=${offset.current}`
+          `/api/post/profile/${profileId}?limit=30&offset=${offset.current}`,
         );
 
         const data: [] = await res.json();
 
         if (data.length < 30) setHasMore(false);
+        setTotalPosts((prev) => [...prev, ...data]);
+
+        offset.current = offset.current + data?.length;
 
         return data;
       },
@@ -44,13 +47,20 @@ const ProfilePost = memo(
       refetchOnWindowFocus: false,
     });
 
-    useEffect(() => {
-      if (data && "error" in data) return;
-      if (data) {
-        setTotalPosts((prev) => [...prev, ...data]);
-        offset.current = offset.current + data?.length;
-      }
-    }, [data]);
+    // useEffect(() => {
+    //   if (data && "error" in data) return;
+    //   if (data) {
+    //     console.log(totalPosts.length);
+    //     setTotalPosts((prev) => {
+    //       const newPosts = data.filter(
+    //         (newPost) =>
+    //           !prev.some((existingPost) => existingPost._id === newPost._id),
+    //       );
+    //       return [...prev, ...newPosts];
+    //     });
+    //     offset.current = offset.current + data?.length;
+    //   }
+    // }, [data]);
 
     const handleScroll = () => {
       if (
@@ -67,8 +77,15 @@ const ProfilePost = memo(
     }, [hasMore, isFetching]);
 
     useEffect(() => {
+      return () => {
+        setTotalPosts([]);
+        offset.current = 0;
+      };
+    }, []);
+
+    useEffect(() => {
       setTotalPosts((prev) =>
-        prev.filter((p: PostType) => p._id !== DeletePostId)
+        prev.filter((p: PostType) => p._id !== DeletePostId),
       );
       setHasDeletedAnyPost(false);
       setDeletePostId(undefined);
@@ -77,8 +94,12 @@ const ProfilePost = memo(
 
     return (
       <div className="min-h-fit relative bottom-10">
-        {totalPosts?.map((post: PostType) => (
-          <PostDisplayer post={post} authUserId={authUserId} key={post?._id} />
+        {totalPosts?.map((post: PostType, index) => (
+          <PostDisplayer
+            post={post}
+            authUserId={authUserId}
+            key={`${post._id}`}
+          />
         ))}
 
         {isPending || isLoading || isFetching ? (
@@ -90,7 +111,7 @@ const ProfilePost = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default ProfilePost;

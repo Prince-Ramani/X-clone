@@ -52,7 +52,9 @@ const createAccount = async (req, res) => {
     await newUser.save();
 
     const token = await createToken(newUser._id);
-    await res.cookie("user", token);
+    await res.cookie("user", token, {
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+    });
 
     return res.status(201).json({
       username: newUser.username,

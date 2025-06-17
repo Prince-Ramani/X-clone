@@ -23,17 +23,18 @@ const createPost = async (req, res) => {
       await Promise.all(
         req.files.uploadedPhoto.map(async (file) => {
           try {
+            console.log(file.path);
             const uploadRes = await cloudinary.uploader.upload(file.path, {
               folder: "X-clone/Posts",
-              resource_type: "image",
             });
+            console.log(uploadRes);
             await unlink(file.path);
             uploadedImages.push(uploadRes.secure_url);
           } catch (err) {
             console.error("Error uploading  the file:", err);
             return res.status(400).json({ error: "Resource type invalid!" });
           }
-        })
+        }),
       );
 
       const post = new Post({
@@ -42,6 +43,7 @@ const createPost = async (req, res) => {
         uploadedBy,
       });
       await post.save();
+
       return res.status(201).json({ message: "Post created successfully!" });
     }
 
@@ -173,7 +175,7 @@ const submitPollAnswer = async (req, res) => {
 
     for (let i = 0; i < post.options.length; i++) {
       const matchingOptions = post.optionsCount.filter(
-        (o) => o.optionText === post.options[i]
+        (o) => o.optionText === post.options[i],
       );
 
       arr.push((matchingOptions.length * 100) / totalVotes);
@@ -206,7 +208,7 @@ const getPollResult = async (req, res) => {
 
     for (let i = 0; i < post.options.length; i++) {
       const matchingOptions = post.optionsCount.filter(
-        (o) => o.optionText === post.options[i]
+        (o) => o.optionText === post.options[i],
       );
 
       arr.push((matchingOptions.length * 100) / totalVotes);
@@ -233,7 +235,7 @@ const commentOnPost = async (req, res) => {
     const newComment = await Post.findByIdAndUpdate(
       postID,
       { $push: { comments: { text, commenter } } },
-      { new: true }
+      { new: true },
     );
     if (!newComment) {
       return res.status(400).json({ error: "No such post exists" });
@@ -267,15 +269,13 @@ const getPosts = async (req, res) => {
       .populate({
         path: "uploadedBy",
         select: "username profilePic accountType",
-      })
-      .lean();
-
+      });
     const postss = posts.map((post) => {
       if (post.type === "poll") {
         const totalVotes = post.optionsCount.length;
 
         let hasAnswered = post.answeredBy.filter(
-          (entry) => entry.userAnswered.toString() === req.user
+          (entry) => entry.userAnswered.toString() === req.user,
         );
 
         if (hasAnswered.length > 0) {
@@ -283,7 +283,7 @@ const getPosts = async (req, res) => {
 
           for (let i = 0; i < post.options.length; i++) {
             const matchingOptions = post.optionsCount.filter(
-              (o) => o.optionText === post.options[i]
+              (o) => o.optionText === post.options[i],
             );
 
             arr.push((matchingOptions.length * 100) / totalVotes);
@@ -404,7 +404,7 @@ const likePost = async (req, res) => {
         { from: userID },
         {
           postId: postID,
-        }
+        },
       );
       return res.status(200).json({
         message: "Post unliked successfully!",
@@ -449,7 +449,7 @@ const getLikedPosts = async (req, res) => {
         const totalVotes = post.optionsCount.length;
 
         let hasAnswered = post.answeredBy.filter(
-          (entry) => entry.userAnswered.toString() === req.user
+          (entry) => entry.userAnswered.toString() === req.user,
         );
 
         if (hasAnswered.length > 0) {
@@ -457,7 +457,7 @@ const getLikedPosts = async (req, res) => {
 
           for (let i = 0; i < post.options.length; i++) {
             const matchingOptions = post.optionsCount.filter(
-              (o) => o.optionText === post.options[i]
+              (o) => o.optionText === post.options[i],
             );
 
             arr.push((matchingOptions.length * 100) / totalVotes);
@@ -518,7 +518,7 @@ const deletePost = async (req, res) => {
           } catch (error) {
             console.error(`Error deleting photo: ${photo}`, error);
           }
-        })
+        }),
       );
     }
 
@@ -599,7 +599,7 @@ const getProfilePost = async (req, res) => {
         const totalVotes = post.optionsCount.length;
 
         let hasAnswered = post.answeredBy.filter(
-          (entry) => entry.userAnswered.toString() === req.user
+          (entry) => entry.userAnswered.toString() === req.user,
         );
 
         if (hasAnswered.length > 0) {
@@ -607,7 +607,7 @@ const getProfilePost = async (req, res) => {
 
           for (let i = 0; i < post.options.length; i++) {
             const matchingOptions = post.optionsCount.filter(
-              (o) => o.optionText === post.options[i]
+              (o) => o.optionText === post.options[i],
             );
 
             arr.push((matchingOptions.length * 100) / totalVotes);
@@ -680,7 +680,7 @@ const getPolls = async (req, res) => {
         const totalVotes = post.optionsCount.length;
 
         let hasAnswered = post.answeredBy.filter(
-          (entry) => entry.userAnswered.toString() === req.user
+          (entry) => entry.userAnswered.toString() === req.user,
         );
 
         if (hasAnswered.length > 0) {
@@ -688,7 +688,7 @@ const getPolls = async (req, res) => {
 
           for (let i = 0; i < post.options.length; i++) {
             const matchingOptions = post.optionsCount.filter(
-              (o) => o.optionText === post.options[i]
+              (o) => o.optionText === post.options[i],
             );
 
             arr.push((matchingOptions.length * 100) / totalVotes);
@@ -757,7 +757,7 @@ const getPost = async (req, res) => {
       const totalVotes = posts[0].optionsCount.length;
 
       let hasAnswered = posts[0].answeredBy.filter(
-        (entry) => entry.userAnswered.toString() === req.user
+        (entry) => entry.userAnswered.toString() === req.user,
       );
 
       if (hasAnswered.length > 0) {
@@ -765,7 +765,7 @@ const getPost = async (req, res) => {
 
         for (let i = 0; i < posts[0].options.length; i++) {
           const matchingOptions = posts[0].optionsCount.filter(
-            (o) => o.optionText === posts[0].options[i]
+            (o) => o.optionText === posts[0].options[i],
           );
 
           arr.push((matchingOptions.length * 100) / totalVotes);

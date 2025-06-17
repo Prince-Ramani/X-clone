@@ -520,7 +520,7 @@ const CreatePostHome = memo(() => {
           {imagesPreview.length > 0 && (
             <div className="flex gap-3 mt-3 flex-wrap ">
               {imagesPreview.map((preview, index) => (
-                <div className="flex flex-col justify-center items-center gap-1">
+                <div className="flex flex-col justify-center items-center gap-1" key={index}>
                   <div key={index} className="relative w-24 h-24">
                     <img
                       src={preview}

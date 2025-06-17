@@ -32,7 +32,7 @@ const ProfilePost = memo(
       queryKey: [personUsername, "LikedPosts"],
       queryFn: async () => {
         const res = await fetch(
-          `/api/post/likedposts/${profileId}?limit=30&offset=${offset.current}`
+          `/api/post/likedposts/${profileId}?limit=30&offset=${offset.current}`,
         );
         const data: [] = await res.json();
 
@@ -40,19 +40,15 @@ const ProfilePost = memo(
 
         if (data.length < 30) setHasMore(false);
 
+        setTotalPosts((prev) => [...prev, ...data]);
+
+        offset.current = offset.current + data?.length;
+
         return data;
       },
       enabled: isAuthenticated && !!profileId,
       refetchOnWindowFocus: false,
     });
-
-    useEffect(() => {
-      if (data && "error" in data) return;
-      if (data) {
-        setTotalPosts((prev) => [...prev, ...data]);
-        offset.current = offset.current + data?.length;
-      }
-    }, [data]);
 
     const handleScroll = () => {
       if (
@@ -70,12 +66,19 @@ const ProfilePost = memo(
 
     useEffect(() => {
       setTotalPosts((prev) =>
-        prev.filter((p: PostType) => p._id !== DeletePostId)
+        prev.filter((p: PostType) => p._id !== DeletePostId),
       );
       setHasDeletedAnyPost(false);
       setDeletePostId(undefined);
       offset.current = offset.current === 0 ? 0 : offset.current - 1;
     }, [hasDeletedAnyPost, setHasDeletedAnyPost]);
+
+    useEffect(() => {
+      return () => {
+        setTotalPosts([]);
+        offset.current = 0;
+      };
+    }, []);
 
     return (
       <div className="min-h-fit relative bottom-10">
@@ -101,7 +104,7 @@ const ProfilePost = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default ProfilePost;
