@@ -23,11 +23,9 @@ const createPost = async (req, res) => {
       await Promise.all(
         req.files.uploadedPhoto.map(async (file) => {
           try {
-            console.log(file.path);
             const uploadRes = await cloudinary.uploader.upload(file.path, {
               folder: "X-clone/Posts",
             });
-            console.log(uploadRes);
             await unlink(file.path);
             uploadedImages.push(uploadRes.secure_url);
           } catch (err) {
@@ -269,7 +267,9 @@ const getPosts = async (req, res) => {
       .populate({
         path: "uploadedBy",
         select: "username profilePic accountType",
-      });
+        options: { lean: true },
+      })
+      .lean();
     const postss = posts.map((post) => {
       if (post.type === "poll") {
         const totalVotes = post.optionsCount.length;
@@ -352,19 +352,54 @@ const postOfFollowing = async (req, res) => {
       .populate({
         path: "uploadedBy",
         select: "-password",
+        options: { lean: true },
       })
       .lean();
-    if (!posts) {
-      return res.status(200).json([]);
-    }
+    const postss = posts.map((post) => {
+      if (post.type === "poll") {
+        const totalVotes = post.optionsCount.length;
 
-    const postss = posts.map((post) => ({
-      ...post,
-      comments: post.comments.length,
-    }));
+        let hasAnswered = post.answeredBy.filter(
+          (entry) => entry.userAnswered.toString() === req.user,
+        );
+
+        if (hasAnswered.length > 0) {
+          let arr = [];
+
+          for (let i = 0; i < post.options.length; i++) {
+            const matchingOptions = post.optionsCount.filter(
+              (o) => o.optionText === post.options[i],
+            );
+
+            arr.push((matchingOptions.length * 100) / totalVotes);
+          }
+
+          return {
+            ...post,
+            totalVotes,
+            arr,
+            comments: post.comments.length,
+            answeredBy: hasAnswered[0] || null,
+          };
+        }
+
+        return {
+          ...post,
+          totalVotes,
+          comments: post.comments.length,
+          answeredBy: hasAnswered[0] || null,
+        };
+      }
+
+      return {
+        ...post,
+        comments: post.comments.length,
+      };
+    });
 
     return res.status(200).json(postss);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: "Internal servere error" });
   }
 };

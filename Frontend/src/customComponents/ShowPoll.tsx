@@ -15,7 +15,7 @@ const ShowPoll = memo(
   }) => {
     const [hasAnswered, setHasAnswered] = useState(false);
     const [selectedOption, setSelectedOption] = useState<number | undefined>(
-      undefined
+      undefined,
     );
     const [isCollpased, setIsCollapsed] = useState<boolean>(false);
 
@@ -33,7 +33,6 @@ const ShowPoll = memo(
         setSelectedOption(answerNumber);
         setHasAnswered(true);
         post.arr = data.arr;
-        console.log(post.arr);
         return data;
       },
       onSuccess: (data) => {
@@ -43,7 +42,7 @@ const ShowPoll = memo(
     });
 
     const submitPollAnswer = (answerNumber: number) => {
-      if (hasAnswered) return toast.error("Aleardy answered!");
+      if (hasAnswered) return toast.error("Already answered!");
       answerPoll(answerNumber);
     };
 
@@ -67,8 +66,8 @@ const ShowPoll = memo(
           {pollResult
             ? pollResult.totalVotes
             : post.totalVotes
-            ? post.totalVotes
-            : 0}
+              ? post.totalVotes
+              : 0}
         </div>
         <div className="p-2 flex rounded-xl  ">
           <div className="flex flex-col gap-2 w-full">
@@ -172,7 +171,7 @@ const ShowPoll = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default ShowPoll;

@@ -32,13 +32,13 @@ const PostDisplayer = memo(
     const [totalNewComments, setTotalNewComments] = useState<number>(0);
 
     const [hasBookmarked, setHasBookmarked] = useState<boolean | undefined>(
-      post.bookmarkedBy?.includes(authUserId)
+      post.bookmarkedBy?.includes(authUserId),
     );
 
     const navigate = useNavigate();
     const [totalLikes, setTotalLikes] = useState(likes);
     const [hasUserLiked, setHasUserLiked] = useState<boolean>(
-      likes.includes(authUserId)
+      likes.includes(authUserId),
     );
 
     const { mutate } = useMutation({
@@ -163,8 +163,8 @@ const PostDisplayer = memo(
                       uploadedPhoto.length === 1
                         ? "h-fit"
                         : index === 2 && uploadedPhoto.length === 3
-                        ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
-                        : "h-40 sm:h-44  lg:h-48"
+                          ? "col-span-2 max-h-48 sm:max-h-56 md:max-h-52  lg:max-h-64 "
+                          : "h-40 sm:h-44  lg:h-48"
                     } overflow-hidden  flex justify-center `}
                     key={index + 1}
                   >
@@ -247,7 +247,7 @@ const PostDisplayer = memo(
                           //@ts-ignore
                           `${import.meta.env.VITE_BASE_URL}/profile/${
                             uploadedBy?.username
-                          }/post/${post?._id}`
+                          }/post/${post?._id}`,
                         )
                         .then(() => toast.success("URL copied!"))
                     }
@@ -261,7 +261,7 @@ const PostDisplayer = memo(
         </div>
       </>
     );
-  }
+  },
 );
 
 export default PostDisplayer;

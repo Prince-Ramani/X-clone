@@ -14,28 +14,11 @@ const Following = memo(
       queryKey: ["FollowingPosts"],
       queryFn: async () => {
         const res = await fetch(
-          `/api/post/followingposts?limit=30&offset=${offset}`
+          `/api/post/followingposts?limit=30&offset=${offset}`,
         );
         const data: [] = await res.json();
         if (data.length < 30) setHasMore(false);
-        return data;
-      },
-      refetchOnWindowFocus: false,
-    });
 
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop + 1 >=
-          document.documentElement.scrollHeight &&
-        hasMore &&
-        (!isPending || !isFetching || isLoading)
-      ) {
-        refetch();
-      }
-    };
-
-    useEffect(() => {
-      if (data) {
         const totalPostsID = new Set(totalPosts.map((p: PostType) => p._id));
 
         const FilteredPosts = data.filter((post: PostType) => {
@@ -53,21 +36,49 @@ const Following = memo(
 
         setTotalPosts((prev) => [...prev, ...FilteredPosts]);
         setOffset((prev) => prev + data.length);
+        return data;
+      },
+      refetchOnWindowFocus: false,
+      enabled: hasMore,
+    });
+
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 1 >=
+          document.documentElement.scrollHeight &&
+        hasMore &&
+        (!isPending || !isFetching || !isLoading)
+      ) {
+        refetch();
       }
-    }, [data]);
+    };
+
+    // useEffect(() => {
+    //   if (data) {
+    //     const totalPostsID = new Set(totalPosts.map((p: PostType) => p._id));
+
+    //     const FilteredPosts = data.filter((post: PostType) => {
+    //       return !totalPostsID.has(post._id);
+    //     });
+
+    //     for (let i = FilteredPosts.length - 1; i > 0; i--) {
+    //       const randomIndex = Math.floor(Math.random() * (i + 1));
+
+    //       [FilteredPosts[i], FilteredPosts[randomIndex]] = [
+    //         FilteredPosts[randomIndex],
+    //         FilteredPosts[i],
+    //       ];
+    //     }
+
+    //     setTotalPosts((prev) => [...prev, ...FilteredPosts]);
+    //     setOffset((prev) => prev + data.length);
+    //   }
+    // }, [data]);
 
     useEffect(() => {
       window.addEventListener("scroll", handleScroll);
       return () => window.removeEventListener("scroll", handleScroll);
     }, [hasMore, isFetching]);
-
-    useEffect(() => {
-      if (data) {
-        setOffset((prev) => prev + data.length);
-
-        setTotalPosts((prev) => [...prev, ...data]);
-      }
-    }, [data]);
 
     useEffect(() => {
       return () => {
@@ -91,7 +102,7 @@ const Following = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default Following;

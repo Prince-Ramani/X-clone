@@ -59,7 +59,11 @@ const Home = () => {
       <CreatePostHome />
 
       {isActive === "For you" ? (
-        <ForYou authUserId={authUser?._id} />
+        <ForYou
+          authUserId={authUser?._id}
+          snapChange={isActive}
+          setSnapChange={setIsActive}
+        />
       ) : (
         <Following authUserId={authUser?._id} />
       )}
