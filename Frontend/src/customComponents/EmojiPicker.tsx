@@ -9,12 +9,12 @@ const EmojiPicker = ({
 }) => {
   if (!isOpen) return null;
   return (
-    <div
+    <button
       className="absolute h-[300px] -left-[140px] sm:-left-0 z-10  w-fit overflow-y-scroll no-scrollbar top-10"
       onClick={(e) => e.stopPropagation()}
     >
       <Picker data={data} onEmojiSelect={onSelect} />
-    </div>
+    </button>
   );
 };
 

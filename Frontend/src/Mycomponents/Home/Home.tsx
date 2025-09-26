@@ -15,8 +15,8 @@ const Home = () => {
       {/* Top */}
 
       <div className="border-b border-gray-800 h-12  flex  justify-around items-center backdrop-blur-lg bg-black/70  sticky top-0 z-10  ">
-        <div
-          className="h-full w-1/2 text-center hover:bg-gray-700/30    "
+        <button
+          className="h-full w-1/2 text-center hover:bg-gray-700/30"
           onClick={() => setIsActive("For you")}
         >
           <div className="h-full flex flex-col justify-center items-center pt-3">
@@ -33,8 +33,8 @@ const Home = () => {
               }`}
             />
           </div>
-        </div>
-        <div
+        </button>
+        <button
           className="   h-full w-1/2 text-center hover:bg-gray-700/30 cursor-pointer"
           onClick={() => setIsActive("Following")}
         >
@@ -52,7 +52,7 @@ const Home = () => {
               }`}
             />
           </div>
-        </div>
+        </button>
       </div>
       {/* Posts */}
 

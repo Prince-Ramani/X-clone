@@ -3,38 +3,38 @@ const router = express.Router();
 const protectRoute = require("../middelwares/protectRoute");
 const { upload } = require("../Cloudinary/cloudinary");
 const {
-  createPost,
-  getPosts,
-  getProfilePost,
-  commentOnPost,
-  getPost,
-  postOfFollowing,
-  likePost,
-  getLikedPosts,
-  deletePost,
-  likeComment,
-  deleteComment,
-  createPoll,
-  submitPollAnswer,
-  getPollResult,
-  getPolls,
-  getPostsCount,
+    createPost,
+    getPosts,
+    getProfilePost,
+    commentOnPost,
+    getPost,
+    postOfFollowing,
+    likePost,
+    getLikedPosts,
+    deletePost,
+    likeComment,
+    deleteComment,
+    createPoll,
+    submitPollAnswer,
+    getPollResult,
+    getPolls,
+    getPostsCount,
 } = require("../controllers/postControllers");
 
 router.post(
-  "/createpost",
-  protectRoute,
-  upload.fields([
-    { name: "uploadedPhoto", maxCount: 4 },
-    { name: "uploadedVideo", maxCount: 1 },
-  ]),
-  createPost
+    "/createpost",
+    protectRoute,
+    upload.fields([
+        { name: "uploadedPhoto", maxCount: 4 },
+        { name: "uploadedVideo", maxCount: 1 },
+    ]),
+    createPost
 );
 router.post(
-  "/createpoll",
-  protectRoute,
-  upload.single("explanationImage"),
-  createPoll
+    "/createpoll",
+    protectRoute,
+    upload.single("explanationImage"),
+    createPoll
 );
 router.post("/answerpoll/:postID", protectRoute, submitPollAnswer);
 router.get("/getallpost", protectRoute, getPosts);

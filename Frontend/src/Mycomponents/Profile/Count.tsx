@@ -18,7 +18,7 @@ const Count = memo(
       queryKey: [personUsername, "followers"],
       queryFn: async () => {
         const res = await fetch(
-          `/api/getfollowersnumbers?username=${personUsername}`
+          `/api/getfollowersnumbers?username=${personUsername}`,
         );
         const data = await res.json();
 
@@ -37,7 +37,7 @@ const Count = memo(
           (item: string | object) =>
             typeof item === "object" &&
             item !== null &&
-            "pendingRequest" in item
+            "pendingRequest" in item,
         );
         if (hasObj) {
           setHasPendingRequest(true);
@@ -49,14 +49,14 @@ const Count = memo(
 
     return (
       <div className=" px-1 mt-2 flex  gap-4 text-sm">
-        <div
+        <button
           className="flex gap-1 hover:border-b"
           onClick={() => navigate(`/profile/${personUsername}/following`)}
         >
           <span className="font-bold">{followingLength || 0}</span>
           <span className="text-gray-400/70">Following</span>
-        </div>
-        <div
+        </button>
+        <button
           className="flex gap-1 hover:border-b"
           onClick={() => navigate(`/profile/${personUsername}/followers`)}
         >
@@ -64,14 +64,14 @@ const Count = memo(
             {followers && hasPendingRequest
               ? followers.length - 1
               : followers
-              ? followers.length
-              : 0}
+                ? followers.length
+                : 0}
           </span>
           <span className="text-gray-400/70">Followers</span>
-        </div>
+        </button>
       </div>
     );
-  }
+  },
 );
 
 export default Count;

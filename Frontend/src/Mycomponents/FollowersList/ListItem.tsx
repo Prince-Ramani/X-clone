@@ -121,7 +121,7 @@ const ListItem = ({
         ""
       )}
 
-      <div
+      <button
         className="flex gap-2 break-all active:bg-gray-500/20 p-2 py-4 "
         onClick={() => navigate(`/profile/${follower.username}`)}
       >
@@ -139,10 +139,7 @@ const ListItem = ({
           <div className="text-gray-400/70 tracking-tighter ">
             @{follower.username}
           </div>
-          <div className="text-sm pt-1 ">
-            {follower.bio ||
-              "HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"}
-          </div>
+          <div className="text-sm pt-1 ">{follower.bio}</div>
         </div>
         <div className="ml-auto pr-2 self-center">
           {!isUserHimself ? (
@@ -169,7 +166,7 @@ const ListItem = ({
             ""
           )}
         </div>
-      </div>
+      </button>
     </>
   );
 };

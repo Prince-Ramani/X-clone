@@ -33,7 +33,7 @@ const Profile = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const [currentPath, setCurrentPath] = useState<string | null | undefined>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const Profile = () => {
       if ("error" in profile || "isBlocked" in profile) return null;
 
       const res = await fetch(
-        `/api/post/getpostscount?personID=${profile._id}`
+        `/api/post/getpostscount?personID=${profile._id}`,
       );
       const data = await res.json();
 
@@ -117,12 +117,12 @@ const Profile = () => {
       )}
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-10 ">
         <CustomTooltip title="Back">
-          <div
+          <button
             className="h-fit w-fit p-2 hover:bg-gray-500/20 rounded-full"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="size-5 " />
-          </div>
+          </button>
         </CustomTooltip>
         <div className="flex flex-col ">
           <span className="font-bold text-lg tracking-wider">
@@ -253,9 +253,8 @@ const Profile = () => {
           </div>
         </>
       )}
-      {/* dcdc */}
       <div className="font-semibold relative bottom-12  text-sm  sm:text-base  tracking-wide flex border-b border-gray-800 text-gray-400/70 select-none    ">
-        <div
+        <button
           className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1 ${
             !currentPath ? "text-white font-bold" : ""
           }  `}
@@ -267,8 +266,8 @@ const Profile = () => {
               !currentPath ? "block" : "hidden"
             }`}
           />
-        </div>
-        <div
+        </button>
+        <button
           className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
             currentPath === "likedposts" ? "text-white font-bold" : ""
           }  `}
@@ -280,8 +279,8 @@ const Profile = () => {
               currentPath === "likedposts" ? "block" : "hidden"
             }`}
           />
-        </div>
-        <div
+        </button>
+        <button
           className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
             currentPath === "media" ? "text-white font-bold" : ""
           }  `}
@@ -293,8 +292,8 @@ const Profile = () => {
               currentPath === "media" ? "block" : "hidden"
             }`}
           />
-        </div>
-        <div
+        </button>
+        <button
           className={`w-1/3 hover:bg-white/20  flex flex-col justify-center items-center gap-1  ${
             currentPath === "polls" ? "text-white font-bold" : ""
           }  `}
@@ -306,7 +305,7 @@ const Profile = () => {
               currentPath === "polls" ? "block" : "hidden"
             }`}
           />
-        </div>
+        </button>
       </div>
 
       {currentPath === "likedposts" && profile && !("isBlocked" in profile) ? (

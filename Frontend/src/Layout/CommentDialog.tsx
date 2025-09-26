@@ -191,7 +191,7 @@ const CommentDialog = ({
               />
             </div>
             <div className="flex gap-1 p-2 items-center h-full  pb-0 border-t-2 border-gray-800/50 ">
-              <span
+              <button
                 className="rounded-full p-2 hover:bg-gray-800/70 relative cursor-pointer"
                 onClick={() => setIsEmojiOpen((prev) => !prev)}
               >
@@ -204,7 +204,7 @@ const CommentDialog = ({
                 ) : (
                   ""
                 )}
-              </span>
+              </button>
               <div
                 className={`ml-auto text-xs lg:size-8 size-5 md:size-6 md:text-sm flex justify-center items-center rounded-full ${
                   textareaValue && textareaValue.length >= 280

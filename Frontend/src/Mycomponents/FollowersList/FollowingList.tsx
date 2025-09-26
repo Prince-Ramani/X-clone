@@ -29,7 +29,7 @@ const FollowingList = () => {
     queryKey: [username, "Following"],
     queryFn: async () => {
       const res = await fetch(
-        `/api/getfollowingbyusername?username=${username}`
+        `/api/getfollowingbyusername?username=${username}`,
       );
       const data = await res.json();
       if ("error" in data) toast.error(data.error);
@@ -43,12 +43,12 @@ const FollowingList = () => {
     <div className="cursor-pointer min-h-full min-w-full border border-gray-800 border-b-0 border-t-0">
       <div className=" pb-1  px-4   flex  items-center backdrop-blur-lg bg-black/70  sticky top-0 gap-5 z-50 ">
         <CustomTooltip title="Back">
-          <div
+          <button
             className="h-fit w-fit p-2 hover:bg-gray-500/20 rounded-full"
             onClick={() => navigate(`/profile/${username}`)}
           >
             <ArrowLeft className="size-5 " />
-          </div>
+          </button>
         </CustomTooltip>
         <div className="flex flex-col ">
           {!!userExists ? (
@@ -66,7 +66,7 @@ const FollowingList = () => {
         </div>
       </div>
       <div className=" flex border-b border-gray-600/60 ">
-        <div
+        <button
           className="w-1/2 flex flex-col justify-between  items-center p-2   pb-0   hover:bg-gray-600/30  "
           onClick={() => navigate(`/profile/${userExists.username}/followers`)}
         >
@@ -74,13 +74,13 @@ const FollowingList = () => {
             <span className="text-gray-400/70">Followers</span>
             <div className="relative bottom-0 w-24 "></div>
           </div>
-        </div>
-        <div className="w-1/2 flex flex-col justify-between  items-center p-2 pb-0   hover:bg-gray-600/30 ">
+        </button>
+        <button className="w-1/2 flex flex-col justify-between  items-center p-2 pb-0   hover:bg-gray-600/30 ">
           <div className="flex justify-between items-center flex-col min-h-full gap-2">
             <span className="font-bold">Following</span>
             <div className=" relative bottom-0 w-24 rounded-full border-2 border-blue-400 "></div>
           </div>
-        </div>
+        </button>
       </div>
 
       <div className="flex flex-col  ">
@@ -90,7 +90,7 @@ const FollowingList = () => {
                 key={follower._id}
                 follower={follower}
                 isUserAlreadyFollowing={follower.followers.includes(
-                  authUser?._id
+                  authUser?._id,
                 )}
                 isUserHimself={follower._id === authUser?._id}
               />
